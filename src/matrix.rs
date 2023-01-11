@@ -1,0 +1,106 @@
+// #[derive(Debug, Clone)]
+// pub enum MatrixType {
+//     Symmetric,
+//     // Asymmetric
+// }
+
+#[derive(Debug)]
+pub struct Matrix {
+    i_size: Option<u32>,
+    j_size: Option<u32>,
+    v_size: Option<u32>,
+    // m_type: MatrixType,
+    pub i:Vec<u32>,
+    pub j:Vec<u32>,
+    pub v:Vec<f64>,
+}
+
+impl Matrix {
+    /* Position ZERO of each Vec is the size of the Vec */
+    pub fn new() -> Self {
+        Self {
+            i_size: None,
+            j_size: None,
+            v_size: None,
+            // m_type: m_type.clone(),
+            i: Vec::new(),
+            j: Vec::new(),
+            v: Vec::new(),
+        }
+    }
+
+    pub fn bandwidth(&self) -> u32 {
+        let mut bandwidth:u32 = 0;
+        for (i, j) in self.i.iter().zip(self.j.iter()) {
+            // println!("[{} - {}] = {}", *i, *j, i.abs_diff(*j));
+            if i.abs_diff(*j) > bandwidth {
+                bandwidth = i.abs_diff(*j);
+            }
+        }
+        bandwidth
+    }
+}
+
+pub fn read_matrix_market(filename: &str) -> Matrix {
+    use std::fs;
+    use std::io::{BufRead, BufReader};
+
+    let filename = "instances/".to_owned() + filename;
+    let file = fs::File::open(filename).unwrap();
+    let reader = BufReader::new(file);
+    let mut matrix = Matrix::new();
+    let mut header:bool = false;
+    
+    for line in reader.lines() {
+        let line = line.unwrap();
+        if line.starts_with("%") {
+            // dbg!("Executing query: {}", line);
+            // reader.lines().next();
+            continue;
+        }
+        // Header in format M, N, L
+        let mut text = line.splitn(3, ' ');
+        let i:&str = text.next().unwrap();
+        let j:&str = text.next().unwrap();
+        let v:&str = text.next().unwrap();
+        let i:u32 = i.parse().unwrap();
+        let j:u32 = j.parse().unwrap();
+        let v:f64 = v.parse().unwrap();
+        // println!("i:{}, j:{}, v:{}", i, j, v);
+        if !header {
+            matrix.i_size = Some(i);
+            matrix.j_size = Some(j);
+            matrix.v_size = Some(v as u32);
+            header = true;
+            continue;
+        }
+        matrix.i.push(i);
+        matrix.j.push(j);
+        matrix.v.push(v);
+    }
+    matrix
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn import_bw() {
+        let file = "test1.mtx";
+        let matrix = read_matrix_market(file);
+        assert_eq!(matrix.bandwidth(), 1);
+
+        let file = "apache2.mtx";
+        let matrix = read_matrix_market(file);
+        assert_eq!(matrix.bandwidth(), 65837);
+
+        let file = "c-26.mtx";
+        let matrix = read_matrix_market(file);
+        assert_eq!(matrix.bandwidth(), 4204);
+
+        let file = "lp_nug05.mtx";
+        let matrix = read_matrix_market(file);
+        assert_eq!(matrix.bandwidth(), 205);
+    }
+}
