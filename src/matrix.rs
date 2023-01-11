@@ -16,7 +16,6 @@ pub struct Matrix {
 }
 
 impl Matrix {
-    /* Position ZERO of each Vec is the size of the Vec */
     pub fn new() -> Self {
         Self {
             i_size: None,
@@ -62,21 +61,23 @@ pub fn read_matrix_market(filename: &str) -> Matrix {
         let mut text = line.splitn(3, ' ');
         let i:&str = text.next().unwrap();
         let j:&str = text.next().unwrap();
-        let v:&str = text.next().unwrap();
         let i:u32 = i.parse().unwrap();
         let j:u32 = j.parse().unwrap();
-        let v:f64 = v.parse().unwrap();
-        // println!("i:{}, j:{}, v:{}", i, j, v);
-        if !header {
-            matrix.i_size = Some(i);
-            matrix.j_size = Some(j);
-            matrix.v_size = Some(v as u32);
-            header = true;
-            continue;
+        let v:f64;
+        if let Some(v2) = text.next() {
+            v = v2.parse().unwrap();
+            // println!("i:{}, j:{}, v:{}", i, j, v);
+            if !header {
+                matrix.i_size = Some(i);
+                matrix.j_size = Some(j);
+                matrix.v_size = Some(v as u32);
+                header = true;
+                continue;
+            }
+            matrix.v.push(v);
         }
         matrix.i.push(i);
         matrix.j.push(j);
-        matrix.v.push(v);
     }
     matrix
 }
@@ -105,18 +106,18 @@ mod tests {
 
         let file = "divorce.mtx";
         let matrix = read_matrix_market(file);
-        assert_eq!(matrix.bandwidth(), 205);
+        assert_eq!(matrix.bandwidth(), 49);
 
         let file = "mycielskian4.mtx";
         let matrix = read_matrix_market(file);
-        assert_eq!(matrix.bandwidth(), 205);
+        assert_eq!(matrix.bandwidth(), 8);
 
         let file = "ch3-3-b1.mtx";
         let matrix = read_matrix_market(file);
-        assert_eq!(matrix.bandwidth(), 205);
+        assert_eq!(matrix.bandwidth(), 17);
 
         let file = "mycielskian3.mtx";
         let matrix = read_matrix_market(file);
-        assert_eq!(matrix.bandwidth(), 205);
+        assert_eq!(matrix.bandwidth(), 3);
     }
 }
