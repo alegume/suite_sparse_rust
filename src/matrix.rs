@@ -6,10 +6,10 @@
 
 #[derive(Debug)]
 pub struct Matrix {
-    i_size: Option<u32>,
-    j_size: Option<u32>,
-    v_size: Option<u32>,
-    // m_type: MatrixType,
+    pub i_size: Option<u32>,
+    pub j_size: Option<u32>,
+    pub v_size: Option<u32>,
+    //pub  m_type: MatrixType,
     pub i:Vec<u32>,
     pub j:Vec<u32>,
     pub v:Vec<f64>,
@@ -22,9 +22,9 @@ impl Matrix {
             j_size: None,
             v_size: None,
             // m_type: m_type.clone(),
-            i: Vec::new(),
-            j: Vec::new(),
-            v: Vec::new(),
+            i: Vec::with_capacity(218_000),
+            j: Vec::with_capacity(218_000),
+            v: Vec::with_capacity(5_999_999),
         }
     }
 
