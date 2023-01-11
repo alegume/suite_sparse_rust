@@ -91,15 +91,31 @@ mod tests {
         let matrix = read_matrix_market(file);
         assert_eq!(matrix.bandwidth(), 1);
 
-        let file = "apache2.mtx";
+        let file = "cage3.mtx";
         let matrix = read_matrix_market(file);
-        assert_eq!(matrix.bandwidth(), 65837);
+        assert_eq!(matrix.bandwidth(), 4);
 
         let file = "c-26.mtx";
         let matrix = read_matrix_market(file);
         assert_eq!(matrix.bandwidth(), 4204);
 
         let file = "lp_nug05.mtx";
+        let matrix = read_matrix_market(file);
+        assert_eq!(matrix.bandwidth(), 205);
+
+        let file = "divorce.mtx";
+        let matrix = read_matrix_market(file);
+        assert_eq!(matrix.bandwidth(), 205);
+
+        let file = "mycielskian4.mtx";
+        let matrix = read_matrix_market(file);
+        assert_eq!(matrix.bandwidth(), 205);
+
+        let file = "ch3-3-b1.mtx";
+        let matrix = read_matrix_market(file);
+        assert_eq!(matrix.bandwidth(), 205);
+
+        let file = "mycielskian3.mtx";
         let matrix = read_matrix_market(file);
         assert_eq!(matrix.bandwidth(), 205);
     }
