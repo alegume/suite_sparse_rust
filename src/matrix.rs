@@ -52,30 +52,29 @@ pub fn read_matrix_market(filename: &str) -> Matrix {
     
     for line in reader.lines() {
         let line = line.unwrap();
-        if line.starts_with("%") {
-            // dbg!("Executing query: {}", line);
-            // reader.lines().next();
-            continue;
-        }
+        if line.starts_with("%") { continue; }
         // Header in format M, N, L
         let mut text = line.splitn(3, ' ');
-        let i:&str = text.next().unwrap();
-        let j:&str = text.next().unwrap();
+        let i:&str = text.next().unwrap().trim();
+        let j:&str = text.next().unwrap().trim();
         let i:u32 = i.parse().unwrap();
         let j:u32 = j.parse().unwrap();
-        let v:f64;
-        if let Some(v2) = text.next() {
-            v = v2.parse().unwrap();
-            // println!("i:{}, j:{}, v:{}", i, j, v);
+        // println!("i:{}, j:{}", i, j);
+        if let Some(v) = text.next() {
             if !header {
+                let v:u32 = v.trim().parse().unwrap();
                 matrix.i_size = Some(i);
                 matrix.j_size = Some(j);
-                matrix.v_size = Some(v as u32);
+                matrix.v_size = Some(v);
                 header = true;
                 continue;
             }
-            matrix.v.push(v);
+            if let Ok(v) = v.trim().parse() {
+                matrix.v.push(v);
+                // println!("i:{}, j:{}, v:{}", i, j, v);
+            } else { panic!("Can't catch v value ({v});"); }
         }
+        // assert!(false);
         matrix.i.push(i);
         matrix.j.push(j);
     }
@@ -88,36 +87,51 @@ mod tests {
     use super::*;
     #[test]
     fn import_bw() {
+        /* Stress tests  */
+        // let file = "apache2.mtx";
+        // let matrix = read_matrix_market(file);
+        // assert_eq!(matrix.bandwidth(), 65837);
+        // let file = "pwtk.mtx";
+        // let matrix = read_matrix_market(file);
+        // assert_eq!(matrix.bandwidth(), 189331);
+
         let file = "test1.mtx";
         let matrix = read_matrix_market(file);
         assert_eq!(matrix.bandwidth(), 1);
 
-        let file = "cage3.mtx";
+        let file = "bcspwr01.mtx";
         let matrix = read_matrix_market(file);
-        assert_eq!(matrix.bandwidth(), 4);
+        assert_eq!(matrix.bandwidth(), 38);
+        // CMr 8
 
-        let file = "c-26.mtx";
+        let file = "lns__131.mtx";
         let matrix = read_matrix_market(file);
-        assert_eq!(matrix.bandwidth(), 4204);
+        assert_eq!(matrix.bandwidth(), 111);
+        // CMr 39
 
-        let file = "lp_nug05.mtx";
+        let file = "mcca.mtx";
         let matrix = read_matrix_market(file);
-        assert_eq!(matrix.bandwidth(), 205);
+        assert_eq!(matrix.bandwidth(), 65);
+        // CMr 3
 
-        let file = "divorce.mtx";
+        let file = "will199.mtx";
         let matrix = read_matrix_market(file);
-        assert_eq!(matrix.bandwidth(), 49);
+        assert_eq!(matrix.bandwidth(), 169);
+        // CMr 115
 
-        let file = "mycielskian4.mtx";
+        let file = "662_bus.mtx";
         let matrix = read_matrix_market(file);
-        assert_eq!(matrix.bandwidth(), 8);
+        assert_eq!(matrix.bandwidth(), 335);
+        // CMr 112
 
-        let file = "ch3-3-b1.mtx";
+        let file = "dwt__361.mtx";
         let matrix = read_matrix_market(file);
-        assert_eq!(matrix.bandwidth(), 17);
+        assert_eq!(matrix.bandwidth(), 50);
+        // CMr 25
 
-        let file = "mycielskian3.mtx";
+        let file = "sherman4.mtx";
         let matrix = read_matrix_market(file);
-        assert_eq!(matrix.bandwidth(), 3);
+        assert_eq!(matrix.bandwidth(), 368);
+        // CMr 0??
     }
 }
