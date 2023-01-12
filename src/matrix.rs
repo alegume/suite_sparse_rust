@@ -46,14 +46,21 @@ impl Matrix {
         // push_back to add to the queue, and pop_front to remove from the queue.
         use std::collections::VecDeque;
         let mut visiteds: Vec<u32> = Vec::new();
-        let mut v_list: VecDeque<u32> = VecDeque::from([self.j[0]]);
-        for v in v_list {
-            println!("v:{:?}", v);
-            if visiteds.contains(&v) { println!("Contain={v}");continue; }
-            for j in &self.j {
-                println!("{j}");
+        let mut to_visit: VecDeque<u32> = VecDeque::from([self.j[0]]);
+        loop {
+            let v = to_visit.pop_front();
+            match v {
+                Some(v) => {
+                    if !visiteds.contains(&v) { 
+                        for j in &self.j { // TODO: optimize storing the index of Vec and beginig in it
+                            // Search for elements that are neighbour and have not been visited yet in order of degree
+                            println!("{j}");
+                            visiteds.push(v);
+                        }
+                    } else { println!{"visited = {v}"}; continue; }
+                },
+                None => { println!{"\tEnd of queue"}; break },
             }
-            visiteds.push(v);
         }
     }
 }
