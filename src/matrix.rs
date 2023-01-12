@@ -16,15 +16,18 @@ pub struct Matrix {
 }
 
 impl Matrix {
+    /* MNL type of matrix oriented/ordered in regard of N () 
+        Yale format ?? 
+    */
     pub fn new() -> Self {
         Self {
             i_size: None,
             j_size: None,
             v_size: None,
             // m_type: m_type.clone(),
-            i: Vec::with_capacity(218_000),
-            j: Vec::with_capacity(218_000),
-            v: Vec::with_capacity(5_999_999),
+            i: Vec::new(),
+            j: Vec::new(),
+            v: Vec::new(),
         }
     }
 
@@ -37,6 +40,21 @@ impl Matrix {
             }
         }
         bandwidth
+    }
+
+    pub fn cmr(&self) {
+        // push_back to add to the queue, and pop_front to remove from the queue.
+        use std::collections::VecDeque;
+        let mut visiteds: Vec<u32> = Vec::new();
+        let mut v_list: VecDeque<u32> = VecDeque::from([self.j[0]]);
+        for v in v_list {
+            println!("v:{:?}", v);
+            if visiteds.contains(&v) { println!("Contain={v}");continue; }
+            for j in &self.j {
+                println!("{j}");
+            }
+            visiteds.push(v);
+        }
     }
 }
 
