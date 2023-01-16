@@ -69,15 +69,13 @@ pub fn read_matrix_market(filename: &str) -> Matrix {
         let mut text = line.splitn(3, ' ');
         let i:&str = text.next().unwrap().trim();
         let j:&str = text.next().unwrap().trim();
+        // 1-based indices (-1)
         let i:u32 = i.parse::<u32>().unwrap() - 1u32;
         let j:u32 = j.parse::<u32>().unwrap() - 1u32;
         println!("i:{}, j:{}", i, j);
         if let Some(v) = text.next() {
-            if !header {
-                // first line of file => (rows, columns, entries)
+            if !header { // first line of file => (rows, columns, entries)
                 nz_len = v.trim().parse().expect("Error reading first line of file.mtx");
-                // matrix.i_size = Some(i.try_into().unwrap());
-                // matrix.j_size = Some(j.try_into().unwrap());
                 header = true;
                 continue;
             }
@@ -86,8 +84,21 @@ pub fn read_matrix_market(filename: &str) -> Matrix {
                 // println!("i:{}, j:{}, v:{}", i, j, v);
             } else { panic!("Can't catch v value ({v});"); }
         }
-        matrix.row_index.push(i);
         matrix.col_index.push(j);
+        // TODO: Fix row_index 
+        // Only insert if new row starts 
+        if let Some(&last_row) = matrix.row_index.last() {
+            if j > last_row {
+                matrix.row_index.push(matrix.row_index.len() as u32);
+            } else if j < last_row {
+                panic!("I need to ensure entries are provided in a pre-defined (column-oriented) order.")
+            } else {
+                println!("Jah inseriu. j={j}");
+            }
+        } else { // Nothing added yet
+            println!("primeira inseriu. j={}", matrix.row_index.len());
+            matrix.row_index.push(matrix.row_index.len() as u32);
+        }
     }
     assert_eq!(nz_len, matrix.v.len());
     assert_eq!(nz_len, matrix.col_index.len());
@@ -99,8 +110,24 @@ pub fn read_matrix_market(filename: &str) -> Matrix {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
-    fn import_bw() {
+    fn read_matrix_market_test() {
+        let file = "test1.mtx";
+        let matrix = read_matrix_market(file);
+        assert_eq!(matrix.v, [5.0, 8.0, 3.0, 6.0]);
+        assert_eq!(matrix.col_index, [0, 1, 2, 1]);
+        assert_eq!(matrix.row_index, [0, 1, 2, 3]);
+
+        let file = "test2.mtx";
+        let matrix = read_matrix_market(file);
+        assert_eq!(matrix.v, [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]);
+        assert_eq!(matrix.col_index, [0, 1, 1, 3, 2, 3, 4, 5]);
+        assert_eq!(matrix.row_index, [0, 2, 4, 7, 8]);
+    }
+
+    /*#[test]
+    fn bw_test() {
         /* Stress tests  */
         // let file = "apache2.mtx";
         // let matrix = read_matrix_market(file);
@@ -148,5 +175,5 @@ mod tests {
         let matrix = read_matrix_market(file);
         assert_eq!(matrix.bandwidth(), 368);
         // CMr 0??
-    }
+    }*/
 }

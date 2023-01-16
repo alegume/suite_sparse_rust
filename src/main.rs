@@ -9,7 +9,8 @@ fn main() {
     let now = Instant::now();
     // let file = "pwtk.mtx";
     // let file = "lp_nug05.mtx";
-    let file = "test1.mtx";
+    // let file = "test1.mtx";
+    let file = "test2.mtx";
     // let file = "apache2.mtx";
     // let file = "lns__131.mtx";
     let matrix = matrix_csr::read_matrix_market(file);
