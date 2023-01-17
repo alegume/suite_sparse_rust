@@ -13,8 +13,8 @@ fn main() {
     let file = "test2.mtx";
     // let file = "apache2.mtx";
     // let file = "lns__131.mtx";
-    // let coordinates = matrix_csr::read_matrix_market(file);
-    // println!("coordinates:{:?}", coordinates);
+    let coordinates = matrix_csr::read_matrix_market_file(file);
+    println!("coordinates:{:?}", coordinates);
     // println!("matrix:{:?}", matrix);
     // println!("|row_i|: {:?}; |col_i|:{:?}", matrix.row_index.len(), matrix.col_index.len());
     // println!("BW: {}", matrix.bandwidth());
