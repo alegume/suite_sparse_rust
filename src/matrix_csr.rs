@@ -15,11 +15,11 @@ pub struct Element {
 }
 
 impl Matrix {
-    pub fn new() -> Self {
+    pub fn new(v_size:usize, row_size:usize, col_size:usize) -> Self {
         Self {
-            v: Vec::new(),
-            col_index: Vec::new(),
-            row_index: Vec::new(),
+            v: Vec::with_capacity(v_size),
+            row_index: Vec::with_capacity(row_size),
+            col_index: Vec::with_capacity(col_size),
         }
     }
 
@@ -59,11 +59,10 @@ impl Matrix {
 
 
 pub fn mm_file_to_csr(coordinates: Vec<Element>) -> Matrix {
-    let mut matrix = Matrix::new();
+    let mut matrix = Matrix::new(coordinates.len(), coordinates.len(),coordinates.len());
 
     matrix
 }
-
 
 pub fn read_matrix_market_file(filename: &str) -> Vec<Element> {
     // Indices are 1-based, i.e. A(1,1) is the first element.
@@ -130,10 +129,18 @@ pub fn read_matrix_market_file(filename: &str) -> Vec<Element> {
 }
 
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn mm_file_to_csr_test() {
+        let file = "test1.mtx";
+        let coordinates = read_matrix_market_file(file);
+        println!("{:?}", coordinates);
+        let matrix = mm_file_to_csr(coordinates);
+        println!("{:?}", matrix);
+    }
 
     #[test]
     fn read_matrix_market_file_test() {
