@@ -130,6 +130,7 @@ pub fn read_matrix_market_file(filename: &str) -> Vec<Element> {
 }
 
 
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -138,7 +139,6 @@ mod tests {
     fn read_matrix_market_file_test() {
         let file = "test1.mtx";
         let coordinates = read_matrix_market_file(file);
-        println!("coordinates:{:?}", coordinates);
         let coo = vec![
             Element{
                 v: Some(5.0),
@@ -162,9 +162,61 @@ mod tests {
             },
         ];
         let mut it = coordinates.iter();
-        for el in coo.into_iter() {
-            assert_eq!(Some(&el), it.next());
+        for el in coo.iter() {
+            assert_eq!(Some(el), it.next());
         }
+        assert_eq!(coordinates.len(), coo.len());
+
+        let file = "test2.mtx";
+        let coordinates = read_matrix_market_file(file);
+        println!("coordinates:{:?}", coordinates);
+        let coo = vec![
+            Element{
+                v: Some(10.0),
+                i: 0,
+                j: 0,
+            },
+            Element{
+                v: Some(20.0),
+                i: 0,
+                j: 1,
+            },
+            Element{
+                v: Some(30.0),
+                i: 1,
+                j: 1,
+            },
+            Element{
+                v: Some(40.0),
+                i: 1,
+                j: 3,
+            },
+            Element{
+                v: Some(50.0),
+                i: 2,
+                j: 2,
+            },
+            Element{
+                v: Some(60.0),
+                i: 2,
+                j: 3,
+            },
+            Element{
+                v: Some(70.0),
+                i: 2,
+                j: 4,
+            },
+            Element{
+                v: Some(80.0),
+                i: 3,
+                j: 5,
+            },
+        ];
+        let mut it = coordinates.iter();
+        for el in coo.iter() {
+            assert_eq!(Some(el), it.next());
+        }
+        assert_eq!(coordinates.len(), coo.len());
     }
 
     // #[test]
