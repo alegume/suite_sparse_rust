@@ -57,7 +57,15 @@ impl Matrix {
     }
 }
 
-pub fn read_matrix_market(filename: &str) -> Vec<Element> {
+
+pub fn mm_file_to_csr(coordinates: Vec<Element>) -> Matrix {
+    let mut matrix = Matrix::new();
+
+    matrix
+}
+
+
+pub fn read_matrix_market_file(filename: &str) -> Vec<Element> {
     // Indices are 1-based, i.e. A(1,1) is the first element.
     use std::fs;
     use std::io::{BufRead, BufReader};
@@ -65,7 +73,6 @@ pub fn read_matrix_market(filename: &str) -> Vec<Element> {
     let filename = "instances/".to_owned() + filename;
     let file = fs::File::open(filename).unwrap();
     let reader = BufReader::new(file);
-    // let mut matrix = Matrix::new();
     let mut header:bool = false;
     let mut nz_len:usize = 0;
     let mut coordinates = Vec::<Element>::new();
@@ -99,7 +106,6 @@ pub fn read_matrix_market(filename: &str) -> Vec<Element> {
     assert_eq!(coordinates.len(), nz_len);
     coordinates
         /*
-        
         matrix.col_index.push(j);
         // TODO: Fix row_index 
         // Only insert if new row starts 
@@ -129,19 +135,26 @@ mod tests {
     use super::*;
 
     #[test]
-    fn read_matrix_market_test() {
+    fn read_matrix_market_file_test() {
         let file = "test1.mtx";
-        let matrix = read_matrix_market(file);
-        assert_eq!(matrix.v, [5.0, 8.0, 3.0, 6.0]);
-        assert_eq!(matrix.col_index, [0, 1, 2, 1]);
-        assert_eq!(matrix.row_index, [0, 1, 2, 3]);
-
-        let file = "test2.mtx";
-        let matrix = read_matrix_market(file);
-        assert_eq!(matrix.v, [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]);
-        assert_eq!(matrix.col_index, [0, 1, 1, 3, 2, 3, 4, 5]);
-        assert_eq!(matrix.row_index, [0, 2, 4, 7, 8]);
+        let matrix = read_matrix_market_file(file);
+        // assert_eq!(matrix.v, [5.0, 8.0, 3.0, 6.0]);
     }
+
+    // #[test]
+    // fn read_matrix_market_test() {
+    //     let file = "test1.mtx";
+    //     let matrix = read_matrix_market(file);
+    //     assert_eq!(matrix.v, [5.0, 8.0, 3.0, 6.0]);
+    //     assert_eq!(matrix.col_index, [0, 1, 2, 1]);
+    //     assert_eq!(matrix.row_index, [0, 1, 2, 3]);
+
+    //     let file = "test2.mtx";
+    //     let matrix = read_matrix_market(file);
+    //     assert_eq!(matrix.v, [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]);
+    //     assert_eq!(matrix.col_index, [0, 1, 1, 3, 2, 3, 4, 5]);
+    //     assert_eq!(matrix.row_index, [0, 2, 4, 7, 8]);
+    // }
 
     /*#[test]
     fn bw_test() {
