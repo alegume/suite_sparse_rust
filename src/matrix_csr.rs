@@ -59,7 +59,26 @@ impl Matrix {
 
 
 pub fn mm_file_to_csr(coordinates: Vec<Element>) -> Matrix {
-    let mut matrix = Matrix::new(coordinates.len(), coordinates.len(),coordinates.len());
+    let len_v: usize;
+    if let Some(_) = coordinates[0].v {
+        len_v = coordinates.len();
+    } else { len_v = 0}
+    let mut matrix = Matrix::new(len_v, coordinates.len(),coordinates.len());
+    let mut last_row: u32 = 0;
+
+    // TODO: sort in regard of i
+
+    // row_index always starts the first line
+    matrix.row_index.push(coordinates[0].i);
+    for el in coordinates {
+        // println!("{:?}", el);
+        if let Some(v) = el.v { matrix.v.push(v); }
+        matrix.col_index.push(el.j);
+        if el.j > last_row {
+            last_row = el.j;
+            matrix.row_index.push(last_row);
+        }
+    } 
 
     matrix
 }
@@ -94,12 +113,19 @@ pub fn read_matrix_market_file(filename: &str) -> Vec<Element> {
             if let Ok(v) = v.trim().parse() {
                 // 1-based indices (-1)
                 let el = Element{
-                i: i.parse::<u32>().unwrap() - 1u32,
-                j: j.parse::<u32>().unwrap() - 1u32,
-                v: Some(v),
+                    i: i.parse::<u32>().unwrap() - 1u32,
+                    j: j.parse::<u32>().unwrap() - 1u32,
+                    v: Some(v),
                 };
                 coordinates.push(el);
             } else { panic!("Can't catch v value ({v});"); }
+        } else { // Coordinate matrix only (don't have V's)
+            let el = Element{
+                i: i.parse::<u32>().unwrap() - 1u32,
+                j: j.parse::<u32>().unwrap() - 1u32,
+                v: None,
+            };
+            coordinates.push(el);
         }
     }
     assert_eq!(coordinates.len(), nz_len);
