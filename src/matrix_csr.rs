@@ -7,6 +7,13 @@ pub struct Matrix {
     pub row_index:Vec<u32>, // indices (in v and row_index) where the rows starts
 }
 
+#[derive(Debug)]
+pub struct Element {
+    v: Option<f64>,
+    i: u32,
+    j: u32,
+}
+
 impl Matrix {
     pub fn new() -> Self {
         Self {
@@ -50,7 +57,7 @@ impl Matrix {
     }
 }
 
-pub fn read_matrix_market(filename: &str) -> Matrix {
+pub fn read_matrix_market(filename: &str) -> Vec<Element> {
     // Indices are 1-based, i.e. A(1,1) is the first element.
     use std::fs;
     use std::io::{BufRead, BufReader};
@@ -58,21 +65,20 @@ pub fn read_matrix_market(filename: &str) -> Matrix {
     let filename = "instances/".to_owned() + filename;
     let file = fs::File::open(filename).unwrap();
     let reader = BufReader::new(file);
-    let mut matrix = Matrix::new();
+    // let mut matrix = Matrix::new();
     let mut header:bool = false;
     let mut nz_len:usize = 0;
+    let mut coordinates = Vec::<Element>::new();
     
     for line in reader.lines() {
         // Format => I1  J1  M(I1, J1)
         let line = line.unwrap();
         if line.starts_with("%") { continue; }
         let mut text = line.splitn(3, ' ');
+    
         let i:&str = text.next().unwrap().trim();
         let j:&str = text.next().unwrap().trim();
-        // 1-based indices (-1)
-        let i:u32 = i.parse::<u32>().unwrap() - 1u32;
-        let j:u32 = j.parse::<u32>().unwrap() - 1u32;
-        println!("i:{}, j:{}", i, j);
+        // Reading V
         if let Some(v) = text.next() {
             if !header { // first line of file => (rows, columns, entries)
                 nz_len = v.trim().parse().expect("Error reading first line of file.mtx");
@@ -80,10 +86,20 @@ pub fn read_matrix_market(filename: &str) -> Matrix {
                 continue;
             }
             if let Ok(v) = v.trim().parse() {
-                matrix.v.push(v);
-                // println!("i:{}, j:{}, v:{}", i, j, v);
+                // 1-based indices (-1)
+                let el = Element{
+                i: i.parse::<u32>().unwrap() - 1u32,
+                j: j.parse::<u32>().unwrap() - 1u32,
+                v: Some(v),
+                };
+                coordinates.push(el);
             } else { panic!("Can't catch v value ({v});"); }
         }
+    }
+    assert_eq!(coordinates.len(), nz_len);
+    coordinates
+        /*
+        
         matrix.col_index.push(j);
         // TODO: Fix row_index 
         // Only insert if new row starts 
@@ -104,6 +120,7 @@ pub fn read_matrix_market(filename: &str) -> Matrix {
     assert_eq!(nz_len, matrix.col_index.len());
     // assert_eq!(matrix.j_size.unwrap(), matrix.j.len());
     matrix
+    */
 }
 
 

@@ -1,4 +1,4 @@
-#[allow(dead_code)]
+#![allow(dead_code)]
 use std::time::{Instant};
 // use std::time::{Duration};
 // use std::thread::sleep;
@@ -13,10 +13,11 @@ fn main() {
     let file = "test2.mtx";
     // let file = "apache2.mtx";
     // let file = "lns__131.mtx";
-    let matrix = matrix_csr::read_matrix_market(file);
-    println!("matrix:{:?}", matrix);
-    println!("|row_i|: {:?}; |col_i|:{:?}", matrix.row_index.len(), matrix.col_index.len());
-    println!("BW: {}", matrix.bandwidth());
+    let coordinates = matrix_csr::read_matrix_market(file);
+    println!("coordinates:{:?}", coordinates);
+    // println!("matrix:{:?}", matrix);
+    // println!("|row_i|: {:?}; |col_i|:{:?}", matrix.row_index.len(), matrix.col_index.len());
+    // println!("BW: {}", matrix.bandwidth());
     // matrix.cmr();
     // println!("BW: {}", matrix.bandwidth());
     println!("time = {}ms", now.elapsed().as_millis());
