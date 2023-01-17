@@ -7,7 +7,7 @@ pub struct Matrix {
     pub row_index:Vec<u32>, // indices (in v and row_index) where the rows starts
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Element {
     v: Option<f64>,
     i: u32,
@@ -137,8 +137,34 @@ mod tests {
     #[test]
     fn read_matrix_market_file_test() {
         let file = "test1.mtx";
-        let matrix = read_matrix_market_file(file);
-        // assert_eq!(matrix.v, [5.0, 8.0, 3.0, 6.0]);
+        let coordinates = read_matrix_market_file(file);
+        println!("coordinates:{:?}", coordinates);
+        let coo = vec![
+            Element{
+                v: Some(5.0),
+                i: 0,
+                j: 0,
+            },
+            Element{
+                v: Some(8.0),
+                i: 1,
+                j: 1,
+            },
+            Element{
+                v: Some(3.0),
+                i: 2,
+                j: 2,
+            },
+            Element{
+                v: Some(6.0),
+                i: 3,
+                j: 1,
+            },
+        ];
+        let mut it = coordinates.iter();
+        for el in coo.into_iter() {
+            assert_eq!(Some(&el), it.next());
+        }
     }
 
     // #[test]
