@@ -170,6 +170,13 @@ mod tests {
         assert_eq!(matrix.v, [5.0, 8.0, 3.0, 6.0]);
         assert_eq!(matrix.col_index, [0, 1, 2, 1]);
         assert_eq!(matrix.row_index, [0, 1, 2, 3]);
+
+        let file = "test2.mtx";
+        let coordinates = read_matrix_market_file(file);
+        let matrix = mm_file_to_csr(coordinates);
+        assert_eq!(matrix.v, [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]);
+        assert_eq!(matrix.col_index, [0, 1, 1, 3, 2, 3, 4, 5]);
+        assert_eq!(matrix.row_index, [0, 2, 4, 7, 8]);
     }
 
     #[test]
