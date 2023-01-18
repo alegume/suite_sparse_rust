@@ -27,17 +27,17 @@ impl Matrix {
         let mut bandwidth:usize = 0;
         let mut row: usize = 0;
 
-        // TODO: revisar o ultimo elemento de row_index
-        while row < self.col_index.len() {
-            // let row = *i as usize;
+        while row < self.row_index.len() - 1 {
             let start = self.row_index[row] as usize;
             let stop = self.row_index[row + 1] as usize;
-            let row_slc = &self.col_index[start..stop];
-            println!("{:?}", row_slc);
-            for j in row_slc {
-                println!("{row} {j}");
-                if row.abs_diff(*j as usize) > bandwidth {
+            let col_slc = &self.col_index[start..stop];
+            println!("{:?}", col_slc);
+            println!("slc[{start}..{stop}]");
+            for j in col_slc {
+                println!("{row} -> {j}");
+                if start.abs_diff(*j as usize) > bandwidth {
                     bandwidth = row.abs_diff(*j as usize);
+                    println!("banda:{bandwidth}");
                 }
             }
             row += 1;
@@ -90,8 +90,9 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
     // println!("depois {:?}", coordinates);
 
     // row_index always starts the first line
+    // TODO: REvisar
     matrix.row_index.push(coordinates[0].i);
-    for el in coordinates {
+    for el in &coordinates {
         if let Some(v) = el.v { matrix.v.push(v); }
         matrix.col_index.push(el.j);
         if el.i > last_row {
@@ -100,6 +101,8 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
             matrix.row_index.push(matrix.col_index.len() as u32 - 1u32);
         }
     } 
+    //he last element is NNZ , i.e., the fictitious index in V immediately after the last valid index NNZ - 1
+    matrix.row_index.push(coordinates.len() as u32);
 
     matrix
 }
@@ -186,13 +189,13 @@ mod tests {
         let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.v, [5.0, 8.0, 3.0, 6.0]);
         assert_eq!(matrix.col_index, [0, 1, 2, 1]);
-        assert_eq!(matrix.row_index, [0, 1, 2, 3]);
+        assert_eq!(matrix.row_index, [0, 1, 2, 3, 4]);
 
         let file = "test2.mtx";
         let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.v, [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]);
         assert_eq!(matrix.col_index, [0, 1, 1, 3, 2, 3, 4, 5]);
-        assert_eq!(matrix.row_index, [0, 2, 4, 7]);
+        assert_eq!(matrix.row_index, [0, 2, 4, 7, 8]);
     }
 
     #[test]
