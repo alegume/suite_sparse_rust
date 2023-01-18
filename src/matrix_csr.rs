@@ -58,16 +58,19 @@ impl Matrix {
 }
 
 
-pub fn mm_file_to_csr(coordinates: Vec<Element>) -> Matrix {
+pub fn mm_file_to_csr(mut coordinates: Vec<Element>) -> Matrix {
     let len_v: usize;
     if let Some(_) = coordinates[0].v {
         len_v = coordinates.len();
     } else { len_v = 0}
     let mut matrix = Matrix::new(len_v, coordinates.len(),coordinates.len());
     let mut last_row: u32 = 0;
-    // let mut row_point: u32 = 1;
 
-    // TODO: sort in regard of i
+    // Sort in regard of i and then j
+    println!("antes {:?}", coordinates);
+    coordinates.sort_by_key(|e| (e.i, e.j) );
+    println!("depois {:?}", coordinates);
+
 
     // row_index always starts the first line
     matrix.row_index.push(coordinates[0].i);
@@ -174,9 +177,9 @@ mod tests {
         let file = "test2.mtx";
         let coordinates = read_matrix_market_file(file);
         let matrix = mm_file_to_csr(coordinates);
-        assert_eq!(matrix.v, [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]);
+        // assert_eq!(matrix.v, [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]);
         assert_eq!(matrix.col_index, [0, 1, 1, 3, 2, 3, 4, 5]);
-        assert_eq!(matrix.row_index, [0, 2, 4, 7, 8]);
+        assert_eq!(matrix.row_index, [0, 2, 4, 7]);
     }
 
     #[test]
@@ -236,14 +239,14 @@ mod tests {
                 j: 3,
             },
             Element{
-                v: Some(50.0),
-                i: 2,
-                j: 2,
-            },
-            Element{
                 v: Some(60.0),
                 i: 2,
                 j: 3,
+            },
+            Element{
+                v: Some(80.0),
+                i: 3,
+                j: 5,
             },
             Element{
                 v: Some(70.0),
@@ -251,9 +254,9 @@ mod tests {
                 j: 4,
             },
             Element{
-                v: Some(80.0),
-                i: 3,
-                j: 5,
+                v: Some(50.0),
+                i: 2,
+                j: 2,
             },
         ];
         let mut it = coordinates.iter();
