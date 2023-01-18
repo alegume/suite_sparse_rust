@@ -23,14 +23,31 @@ impl Matrix {
         }
     }
 
-    pub fn bandwidth(&self) -> u32 {
-        let mut bandwidth:u32 = 0;
-        for (i, j) in self.col_index.iter().zip(self.row_index.iter()) {
-            // println!("[{} - {}] = {}", *i, *j, i.abs_diff(*j));
-            if i.abs_diff(*j) > bandwidth {
-                bandwidth = i.abs_diff(*j);
+    pub fn bandwidth(&self) -> usize {
+        let mut bandwidth:usize = 0;
+        let mut row: usize = 0;
+
+        // TODO: revisar o ultimo elemento de row_index
+        for j in (0..self.col_index.len()) {
+            // let row = *i as usize;
+            let start = self.row_index[row] as usize;
+            let stop = self.row_index[row + 1] as usize;
+            let row_slc = &self.col_index[start..stop];
+            println!("{:?}", row_slc);
+            for j in row_slc {
+                println!("{row} {j}");
+                if row.abs_diff(*j as usize) > bandwidth {
+                    bandwidth = row.abs_diff(*j as usize);
+                }
             }
+            row += 1;
         }
+        // for (i, j) in self.col_index.iter().zip(self.row_index.iter()) {
+        //     // println!("[{} - {}] = {}", *i, *j, i.abs_diff(*j));
+        //     if i.abs_diff(*j) > bandwidth {
+        //         bandwidth = i.abs_diff(*j);
+        //     }
+        // }
         bandwidth
     }
 
@@ -167,14 +184,13 @@ mod tests {
     fn mm_file_to_csr_test() {
         let file = "test1.mtx";
         let matrix = mm_file_to_csr(file);
-        println!("{:?}", matrix);
         assert_eq!(matrix.v, [5.0, 8.0, 3.0, 6.0]);
         assert_eq!(matrix.col_index, [0, 1, 2, 1]);
         assert_eq!(matrix.row_index, [0, 1, 2, 3]);
 
         let file = "test2.mtx";
         let matrix = mm_file_to_csr(file);
-        // assert_eq!(matrix.v, [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]);
+        assert_eq!(matrix.v, [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]);
         assert_eq!(matrix.col_index, [0, 1, 1, 3, 2, 3, 4, 5]);
         assert_eq!(matrix.row_index, [0, 2, 4, 7]);
     }
@@ -263,54 +279,53 @@ mod tests {
         assert_eq!(coordinates.len(), coo.len());
     }
 
-    /*#[test]
+    #[test]
     fn bw_test() {
         /* Stress tests  */
         // let file = "apache2.mtx";
-        // let matrix = read_matrix_market(file);
+        // let matrix = mm_file_to_csr(file);
         // assert_eq!(matrix.bandwidth(), 65837);
         // let file = "pwtk.mtx";
-        // let matrix = read_matrix_market(file);
+        // let matrix = mm_file_to_csr(file);
         // assert_eq!(matrix.bandwidth(), 189331);
 
         let file = "test1.mtx";
-        let matrix = read_matrix_market(file);
-        assert_eq!(matrix.bandwidth(), 1);
+        let matrix = mm_file_to_csr(file);
+        assert_eq!(matrix.bandwidth(), 2);
 
-        
         let file = "bcspwr01.mtx";
-        let matrix = read_matrix_market(file);
+        let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 38);
         // CMr 8
 
         let file = "lns__131.mtx";
-        let matrix = read_matrix_market(file);
+        let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 111);
         // CMr 39
 
         let file = "mcca.mtx";
-        let matrix = read_matrix_market(file);
+        let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 65);
         // CMr 3
 
         let file = "will199.mtx";
-        let matrix = read_matrix_market(file);
+        let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 169);
         // CMr 115
 
         let file = "662_bus.mtx";
-        let matrix = read_matrix_market(file);
+        let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 335);
         // CMr 112
 
         let file = "dwt__361.mtx";
-        let matrix = read_matrix_market(file);
+        let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 50);
         // CMr 25
 
         let file = "sherman4.mtx";
-        let matrix = read_matrix_market(file);
+        let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 368);
         // CMr 0??
-    }*/
+    }
 }
