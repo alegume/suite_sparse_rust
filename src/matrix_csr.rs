@@ -28,7 +28,7 @@ impl Matrix {
         let mut row: usize = 0;
 
         // TODO: revisar o ultimo elemento de row_index
-        for j in (0..self.col_index.len()) {
+        while row < self.col_index.len() {
             // let row = *i as usize;
             let start = self.row_index[row] as usize;
             let stop = self.row_index[row + 1] as usize;
