@@ -65,6 +65,7 @@ pub fn mm_file_to_csr(coordinates: Vec<Element>) -> Matrix {
     } else { len_v = 0}
     let mut matrix = Matrix::new(len_v, coordinates.len(),coordinates.len());
     let mut last_row: u32 = 0;
+    // let mut row_point: u32 = 1;
 
     // TODO: sort in regard of i
 
@@ -74,9 +75,10 @@ pub fn mm_file_to_csr(coordinates: Vec<Element>) -> Matrix {
         // println!("{:?}", el);
         if let Some(v) = el.v { matrix.v.push(v); }
         matrix.col_index.push(el.j);
-        if el.j > last_row {
+        if el.i > last_row {
+            // println!("i:{:?}, j:{:?}, lr:{:?}, v.len{:?}, ", el.i, el.j, last_row, matrix.v.len());
             last_row = el.j;
-            matrix.row_index.push(last_row);
+            matrix.row_index.push(matrix.v.len() as u32 - 1u32);
         }
     } 
 
@@ -163,9 +165,11 @@ mod tests {
     fn mm_file_to_csr_test() {
         let file = "test1.mtx";
         let coordinates = read_matrix_market_file(file);
-        println!("{:?}", coordinates);
         let matrix = mm_file_to_csr(coordinates);
         println!("{:?}", matrix);
+        assert_eq!(matrix.v, [5.0, 8.0, 3.0, 6.0]);
+        assert_eq!(matrix.col_index, [0, 1, 2, 1]);
+        assert_eq!(matrix.row_index, [0, 1, 2, 3]);
     }
 
     #[test]
