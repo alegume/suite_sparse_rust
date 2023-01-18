@@ -11,9 +11,9 @@ fn main() {
     // let file = "lp_nug05.mtx";
     // let file = "test1.mtx";
     // let file = "test2.mtx";
-    // let file = "bcspwr01.mtx";
+    let file = "bcspwr01.mtx";
     // let file = "apache2.mtx";
-    let file = "lns__131.mtx";
+    // let file = "lns__131.mtx";
     let matrix = matrix_csr::mm_file_to_csr(file);
     // println!("{:?}", matrix);
     println!("BW: {}", matrix.bandwidth());

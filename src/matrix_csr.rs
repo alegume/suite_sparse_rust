@@ -70,7 +70,7 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
     // Sort in regard of i and then j
     // println!("antes {:?}", coordinates);
     coordinates.sort_by_key(|e| (e.i, e.j) );
-    // println!("depois {:?}", coordinates);
+    println!("depois {:?}", coordinates);
 
     // row_index always starts the first line
     matrix.row_index.push(coordinates[0].i);
@@ -78,9 +78,9 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
         if let Some(v) = el.v { matrix.v.push(v); }
         matrix.col_index.push(el.j);
         if el.i > last_row {
-            // println!("i:{:?}, j:{:?}, lr:{:?}, v.len{:?}, ", el.i, el.j, last_row, matrix.v.len());
+            println!("i:{:?}, j:{:?}, lr:{:?}, row.len{:?}, ", el.i, el.j, last_row, matrix.col_index.len());
             last_row = el.j;
-            matrix.row_index.push(matrix.v.len() as u32 - 1u32);
+            matrix.row_index.push(matrix.col_index.len() as u32 - 1u32);
         }
     } 
 
