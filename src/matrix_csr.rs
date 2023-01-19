@@ -25,22 +25,23 @@ impl Matrix {
 
     pub fn bandwidth(&self) -> usize {
         let mut bandwidth:usize = 0;
-        let mut row: usize = 0;
+        let mut n_row: usize = 0;
 
-        while row < self.row_index.len() - 1 {
-            let start = self.row_index[row] as usize;
-            let stop = self.row_index[row + 1] as usize;
-            let col_slc = &self.col_index[start..stop];
-            println!("{:?}", col_slc);
-            println!("slc[{start}..{stop}]");
-            for j in col_slc {
-                println!("{row} -> {j}");
-                if start.abs_diff(*j as usize) > bandwidth {
-                    bandwidth = row.abs_diff(*j as usize);
+        // Each entry on row_index represents a ROW!
+        while n_row < self.row_index.len() - 1 {
+            let start = self.row_index[n_row] as usize;
+            let stop = self.row_index[n_row + 1] as usize;
+            let row = &self.col_index[start..stop];
+            print!("row{:?}   ", row);
+            println!("col_index[{start}..{stop}]\n");
+            for j in row {
+                // println!("{n_row} -> {j}");
+                if n_row.abs_diff(*j as usize) > bandwidth {
+                    bandwidth = n_row.abs_diff(*j as usize);
                     println!("banda:{bandwidth}");
                 }
             }
-            row += 1;
+            n_row += 1;
         }
         // for (i, j) in self.col_index.iter().zip(self.row_index.iter()) {
         //     // println!("[{} - {}] = {}", *i, *j, i.abs_diff(*j));
@@ -82,7 +83,6 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
         len_v = coordinates.len();
     } else { len_v = 0}
     let mut matrix = Matrix::new(len_v, coordinates.len(),coordinates.len());
-    let mut last_row: u32 = 0;
 
     // Sort in regard of i and then j
     // println!("antes {:?}", coordinates);
@@ -90,14 +90,15 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
     // println!("depois {:?}", coordinates);
 
     // row_index always starts the first line
-    // TODO: REvisar
     matrix.row_index.push(coordinates[0].i);
     for el in &coordinates {
         if let Some(v) = el.v { matrix.v.push(v); }
         matrix.col_index.push(el.j);
-        if el.i > last_row {
-            // println!("i:{:?}, j:{:?}, lr:{:?}, row.len{:?}, ", el.i, el.j, last_row, matrix.col_index.len());
-            last_row = el.j;
+        // println!("i:{:?}, j:{:?}, lr:{:?}, col.len{:?}, ", el.i, el.j, matrix.row_index.len(), matrix.col_index.len());
+        // Each (row_index[n+1] - row_index[n]) represent a row
+        if el.i > matrix.row_index.len() as u32 - 1u32 {
+            // println!("entrou");
+            // last_row = el.j; // ???
             matrix.row_index.push(matrix.col_index.len() as u32 - 1u32);
         }
     } 
@@ -293,6 +294,10 @@ mod tests {
         // assert_eq!(matrix.bandwidth(), 189331);
 
         let file = "test1.mtx";
+        let matrix = mm_file_to_csr(file);
+        assert_eq!(matrix.bandwidth(), 2);
+
+        let file = "test2.mtx";
         let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 2);
 
