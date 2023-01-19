@@ -1,7 +1,8 @@
 #[derive(Debug)]
 pub struct Matrix {
     /* ROW_INDEX[j] is the total number of nonzeros above row j.
-    I *DON'T* use the last element in row_index as the total number of nonzeros in the matrix. Because I can use row_index.len()*/
+    Each (row_index[n+1] - row_index[n]) represent a row
+    */
     pub v:Vec<f64>, // non zeros values
     pub col_index:Vec<usize>, // column indices of values in v
     pub row_index:Vec<usize>, // indices (in v and row_index) where the rows starts
