@@ -3,15 +3,15 @@ pub struct Matrix {
     /* ROW_INDEX[j] is the total number of nonzeros above row j.
     I *DON'T* use the last element in row_index as the total number of nonzeros in the matrix. Because I can use row_index.len()*/
     pub v:Vec<f64>, // non zeros values
-    pub col_index:Vec<u32>, // column indices of values in v
-    pub row_index:Vec<u32>, // indices (in v and row_index) where the rows starts
+    pub col_index:Vec<usize>, // column indices of values in v
+    pub row_index:Vec<usize>, // indices (in v and row_index) where the rows starts
 }
 
 #[derive(Debug, PartialEq)]
 pub struct Element {
     v: Option<f64>,
-    i: u32,
-    j: u32,
+    i: usize,
+    j: usize,
 }
 
 impl Matrix {
@@ -32,31 +32,22 @@ impl Matrix {
             let start = self.row_index[n_row] as usize;
             let stop = self.row_index[n_row + 1] as usize;
             let row = &self.col_index[start..stop];
-            print!("row{:?}   ", row);
-            println!("col_index[{start}..{stop}]\n");
-            for j in row {
-                // println!("{n_row} -> {j}");
+            // print!("row{:?}   ", row);// println!("col_index[{start}..{stop}]\n");
+            for j in row { // Columns in a row
                 if n_row.abs_diff(*j as usize) > bandwidth {
                     bandwidth = n_row.abs_diff(*j as usize);
-                    println!("banda:{bandwidth}");
                 }
             }
             n_row += 1;
         }
-        // for (i, j) in self.col_index.iter().zip(self.row_index.iter()) {
-        //     // println!("[{} - {}] = {}", *i, *j, i.abs_diff(*j));
-        //     if i.abs_diff(*j) > bandwidth {
-        //         bandwidth = i.abs_diff(*j);
-        //     }
-        // }
         bandwidth
     }
 
     pub fn cmr(&self) {
         // push_back to add to the queue, and pop_front to remove from the queue.
         use std::collections::VecDeque;
-        let mut visiteds: Vec<u32> = Vec::new();
-        let mut to_visit: VecDeque<u32> = VecDeque::from([self.row_index[0]]);
+        let mut visiteds: Vec<usize> = Vec::new();
+        let mut to_visit: VecDeque<usize> = VecDeque::from([self.row_index[0]]);
         loop {
             let v = to_visit.pop_front();
             match v {
@@ -85,9 +76,7 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
     let mut matrix = Matrix::new(len_v, coordinates.len(),coordinates.len());
 
     // Sort in regard of i and then j
-    // println!("antes {:?}", coordinates);
     coordinates.sort_by_key(|e| (e.i, e.j) );
-    // println!("depois {:?}", coordinates);
 
     // row_index always starts the first line
     matrix.row_index.push(coordinates[0].i);
@@ -96,14 +85,12 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
         matrix.col_index.push(el.j);
         // println!("i:{:?}, j:{:?}, lr:{:?}, col.len{:?}, ", el.i, el.j, matrix.row_index.len(), matrix.col_index.len());
         // Each (row_index[n+1] - row_index[n]) represent a row
-        if el.i > matrix.row_index.len() as u32 - 1u32 {
-            // println!("entrou");
-            // last_row = el.j; // ???
-            matrix.row_index.push(matrix.col_index.len() as u32 - 1u32);
+        if el.i > matrix.row_index.len() - 1 {
+            matrix.row_index.push(matrix.col_index.len() - 1);
         }
     } 
     //he last element is NNZ , i.e., the fictitious index in V immediately after the last valid index NNZ - 1
-    matrix.row_index.push(coordinates.len() as u32);
+    matrix.row_index.push(coordinates.len());
 
     matrix
 }
@@ -138,16 +125,16 @@ pub fn read_matrix_market_file(filename: &str) -> Vec<Element> {
             if let Ok(v) = v.trim().parse() {
                 // 1-based indices (-1)
                 let el = Element{
-                    i: i.parse::<u32>().unwrap() - 1u32,
-                    j: j.parse::<u32>().unwrap() - 1u32,
+                    i: i.parse::<usize>().unwrap() - 1,
+                    j: j.parse::<usize>().unwrap() - 1,
                     v: Some(v),
                 };
                 coordinates.push(el);
             } else { panic!("Can't catch v value ({v});"); }
         } else { // Coordinate matrix only (don't have V's)
             let el = Element{
-                i: i.parse::<u32>().unwrap() - 1u32,
-                j: j.parse::<u32>().unwrap() - 1u32,
+                i: i.parse::<usize>().unwrap() - 1,
+                j: j.parse::<usize>().unwrap() - 1,
                 v: None,
             };
             coordinates.push(el);
@@ -155,28 +142,6 @@ pub fn read_matrix_market_file(filename: &str) -> Vec<Element> {
     }
     assert_eq!(coordinates.len(), nz_len);
     coordinates
-        /*
-        matrix.col_index.push(j);
-        // TODO: Fix row_index 
-        // Only insert if new row starts 
-        if let Some(&last_row) = matrix.row_index.last() {
-            if j > last_row {
-                matrix.row_index.push(matrix.row_index.len() as u32);
-            } else if j < last_row {
-                panic!("I need to ensure entries are provided in a pre-defined (column-oriented) order.")
-            } else {
-                println!("Jah inseriu. j={j}");
-            }
-        } else { // Nothing added yet
-            println!("primeira inseriu. j={}", matrix.row_index.len());
-            matrix.row_index.push(matrix.row_index.len() as u32);
-        }
-    }
-    assert_eq!(nz_len, matrix.v.len());
-    assert_eq!(nz_len, matrix.col_index.len());
-    // assert_eq!(matrix.j_size.unwrap(), matrix.j.len());
-    matrix
-    */
 }
 
 
