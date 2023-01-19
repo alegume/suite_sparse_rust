@@ -42,9 +42,10 @@ impl Matrix {
         bandwidth
     }
 
-    fn get_row(&self, n_row:usize) -> &[usize] {
-        let start = self.row_index[n_row] as usize;
-        let stop = self.row_index[n_row + 1] as usize;
+    // Get the nth row of matrix
+    fn get_row(&self, n:usize) -> &[usize] {
+        let start = self.row_index[n] as usize;
+        let stop = self.row_index[n + 1] as usize;
         let row = &self.col_index[start..stop];
         row
     }
@@ -55,16 +56,24 @@ impl Matrix {
         let mut visiteds: Vec<usize> = Vec::new();
         let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
         loop {
-            let v = to_visit.pop_front();
-            match v {
-                Some(v) => {
-                    if !visiteds.contains(&v) { 
-                        for j in &self.col_index { // TODO: optimize storing the index of Vec and beginig in it
-                            // Search for elements that are neighbour and have not been visited yet in order of degree
-                            println!("{j}");
-                            visiteds.push(v);
-                        }
-                    } else { println!{"visited = {v}"}; continue; }
+            let e = to_visit.pop_front();
+            match e {
+                Some(e) => {
+                    if !visiteds.contains(&e) { 
+                        println!("{e}");
+                        // get the n_row of e
+
+                        // get row of e
+                        
+                        // insert elements neighbour and that not been visited yet in order of degree in to_visit
+
+
+                        // for i in self.get_row(n)
+                        // for j in &self.col_index { // TODO: optimize storing the index of Vec and beginig in it
+                        //     // Search for elements that are 
+                        //     visiteds.push(v);
+                        // }
+                    } else { println!{"visited = {e}"}; continue; }
                 },
                 None => { println!{"\tEnd of queue"}; break },
             }
