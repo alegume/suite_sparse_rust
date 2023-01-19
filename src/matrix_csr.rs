@@ -26,14 +26,12 @@ impl Matrix {
 
     pub fn bandwidth(&self) -> usize {
         let mut bandwidth:usize = 0;
-        let mut n_row: usize = 0;
+        let mut n_row:usize = 0;
 
         // Each entry on row_index represents a ROW!
         while n_row < self.row_index.len() - 1 {
-            let start = self.row_index[n_row] as usize;
-            let stop = self.row_index[n_row + 1] as usize;
-            let row = &self.col_index[start..stop];
-            // print!("row{:?}   ", row);// println!("col_index[{start}..{stop}]\n");
+            let row = self.get_row(n_row);
+            // print!("row{:?}   ", row);
             for j in row { // Columns in a row
                 if n_row.abs_diff(*j as usize) > bandwidth {
                     bandwidth = n_row.abs_diff(*j as usize);
@@ -44,17 +42,24 @@ impl Matrix {
         bandwidth
     }
 
+    fn get_row(&self, n_row:usize) -> &[usize] {
+        let start = self.row_index[n_row] as usize;
+        let stop = self.row_index[n_row + 1] as usize;
+        let row = &self.col_index[start..stop];
+        row
+    }
+
     pub fn cmr(&self) {
         // push_back to add to the queue, and pop_front to remove from the queue.
         use std::collections::VecDeque;
         let mut visiteds: Vec<usize> = Vec::new();
-        let mut to_visit: VecDeque<usize> = VecDeque::from([self.row_index[0]]);
+        let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
         loop {
             let v = to_visit.pop_front();
             match v {
                 Some(v) => {
                     if !visiteds.contains(&v) { 
-                        for j in &self.row_index { // TODO: optimize storing the index of Vec and beginig in it
+                        for j in &self.col_index { // TODO: optimize storing the index of Vec and beginig in it
                             // Search for elements that are neighbour and have not been visited yet in order of degree
                             println!("{j}");
                             visiteds.push(v);
@@ -262,14 +267,20 @@ mod tests {
         let file = "test1.mtx";
         let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 2);
+        matrix.cmr();
+        assert_eq!(matrix.bandwidth(), 2);
 
         let file = "test2.mtx";
         let matrix = mm_file_to_csr(file);
+        assert_eq!(matrix.bandwidth(), 2);
+        matrix.cmr();
         assert_eq!(matrix.bandwidth(), 2);
 
         let file = "bcspwr01.mtx";
         let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 38);
+        matrix.cmr();
+        // assert_eq!(matrix.bandwidth(), 8);
         // CMr 8
 
         let file = "lns__131.mtx";
