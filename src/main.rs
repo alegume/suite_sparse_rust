@@ -14,7 +14,7 @@ fn main() {
     // let file = "bcspwr01.mtx";
     // let file = "lns__131.mtx";
     // let file = "test1.mtx";
-    let file = "test2.mtx";
+    // let file = "test2.mtx";
     let matrix = matrix_csr::mm_file_to_csr(file);
     println!("Time to create Matrix = {}ms", now.elapsed().as_millis());
     // println!("{:?}", matrix);

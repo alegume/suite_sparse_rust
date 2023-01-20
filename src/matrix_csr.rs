@@ -53,31 +53,50 @@ impl Matrix {
     pub fn cmr(&self) {
         // push_back to add to the queue, and pop_front to remove from the queue.
         use std::collections::VecDeque;
-        let mut visiteds: Vec<usize> = Vec::new();
+        let mut lines_visited: Vec<usize> = Vec::new();
         let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
-        loop {
-            let e = to_visit.pop_front();
-            match e {
-                Some(e) => {
-                    if !visiteds.contains(&e) { 
-                        println!("{e}");
-                        // get the n_row of e
+        // let n_row:usize = 0;
 
-                        // get row of e
-                        
-                        // insert elements neighbour and that not been visited yet in order of degree in to_visit
+        'main_loop: loop {
+            if let Some(i) = to_visit.pop_front() {
+                if !lines_visited.contains(&i) { 
+                    println!("> {i}");
+                    // get the n_row of e??
 
-
-                        // for i in self.get_row(n)
-                        // for j in &self.col_index { // TODO: optimize storing the index of Vec and beginig in it
-                        //     // Search for elements that are 
-                        //     visiteds.push(v);
-                        // }
-                    } else { println!{"visited = {e}"}; continue; }
-                },
-                None => { println!{"\tEnd of queue"}; break },
-            }
+                    // get row of i (neighbours of i)
+                    let row = self.get_row(i);
+                    // TODO: sort by degree (number os elements in each row ov i in row)
+                    println!("ROW{:?}", row);
+                    for j in row {
+                        if *j < (self.row_index.len() - 1) {
+                            println!("\t\tpushou {j}");
+                            to_visit.push_back(*j);
+                        }
+                    }
+                    lines_visited.push(i);
+                } else { 
+                    println!{"visited = {i}"}; 
+                    continue;
+                }
+            } else {  // Empty queue
+                println!{"\tEnd of queue"};
+                // Covers the case of disconected graphs
+                // for j in 1..self.row_index.len() - 1 {
+                //     if lines_visited.contains(&j) { 
+                //         continue; 
+                //     } else {
+                //         // Ignore verify if it's not a square matrices (M>N)
+                //         // Because cols > n_rows it's not reachable anyway
+                //         // if i
+                //         println!{"adicionou {j}"};
+                //         to_visit.push_back(j);
+                //         continue 'main_loop;
+                //     }
+                // }
+                break;
+            };
         }
+        println!("\torder: {:?}", lines_visited);
     }
 }
 
