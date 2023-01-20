@@ -55,48 +55,65 @@ impl Matrix {
         use std::collections::VecDeque;
         let mut lines_visited: Vec<usize> = Vec::new();
         let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
+        let last_row = self.row_index.len() - 1;
         // let n_row:usize = 0;
 
         'main_loop: loop {
             if let Some(i) = to_visit.pop_front() {
                 if !lines_visited.contains(&i) { 
-                    println!("> {i}");
-                    // get the n_row of e??
-
+                    // If it's the last column PTR it's invalid
+                    if i >= last_row { 
+                        // println!("PARAR! {}", i);
+                        continue; 
+                    } else {
+                        // println!("NAO parou {} -- {}", i, last_row);
+                    }
+                    // // println!("> {i}");
                     // get row of i (neighbours of i)
                     let row = self.get_row(i);
                     // TODO: sort by degree (number os elements in each row ov i in row)
-                    println!("ROW{:?}", row);
+                    // println!("ROW{:?}", row);
                     for j in row {
-                        if *j < (self.row_index.len() - 1) {
-                            println!("\t\tpushou {j}");
+                        if !lines_visited.contains(&j) {
+                            // println!("\t\tpushou {j} (last{last_row})");
                             to_visit.push_back(*j);
+                        } else {
+                            // println!("\t\t naopushou");
                         }
                     }
                     lines_visited.push(i);
                 } else { 
-                    println!{"visited = {i}"}; 
+                    // println!{"visited = {i}"}; 
                     continue;
                 }
             } else {  // Empty queue
-                println!{"\tEnd of queue"};
+                // TODO: Otimizar
+                // println!{"\tEnd of queue"};
                 // Covers the case of disconected graphs
-                // for j in 1..self.row_index.len() - 1 {
-                //     if lines_visited.contains(&j) { 
-                //         continue; 
-                //     } else {
-                //         // Ignore verify if it's not a square matrices (M>N)
-                //         // Because cols > n_rows it's not reachable anyway
-                //         // if i
-                //         println!{"adicionou {j}"};
-                //         to_visit.push_back(j);
-                //         continue 'main_loop;
-                //     }
-                // }
+                for j in self.col_index.iter() {
+                    if lines_visited.contains(&j) { 
+                        // println!("ja contem: {j}");
+                        continue; 
+                    } else {
+                        // println!("NAO  contem: {j}");
+                        // Just add if it's not a square matrices (M>N)
+                        // Because cols > n_rows it's not reachable anyway
+                        if *j >= last_row {
+                            lines_visited.push(*j);
+                            // println!{"visitou inatingivel {j} - {last_row}"};
+                            continue;
+                        } else {
+                            to_visit.push_back(*j);
+                            // println!{"adicionou fila {j} -  - {last_row}"};
+                            continue 'main_loop;
+                        }
+                    }
+                }
                 break;
             };
         }
-        println!("\torder: {:?}", lines_visited);
+        // println!("\torder: {:?} (n={})", lines_visited, lines_visited.len());
+        println!("(n={})", lines_visited.len());
     }
 }
 
