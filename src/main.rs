@@ -9,7 +9,7 @@ fn main() {
     let now = Instant::now();
     // let file = "apache2.mtx";
     // let file = "pwtk.mtx";
-    let file = "nasa2910.mtx";
+    // let file = "nasa2910.mtx";
     // let file = "will199.mtx";
     // let file = "bcspwr01.mtx";
     // let file = "mcca.mtx";
