@@ -1,3 +1,6 @@
+use std::collections::VecDeque;
+use std::collections::HashMap;
+
 #[derive(Debug)]
 pub struct Matrix {
     /* ROW_INDEX[j] is the total number of nonzeros above row j.
@@ -52,68 +55,68 @@ impl Matrix {
 
     pub fn cmr(&self) {
         // push_back to add to the queue, and pop_front to remove from the queue.
-        use std::collections::VecDeque;
-        let mut lines_visited: Vec<usize> = Vec::new();
+        let mut lines_visited:HashMap<usize, usize> = HashMap::new();
         let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
+        // let mut to_visit: VecDeque<usize>;
         let last_row = self.row_index.len() - 1;
-        // let n_row:usize = 0;
+        let mut n:usize = last_row;
 
-        'main_loop: loop {
-            if let Some(i) = to_visit.pop_front() {
-                if !lines_visited.contains(&i) { 
-                    // If it's the last column PTR it's invalid
-                    if i >= last_row { 
-                        // println!("PARAR! {}", i);
-                        continue; 
-                    } else {
-                        // println!("NAO parou {} -- {}", i, last_row);
-                    }
-                    // // println!("> {i}");
-                    // get row of i (neighbours of i)
-                    let row = self.get_row(i);
-                    // TODO: sort by degree (number os elements in each row ov i in row)
-                    // println!("ROW{:?}", row);
-                    for j in row {
-                        if !lines_visited.contains(&j) {
-                            // println!("\t\tpushou {j} (last{last_row})");
-                            to_visit.push_back(*j);
-                        } else {
-                            // println!("\t\t naopushou");
-                        }
-                    }
-                    lines_visited.push(i);
-                } else { 
-                    // println!{"visited = {i}"}; 
-                    continue;
-                }
-            } else {  // Empty queue
-                // TODO: Otimizar
-                // println!{"\tEnd of queue"};
-                // Covers the case of disconected graphs
-                for j in self.col_index.iter() {
-                    if lines_visited.contains(&j) { 
-                        // println!("ja contem: {j}");
-                        continue; 
-                    } else {
-                        // println!("NAO  contem: {j}");
-                        // Just add if it's not a square matrices (M>N)
-                        // Because cols > n_rows it's not reachable anyway
-                        if *j >= last_row {
-                            lines_visited.push(*j);
-                            // println!{"visitou inatingivel {j} - {last_row}"};
-                            continue;
-                        } else {
-                            to_visit.push_back(*j);
-                            // println!{"adicionou fila {j} -  - {last_row}"};
-                            continue 'main_loop;
-                        }
-                    }
-                }
-                break;
-            };
+        // TODO: calcular degree e definir n se M != n
+
+        for j in self.col_index.iter() {
+            if *j >= last_row {
+                if !lines_visited.contains_key(&j) { 
+                    // println!{"visitou inatingivel {j} - {last_row}"};
+                    n -= 1;
+                    println!("n{n}");
+                    lines_visited.insert(*j, n);
+                } 
+                // println!("ja visitou: {j}");
+                continue;
+            } else {
+                // println!("NAO  visitou: {j}");
+                // Just add if it's not a square matrices (M>N)
+                // Because cols > n_rows it's not reachable anyway
+                to_visit.push_back(*j);
+                // println!{"adicionou fila {j} -  {last_row}"};
+                self.cycle_throw_queue(&mut to_visit, &mut lines_visited, last_row, &mut n);
+            }
         }
-        // println!("\torder: {:?} (n={})", lines_visited, lines_visited.len());
+
+        println!("order: {:?}", lines_visited);
         println!("(n={})", lines_visited.len());
+    }
+
+    fn cycle_throw_queue(&self, to_visit:&mut VecDeque<usize>, lines_visited:&mut HashMap<usize, usize>, last_row:usize, n: &mut usize) {
+        while let Some(i) = to_visit.pop_front() {
+            if !lines_visited.contains_key(&i) { 
+                // // // println!("> {i}");
+                let row = self.get_row(i); // get row of i (neighbours of i)
+                // TODO: sort by degree (number os elements in each row ov i in row)
+                // println!("\tROW{:?}", row);
+                for j in row.iter() {
+                    // If it's the last column PTR it's invalid
+                    if *j >= last_row {
+                        if !lines_visited.contains_key(&j) {
+                            *n -= 1;
+                            println!("n{n}");
+                            lines_visited.insert(*j, *n);
+                            // println!{"\tctq visitou inatingivel {j} - {last_row}"};
+                        }
+                        continue;
+                    } else if !lines_visited.contains_key(&j) {
+                        to_visit.push_back(*j);
+                        // println!{"\tctq adicionou fila {j} -  {last_row}"};
+                    }
+                }
+                *n -= 1;
+                println!("n{n}");
+                lines_visited.insert(i, *n);
+            } else { 
+                // println!{"\tctq visited = {i}"}; 
+            }
+        }
+        // dbg!("Empty qeue");
     }
 }
 
@@ -134,7 +137,7 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
     for el in &coordinates {
         if let Some(v) = el.v { matrix.v.push(v); }
         matrix.col_index.push(el.j);
-        // println!("i:{:?}, j:{:?}, lr:{:?}, col.len{:?}, ", el.i, el.j, matrix.row_index.len(), matrix.col_index.len());
+        // // println!("i:{:?}, j:{:?}, lr:{:?}, col.len{:?}, ", el.i, el.j, matrix.row_index.len(), matrix.col_index.len());
         // Each (row_index[n+1] - row_index[n]) represent a row
         if el.i > matrix.row_index.len() - 1 {
             matrix.row_index.push(matrix.col_index.len() - 1);
@@ -171,6 +174,7 @@ pub fn read_matrix_market_file(filename: &str) -> Vec<Element> {
             if !header { // first line of file => (rows, columns, entries)
                 nz_len = v.trim().parse().expect("Error reading first line of file.mtx");
                 header = true;
+                // assert_eq!(i, j);
                 continue;
             }
             if let Ok(v) = v.trim().parse() {
@@ -249,7 +253,7 @@ mod tests {
 
         let file = "test2.mtx";
         let coordinates = read_matrix_market_file(file);
-        println!("coordinates:{:?}", coordinates);
+        // println!("coordinates:{:?}", coordinates);
         let coo = vec![
             Element{
                 v: Some(10.0),
