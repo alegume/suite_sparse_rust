@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Matrix {
     /* ROW_INDEX[j] is the total number of nonzeros above row j.
     Each (row_index[n+1] - row_index[n]) represent a row
@@ -57,8 +57,18 @@ impl Matrix {
         row
     }
 
-    fn degree(&self) -> Vec<usize> {
-        todo!()
+    fn degrees(&self) -> Vec<usize> {
+        let mut degrees: Vec<usize> = vec![0; std::cmp::max(self.m, self.n)];
+        for i in 1..self.row_index.len() - 1 {
+            degrees[i] = self.row_index[i] - self.row_index[i-1];
+        }
+        degrees
+    }
+
+    fn degree(&self, i:usize) -> usize {
+        if i < self.row_index.len() - 1 {
+            self.row_index[i+1] - self.row_index[i]
+        } else { 0 }
     }
 
     pub fn cmr(&self) {
@@ -67,23 +77,23 @@ impl Matrix {
         let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
         let last_row = self.row_index.len() - 1;
         // lines_visited.insert(0, last_row);
-        let mut n:usize = if self.n > self.m { self.n } else { self.m }; 
-        dbg!(n);
-        // TODO: calcular degree
+        let mut n:usize = std::cmp::max(self.m, self.n); 
+        // dbg!(n);
+        // let degrees = self.degrees();
 
         for i in 0..self.row_index.len() - 1 {
             // if lines_visited.contains_key(&i) { continue };
-            println!("\t\t col_index = {i}");
+            // println!("\t\t col_index = {i}");
             if i >= last_row {
                 if !lines_visited.contains_key(&i) { 
-                    println!{"loop 1; visitou inatingivel {i} - {last_row}"};
+                    // println!{"loop 1; visitou inatingivel {i} - {last_row}"};
                     n -= 1;
                     // dbg!(&n);
                     lines_visited.insert(i, n);
                 } 
                 continue;
             } else {
-                println!("loop 1; add na fila {}",i);
+                // println!("loop 1; add na fila {}",i);
                 // Just add if it's not a square matrices (M>N)
                 // Because cols > n_rows it's not reachable anyway
                 to_visit.push_back(i);
@@ -91,7 +101,7 @@ impl Matrix {
             }
         }
 
-        println!("order: {:?}", lines_visited);
+        // println!("order: {:?}", lines_visited);
         println!("(n={})", lines_visited.len());
     }
 
@@ -99,30 +109,41 @@ impl Matrix {
         while let Some(i) = to_visit.pop_front() {
             if !lines_visited.contains_key(&i) { 
                 let row = self.get_row(i); // get row of i (neighbours of i)
-                // TODO: sort by degree (number os elements in each row ov i in row)
-                println!("\tROW{:?}", row);
-                for j in row.iter() {
+                // println!("\tROW{:?}", row);
+                // const abc = row.();
+                let mut row2 = row.to_vec();
+                // Sort by degree
+                // row2.reverse();
+                // println!("\tROW2{:?}", row2);
+                // println!("\tdegrees{:?}", self.degrees());
+                row2.sort_by(|a, b| {
+                    // println!("a{a} - b{b}");
+                    self.degree(*a).cmp(&self.degree(*b))
+                    // self.degrees()[*n]
+                });
+                // println!("\n\tROW2{:?}", row2);
+                for j in row2.iter() {
                     // If it's the last column PTR it's invalid
                     if *j >= last_row {
                         if !lines_visited.contains_key(&j) {
                             *n -= 1;
                             // println!("n {n}");
                             lines_visited.insert(*j, *n);
-                            println!{"\tctq visitou inatingivel {j} - {last_row}"};
+                            // println!{"\tctq visitou inatingivel {j} - {last_row}"};
                         }
                         continue;
                     } else if !lines_visited.contains_key(&j) {
                         to_visit.push_back(*j);
-                        println!{"\tctq adicionou fila {j} -  {last_row}"};
+                        // println!{"\tctq adicionou fila {j} -  {last_row}"};
                     }
                 }
                 *n -= 1;
                 // dbg!(&n);
                 lines_visited.insert(i, *n);
-                println!("\tVISTADO {i}");
+                // println!("\tVISTADO {i}");
             }
         }
-        println!("\tEmpty qeue");
+        // println!("\tEmpty qeue");
     }
 }
 
@@ -222,12 +243,16 @@ mod tests {
         assert_eq!(matrix.v, [5.0, 8.0, 3.0, 6.0]);
         assert_eq!(matrix.col_index, [0, 1, 2, 1]);
         assert_eq!(matrix.row_index, [0, 1, 2, 3, 4]);
+        assert_eq!(matrix.m, 4);
+        assert_eq!(matrix.n, 3);
 
         let file = "test2.mtx";
         let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.v, [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]);
         assert_eq!(matrix.col_index, [0, 1, 1, 3, 2, 3, 4, 5]);
         assert_eq!(matrix.row_index, [0, 2, 4, 7, 8]);
+        assert_eq!(matrix.m, 4);
+        assert_eq!(matrix.n, 6);
     }
 
     #[test]
@@ -333,12 +358,14 @@ mod tests {
         assert_eq!(matrix.bandwidth(), 2);
         matrix.cmr();
         assert_eq!(matrix.bandwidth(), 2);
+        assert_eq!(matrix.degrees(), [1, 1, 1, 1]);
 
         let file = "test2.mtx";
         let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 2);
         matrix.cmr();
         assert_eq!(matrix.bandwidth(), 2);
+        assert_eq!(matrix.degrees(), [2, 2, 3, 1]);
 
         let file = "bcspwr01.mtx";
         let matrix = mm_file_to_csr(file);

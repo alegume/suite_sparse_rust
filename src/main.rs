@@ -8,19 +8,19 @@ mod matrix_csr;
 fn main() {
     let now = Instant::now();
     // let file = "apache2.mtx"; // ~2.8M
-    // let file = "pwtk.mtx"; //~6M
+    let file = "pwtk.mtx"; //~6M
     // let file = "Roget.mtx"; // ~5k
     // let file = "nasa2910.mtx"; // ~88k
-    // let file = "mcca.mtx";
-    // let file = "will199.mtx";
-    // let file = "bcspwr01.mtx";
     // let file = "lns__131.mtx";
-    let file = "test1.mtx";
+    // let file = "bcspwr01.mtx";
+    // let file = "will199.mtx";
+    // let file = "mcca.mtx";
+    // let file = "test1.mtx";
     // let file = "test2.mtx";
 
     let matrix = matrix_csr::mm_file_to_csr(file);
     println!("Time to create Matrix = {}ms", now.elapsed().as_millis());
-    println!("{:?}", matrix);
+    // println!("{:?}", matrix);
 
     let now = Instant::now();
     println!("Time to compute BW= {}ms", now.elapsed().as_millis());
