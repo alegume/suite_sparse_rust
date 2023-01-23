@@ -9,6 +9,8 @@ pub struct Matrix {
     pub v:Vec<f64>, // non zeros values
     pub col_index:Vec<usize>, // column indices of values in v
     pub row_index:Vec<usize>, // indices (in v and row_index) where the rows starts
+    m: usize,
+    n: usize,
 }
 
 #[derive(Debug, PartialEq)]
@@ -19,11 +21,13 @@ pub struct Element {
 }
 
 impl Matrix {
-    pub fn new(v_size:usize, row_size:usize, col_size:usize) -> Self {
+    pub fn new(v_size:usize, row_size:usize, col_size:usize, n:usize, m:usize) -> Self {
         Self {
             v: Vec::with_capacity(v_size),
             row_index: Vec::with_capacity(row_size),
             col_index: Vec::with_capacity(col_size),
+            n: n,
+            m: m
         }
     }
 
@@ -63,12 +67,12 @@ impl Matrix {
         let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
         let last_row = self.row_index.len() - 1;
         // lines_visited.insert(0, last_row);
-        let mut n:usize = last_row;
-
+        let mut n:usize = if self.n > self.m { self.n } else { self.m }; 
+        dbg!(n);
         // TODO: calcular degree
 
         for i in 0..self.row_index.len() - 1 {
-            if lines_visited.contains_key(&i) { continue };
+            // if lines_visited.contains_key(&i) { continue };
             println!("\t\t col_index = {i}");
             if i >= last_row {
                 if !lines_visited.contains_key(&i) { 
@@ -124,12 +128,14 @@ impl Matrix {
 
 
 pub fn mm_file_to_csr(file: &str) -> Matrix {
-    let mut coordinates = read_matrix_market_file(file);
+    let mut coordinates: Vec<Element>;
+    let (n, m): (usize, usize); 
+    (coordinates, n, m) = read_matrix_market_file(file);
     let len_v: usize;
     if let Some(_) = coordinates[0].v {
         len_v = coordinates.len();
-    } else { len_v = 0}
-    let mut matrix = Matrix::new(len_v, coordinates.len(),coordinates.len());
+    } else { len_v = 0 }
+    let mut matrix = Matrix::new(len_v, coordinates.len(),coordinates.len(), n, m);
 
     // Sort in regard of i and then j
     coordinates.sort_by_key(|e| (e.i, e.j) );
@@ -151,7 +157,7 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
     matrix
 }
 
-pub fn read_matrix_market_file(filename: &str) -> Vec<Element> {
+pub fn read_matrix_market_file(filename: &str) -> (Vec<Element>, usize, usize) {
     // Indices are 1-based, i.e. A(1,1) is the first element.
     use std::fs;
     use std::io::{BufRead, BufReader};
@@ -162,6 +168,7 @@ pub fn read_matrix_market_file(filename: &str) -> Vec<Element> {
     let mut header:bool = false;
     let mut nz_len:usize = 0;
     let mut coordinates = Vec::<Element>::new();
+    let (mut n, mut m): (usize, usize)= (0, 0); 
     
     for line in reader.lines() {
         // Format => I1  J1  M(I1, J1)
@@ -176,6 +183,8 @@ pub fn read_matrix_market_file(filename: &str) -> Vec<Element> {
             if !header { // first line of file => (rows, columns, entries)
                 nz_len = v.trim().parse().expect("Error reading first line of file.mtx");
                 header = true;
+                n = i.parse::<usize>().unwrap();
+                m = j.parse::<usize>().unwrap();
                 // assert_eq!(i, j);
                 continue;
             }
@@ -198,7 +207,7 @@ pub fn read_matrix_market_file(filename: &str) -> Vec<Element> {
         }
     }
     assert_eq!(coordinates.len(), nz_len);
-    coordinates
+    (coordinates, n, m)
 }
 
 
