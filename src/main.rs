@@ -20,7 +20,7 @@ fn main() {
 
     let matrix = matrix_csr::mm_file_to_csr(file);
     println!("Time to create Matrix = {}ms", now.elapsed().as_millis());
-    // println!("{:?}", matrix);
+    println!("{:?}", matrix);
 
     let now = Instant::now();
     println!("Time to compute BW= {}ms", now.elapsed().as_millis());

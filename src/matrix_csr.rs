@@ -53,32 +53,36 @@ impl Matrix {
         row
     }
 
+    fn degree(&self) -> Vec<usize> {
+        todo!()
+    }
+
     pub fn cmr(&self) {
-        // push_back to add to the queue, and pop_front to remove from the queue.
+        // push_back to add to the queue and pop_front to remove from the queue.
         let mut lines_visited:HashMap<usize, usize> = HashMap::new();
         let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
-        // let mut to_visit: VecDeque<usize>;
         let last_row = self.row_index.len() - 1;
+        // lines_visited.insert(0, last_row);
         let mut n:usize = last_row;
 
-        // TODO: calcular degree e definir n se M != n
+        // TODO: calcular degree
 
-        for j in self.col_index.iter() {
-            if *j >= last_row {
-                if !lines_visited.contains_key(&j) { 
-                    // println!{"visitou inatingivel {j} - {last_row}"};
+        for i in 0..self.row_index.len() - 1 {
+            if lines_visited.contains_key(&i) { continue };
+            println!("\t\t col_index = {i}");
+            if i >= last_row {
+                if !lines_visited.contains_key(&i) { 
+                    println!{"loop 1; visitou inatingivel {i} - {last_row}"};
                     n -= 1;
-                    println!("n{n}");
-                    lines_visited.insert(*j, n);
+                    // dbg!(&n);
+                    lines_visited.insert(i, n);
                 } 
-                // println!("ja visitou: {j}");
                 continue;
             } else {
-                // println!("NAO  visitou: {j}");
+                println!("loop 1; add na fila {}",i);
                 // Just add if it's not a square matrices (M>N)
                 // Because cols > n_rows it's not reachable anyway
-                to_visit.push_back(*j);
-                // println!{"adicionou fila {j} -  {last_row}"};
+                to_visit.push_back(i);
                 self.cycle_throw_queue(&mut to_visit, &mut lines_visited, last_row, &mut n);
             }
         }
@@ -90,33 +94,31 @@ impl Matrix {
     fn cycle_throw_queue(&self, to_visit:&mut VecDeque<usize>, lines_visited:&mut HashMap<usize, usize>, last_row:usize, n: &mut usize) {
         while let Some(i) = to_visit.pop_front() {
             if !lines_visited.contains_key(&i) { 
-                // // // println!("> {i}");
                 let row = self.get_row(i); // get row of i (neighbours of i)
                 // TODO: sort by degree (number os elements in each row ov i in row)
-                // println!("\tROW{:?}", row);
+                println!("\tROW{:?}", row);
                 for j in row.iter() {
                     // If it's the last column PTR it's invalid
                     if *j >= last_row {
                         if !lines_visited.contains_key(&j) {
                             *n -= 1;
-                            println!("n{n}");
+                            // println!("n {n}");
                             lines_visited.insert(*j, *n);
-                            // println!{"\tctq visitou inatingivel {j} - {last_row}"};
+                            println!{"\tctq visitou inatingivel {j} - {last_row}"};
                         }
                         continue;
                     } else if !lines_visited.contains_key(&j) {
                         to_visit.push_back(*j);
-                        // println!{"\tctq adicionou fila {j} -  {last_row}"};
+                        println!{"\tctq adicionou fila {j} -  {last_row}"};
                     }
                 }
                 *n -= 1;
-                println!("n{n}");
+                // dbg!(&n);
                 lines_visited.insert(i, *n);
-            } else { 
-                // println!{"\tctq visited = {i}"}; 
+                println!("\tVISTADO {i}");
             }
         }
-        // dbg!("Empty qeue");
+        println!("\tEmpty qeue");
     }
 }
 
