@@ -183,8 +183,8 @@ pub fn read_matrix_market_file(filename: &str) -> (Vec<Element>, usize, usize) {
             if !header { // first line of file => (rows, columns, entries)
                 nz_len = v.trim().parse().expect("Error reading first line of file.mtx");
                 header = true;
-                n = i.parse::<usize>().unwrap();
-                m = j.parse::<usize>().unwrap();
+                m = i.parse::<usize>().unwrap();
+                n = j.parse::<usize>().unwrap();
                 // assert_eq!(i, j);
                 continue;
             }
@@ -233,7 +233,7 @@ mod tests {
     #[test]
     fn read_matrix_market_file_test() {
         let file = "test1.mtx";
-        let coordinates = read_matrix_market_file(file);
+        let (coordinates, n, m) = read_matrix_market_file(file);
         let coo = vec![
             Element{
                 v: Some(5.0),
@@ -261,9 +261,11 @@ mod tests {
             assert_eq!(Some(el), it.next());
         }
         assert_eq!(coordinates.len(), coo.len());
+        assert_eq!(m, 4);
+        assert_eq!(n, 3);
 
         let file = "test2.mtx";
-        let coordinates = read_matrix_market_file(file);
+        let (coordinates, n, m) = read_matrix_market_file(file);
         // println!("coordinates:{:?}", coordinates);
         let coo = vec![
             Element{
@@ -312,6 +314,8 @@ mod tests {
             assert_eq!(Some(el), it.next());
         }
         assert_eq!(coordinates.len(), coo.len());
+        assert_eq!(m, 4);
+        assert_eq!(n, 6);
     }
 
     #[test]
