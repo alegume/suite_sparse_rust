@@ -13,8 +13,8 @@ fn main() {
     // let file = "Roget.mtx"; // ~5k
     // let file = "will199.mtx";
     // let file = "bcspwr01.mtx";
-    // let file = "mcca.mtx";
-    let file = "lns__131.mtx";
+    let file = "mcca.mtx";
+    // let file = "lns__131.mtx";
     // let file = "test1.mtx";
     // let file = "test2.mtx";
 
