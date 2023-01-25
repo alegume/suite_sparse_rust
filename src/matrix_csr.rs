@@ -71,6 +71,7 @@ impl Matrix {
         } else { 0 }
     }
 
+    // TODO: find pseudoperipheral vertex with GL algo
     pub fn cmr(&self) {
         // push_back to add to the queue and pop_front to remove from the queue.
         let mut lines_visited:HashMap<usize, usize> = HashMap::new();
@@ -82,7 +83,9 @@ impl Matrix {
         // let degrees = self.degrees();
 
         for i in 0..self.row_index.len() - 1 {
-            // if lines_visited.contains_key(&i) { continue };
+            // if lines_visited.contains_key(&i) { 
+            //     println!("\taqui");
+            //     continue;}
             // println!("\t\t col_index = {i}");
             if i >= last_row {
                 if !lines_visited.contains_key(&i) { 
@@ -95,15 +98,38 @@ impl Matrix {
             } else {
                 // println!("loop 1; add na fila {}",i);
                 // Just add if it's not a square matrices (M>N)
-                // Because cols > n_rows it's not reachable anyway
+                // Because cols > n_rows, n_col it's not reachable anyway
                 to_visit.push_back(i);
                 self.cycle_throw_queue(&mut to_visit, &mut lines_visited, last_row, &mut n);
             }
         }
 
-        // println!("order: {:?}", lines_visited);
+        self.reorder(&lines_visited);
+        println!("order: {:?}", lines_visited);
         println!("(n={})", lines_visited.len());
     }
+
+    fn reorder(&self, order: &HashMap<usize, usize>) {
+        let mut v = vec![0f64; self.v.len()];
+        let mut row_index = vec![0usize; self.row_index.len()];
+        // let mut col_index = vec![0usize; self.col_index.len()];
+
+        println!("{:?}", self.v);
+        println!("{:?}", self.row_index);
+        for (old, new) in order {
+            println!("{:?}, {:?}", old, new);
+            v[*new] = self.v[*old];
+            row_index[*new] = self.row_index[*old];
+            // pos = *order.get(&i).expect("Error while reordering in CMr");
+            // v_tmp = self.v[i];
+
+        }
+        row_index[self.row_index.len() - 1] = self.row_index[self.row_index.len() - 1];
+        println!("{:?}", v);
+        println!("{:?}", row_index);
+
+    }
+
 
     fn cycle_throw_queue(&self, to_visit:&mut VecDeque<usize>, lines_visited:&mut HashMap<usize, usize>, last_row:usize, n: &mut usize) {
         while let Some(i) = to_visit.pop_front() {
