@@ -26,8 +26,8 @@ impl Matrix {
             v: Vec::with_capacity(v_size),
             row_index: Vec::with_capacity(row_size),
             col_index: Vec::with_capacity(col_size),
-            n: n,
-            m: m
+            n,
+            m
         }
     }
 
@@ -72,12 +72,11 @@ impl Matrix {
     }
 
     // TODO: find pseudoperipheral vertex with GL algo
-    pub fn cmr(&self) {
+    pub fn cmr(&mut self) {
         // push_back to add to the queue and pop_front to remove from the queue.
         let mut lines_visited:HashMap<usize, usize> = HashMap::new();
         let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
         let last_row = self.row_index.len() - 1;
-        // lines_visited.insert(0, last_row);
         let mut n:usize = std::cmp::max(self.m, self.n); 
         // dbg!(n);
         // let degrees = self.degrees();
@@ -105,29 +104,55 @@ impl Matrix {
         }
 
         self.reorder(&lines_visited);
-        println!("order: {:?}", lines_visited);
-        println!("(n={})", lines_visited.len());
+        // println!("\norder: {:?}", lines_visited);
+        // println!("(n={})", lines_visited.len());
     }
 
-    fn reorder(&self, order: &HashMap<usize, usize>) {
+    fn reorder(&mut self, order: &HashMap<usize, usize>) {
         let mut v = vec![0f64; self.v.len()];
-        let mut row_index = vec![0usize; self.row_index.len()];
-        // let mut col_index = vec![0usize; self.col_index.len()];
+        let n = std::cmp::max(self.m, self.n);
+        let mut row_offset = vec![0usize; n + 1];
+        let mut col_index = vec![0usize; n];
+        let mut j_tmp: usize;
 
-        println!("{:?}", self.v);
-        println!("{:?}", self.row_index);
-        for (old, new) in order {
-            println!("{:?}, {:?}", old, new);
-            v[*new] = self.v[*old];
-            row_index[*new] = self.row_index[*old];
+        // println!("v: {:?}", self.v);
+        // println!("col: {:?}", self.col_index);
+        // println!("row: {:?}", self.row_index);
+        for old in 0..n {
+            let new = order.get(&old).unwrap_or_else(|| panic!("Did not found index {}", old));
+            // println!("{:?}, {:?}", old, new);
+            if self.v.len() > 0 {
+                v[*new] = self.v[old];
+            }
+            // Change col_offsets
+            j_tmp = self.col_index[*order.get(new).expect("a")]; // j_tmp = col[j^t] 
+            col_index[*new] = *order.get(&j_tmp).unwrap(); // col[j_new] = j_tmp^t
+            // Calculate row offset (size of old row)
+            if old > 0 { // first position is always 0
+                // println!("o:{:?}, s:{:?}", old,  row_offset[old - 1]);
+                // println!("M:{:?}, N:{:?}", self.m, self.n);
+                let row_size = if self.m > self.n {
+                    // self.get_row(old).len()
+                    1
+                } else { 1 };
+                row_offset[old] = row_offset[old - 1] + row_size;
+            }
+
+            // row_index[*new] = self.row_index[*old];
             // pos = *order.get(&i).expect("Error while reordering in CMr");
             // v_tmp = self.v[i];
 
         }
-        row_index[self.row_index.len() - 1] = self.row_index[self.row_index.len() - 1];
-        println!("{:?}", v);
-        println!("{:?}", row_index);
+        // Last item is invariant (number of non zeros in the matrix)
+        row_offset[n] = self.m;
+        // println!("v: {:?}", v);
+        // println!("col: {:?}", col_index);
+        // println!("row: {:?}", row_offset);
 
+        // Change matrix
+        self.v = v;
+        self.col_index = col_index;
+        self.row_index = row_offset;
     }
 
 
