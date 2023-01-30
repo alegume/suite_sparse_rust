@@ -11,11 +11,11 @@ fn main() {
     // let file = "pwtk.mtx"; //~6M
     // let file = "Roget.mtx"; // ~5k
     // let file = "nasa2910.mtx"; // ~88k
-    let file = "will199.mtx";
-    let file = "mcca.mtx";
-    let file = "lns__131.mtx";
-    let file = "bcspwr01.mtx";
-    let file = "test1.mtx";
+    // let file = "will199.mtx";
+    // let file = "mcca.mtx";
+    // let file = "lns__131.mtx";
+    // let file = "bcspwr01.mtx";
+    // let file = "test1.mtx";
     let file = "test2.mtx";
 
     let mut matrix = matrix_csr::mm_file_to_csr(file);

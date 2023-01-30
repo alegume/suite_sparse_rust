@@ -38,7 +38,6 @@ impl Matrix {
         // Each entry on row_index represents a ROW!
         while n_row < self.row_index.len() - 1 {
             let row = self.get_row(n_row);
-            // print!("row{:?}   ", row);
             for j in row { // Columns in a row
                 if n_row.abs_diff(*j as usize) > bandwidth {
                     bandwidth = n_row.abs_diff(*j as usize);
@@ -78,19 +77,14 @@ impl Matrix {
         let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
         let last_row = self.row_index.len() - 1;
         let mut n:usize = std::cmp::max(self.m, self.n); 
-        // dbg!(n);
         // let degrees = self.degrees();
 
         for i in 0..self.row_index.len() - 1 {
             // if lines_visited.contains_key(&i) { 
-            //     println!("\taqui");
             //     continue;}
-            // println!("\t\t col_index = {i}");
             if i >= last_row {
                 if !lines_visited.contains_key(&i) { 
-                    // println!{"loop 1; visitou inatingivel {i} - {last_row}"};
                     n -= 1;
-                    // dbg!(&n);
                     lines_visited.insert(i, n);
                 } 
                 continue;
@@ -98,14 +92,14 @@ impl Matrix {
                 // println!("loop 1; add na fila {}",i);
                 // Just add if it's not a square matrices (M>N)
                 // Because cols > n_rows, n_col it's not reachable anyway
-                to_visit.push_back(i);
-                self.cycle_throw_queue(&mut to_visit, &mut lines_visited, last_row, &mut n);
+                if !lines_visited.contains_key(&i) {
+                    to_visit.push_back(i);
+                    self.cycle_throw_queue(&mut to_visit, &mut lines_visited, last_row, &mut n);
+                }
             }
         }
 
         self.reorder(&lines_visited);
-        // println!("\norder: {:?}", lines_visited);
-        // println!("(n={})", lines_visited.len());
     }
 
     fn reorder(&mut self, order: &HashMap<usize, usize>) {
@@ -115,12 +109,8 @@ impl Matrix {
         let mut col_index = vec![0usize; n];
         let mut j_tmp: usize;
 
-        // println!("v: {:?}", self.v);
-        // println!("col: {:?}", self.col_index);
-        // println!("row: {:?}", self.row_index);
         for old in 0..n {
             let new = order.get(&old).unwrap_or_else(|| panic!("Did not found index {}", old));
-            // println!("{:?}, {:?}", old, new);
             if self.v.len() > 0 {
                 v[*new] = self.v[old];
             }
@@ -129,8 +119,6 @@ impl Matrix {
             col_index[*new] = *order.get(&j_tmp).unwrap(); // col[j_new] = j_tmp^t
             // Calculate row offset (size of old row)
             if old > 0 { // first position is always 0
-                // println!("o:{:?}, s:{:?}", old,  row_offset[old - 1]);
-                // println!("M:{:?}, N:{:?}", self.m, self.n);
                 let row_size = if self.m > self.n {
                     // self.get_row(old).len()
                     1
@@ -145,9 +133,6 @@ impl Matrix {
         }
         // Last item is invariant (number of non zeros in the matrix)
         row_offset[n] = self.m;
-        // println!("v: {:?}", v);
-        // println!("col: {:?}", col_index);
-        // println!("row: {:?}", row_offset);
 
         // Change matrix
         self.v = v;
@@ -160,41 +145,30 @@ impl Matrix {
         while let Some(i) = to_visit.pop_front() {
             if !lines_visited.contains_key(&i) { 
                 let row = self.get_row(i); // get row of i (neighbours of i)
-                // println!("\tROW{:?}", row);
                 // const abc = row.();
                 let mut row2 = row.to_vec();
                 // Sort by degree
                 // row2.reverse();
-                // println!("\tROW2{:?}", row2);
-                // println!("\tdegrees{:?}", self.degrees());
                 row2.sort_by(|a, b| {
-                    // println!("a{a} - b{b}");
                     self.degree(*a).cmp(&self.degree(*b))
                     // self.degrees()[*n]
                 });
-                // println!("\n\tROW2{:?}", row2);
                 for j in row2.iter() {
                     // If it's the last column PTR it's invalid
                     if *j >= last_row {
                         if !lines_visited.contains_key(&j) {
                             *n -= 1;
-                            // println!("n {n}");
                             lines_visited.insert(*j, *n);
-                            // println!{"\tctq visitou inatingivel {j} - {last_row}"};
                         }
                         continue;
                     } else if !lines_visited.contains_key(&j) {
                         to_visit.push_back(*j);
-                        // println!{"\tctq adicionou fila {j} -  {last_row}"};
                     }
                 }
                 *n -= 1;
-                // dbg!(&n);
                 lines_visited.insert(i, *n);
-                // println!("\tVISTADO {i}");
             }
         }
-        // println!("\tEmpty qeue");
     }
 }
 
@@ -290,7 +264,7 @@ mod tests {
     #[test]
     fn mm_file_to_csr_test() {
         let file = "test1.mtx";
-        let matrix = mm_file_to_csr(file);
+        let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.v, [5.0, 8.0, 3.0, 6.0]);
         assert_eq!(matrix.col_index, [0, 1, 2, 1]);
         assert_eq!(matrix.row_index, [0, 1, 2, 3, 4]);
@@ -298,7 +272,7 @@ mod tests {
         assert_eq!(matrix.n, 3);
 
         let file = "test2.mtx";
-        let matrix = mm_file_to_csr(file);
+        let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.v, [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]);
         assert_eq!(matrix.col_index, [0, 1, 1, 3, 2, 3, 4, 5]);
         assert_eq!(matrix.row_index, [0, 2, 4, 7, 8]);
@@ -398,60 +372,60 @@ mod tests {
     fn bw_test() {
         /* Stress tests  */
         // let file = "apache2.mtx";
-        // let matrix = mm_file_to_csr(file);
+        // let mut matrix = mm_file_to_csr(file);
         // assert_eq!(matrix.bandwidth(), 65837);
         // let file = "pwtk.mtx";
-        // let matrix = mm_file_to_csr(file);
+        // let mut matrix = mm_file_to_csr(file);
         // assert_eq!(matrix.bandwidth(), 189331);
 
         let file = "test1.mtx";
-        let matrix = mm_file_to_csr(file);
+        let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 2);
         matrix.cmr();
         assert_eq!(matrix.bandwidth(), 2);
         assert_eq!(matrix.degrees(), [1, 1, 1, 1]);
 
         let file = "test2.mtx";
-        let matrix = mm_file_to_csr(file);
+        let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 2);
         matrix.cmr();
         assert_eq!(matrix.bandwidth(), 2);
         assert_eq!(matrix.degrees(), [2, 2, 3, 1]);
 
         let file = "bcspwr01.mtx";
-        let matrix = mm_file_to_csr(file);
+        let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 38);
         matrix.cmr();
         // assert_eq!(matrix.bandwidth(), 8);
         // CMr 8
 
         let file = "lns__131.mtx";
-        let matrix = mm_file_to_csr(file);
+        let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 111);
         // CMr 39
 
         let file = "mcca.mtx";
-        let matrix = mm_file_to_csr(file);
+        let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 65);
         // CMr 3
 
         let file = "will199.mtx";
-        let matrix = mm_file_to_csr(file);
+        let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 169);
         // CMr 115
 
         let file = "662_bus.mtx";
-        let matrix = mm_file_to_csr(file);
+        let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 335);
         // CMr 112
 
         let file = "dwt__361.mtx";
-        let matrix = mm_file_to_csr(file);
+        let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 50);
         // CMr 25
 
         let file = "sherman4.mtx";
-        let matrix = mm_file_to_csr(file);
+        let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 368);
         // CMr 0??
     }
