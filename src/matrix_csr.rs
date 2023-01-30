@@ -1,6 +1,4 @@
 use std::collections::VecDeque;
-use std::collections::HashMap;
-use std::collections::hash_map;
 
 #[derive(Debug, Clone)]
 pub struct Matrix {
@@ -56,10 +54,10 @@ impl Matrix {
         row
     }
 
-    fn get_values_of_row(&self, n:usize) -> &[usize] {
+    fn get_values_of_row(&self, n:usize) -> &[f64] {
         let start = self.row_index[n] as usize;
         let stop = self.row_index[n + 1] as usize;
-        let row = &self.col_index[start..stop];
+        let row = &self.v[start..stop];
         row
     }
 
@@ -79,72 +77,53 @@ impl Matrix {
 
     // TODO: find pseudoperipheral vertex with GL algo
     pub fn cmr(&mut self) {
+        // lines_visited = old_col (old columns to new ones)
+        let mut lines_visited:Vec<usize> = vec![std::usize::MAX; self.m];
         // push_back to add to the queue and pop_front to remove from the queue.
-        let mut lines_visited:HashMap<usize, usize> = HashMap::new();
         let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
-        let last_row = self.row_index.len() - 1;
+        let last_row = self.row_index.len() - 1; // TODO:: usar M
         let mut n:usize = std::cmp::max(self.m, self.n); 
 
-        for i in 0..self.row_index.len() - 1 {
-            // if lines_visited.contains_key(&i) { 
-            //     continue;}
-            if i >= last_row {
-                if !lines_visited.contains_key(&i) { 
-                    n -= 1;
-                    lines_visited.insert(n, i);
-                } 
-                continue;
-            } else {
-                // println!("loop 1; add na fila {}",i);
-                // Just add if it's not a square matrices (M>N)
-                // Because cols > n_rows, n_col it's not reachable anyway
-                if !lines_visited.contains_key(&i) {
-                    to_visit.push_back(i);
-                    self.cycle_throw_queue(&mut to_visit, &mut lines_visited, last_row, &mut n);
-                }
+        for i in 0..last_row {
+            if lines_visited[i] == std::usize::MAX {
+                to_visit.push_back(i);
+                self.cycle_throw_queue(&mut to_visit, &mut lines_visited, last_row, &mut n);
             }
         }
+        dbg!(&lines_visited);
 
-        // dbg!(&lines_visited);
-        // invert the HashMap and create a vec of transpositio (old, new)
-        let mut order:Vec<(usize, usize)> = Vec::with_capacity(self.m);
-        for i in 1..self.m {
-            let old = lines_visited.get(&i).unwrap_or_else(|| panic!("Did not found index {}", i));
-            order.push((*old, i));
-        }
-        self.reorder(order);
+        self.reorder(&lines_visited);
     }
 
-    fn cycle_throw_queue(&self, to_visit:&mut VecDeque<usize>, lines_visited:&mut HashMap<usize, usize>, last_row:usize, n: &mut usize) {
+    fn cycle_throw_queue(&self, to_visit:&mut VecDeque<usize>, lines_visited:&mut Vec<usize>, last_row:usize, n: &mut usize) {
         while let Some(i) = to_visit.pop_front() {
-            if !lines_visited.contains_key(&i) { 
+            if lines_visited[i] == std::usize::MAX { 
                 let row = self.get_columns_of_row(i); // get row of i (neighbours of i)
                 let mut row2 = row.to_vec(); // Make a copy
                 // Sort by degree
                 row2.sort_by(|a, b| {
                     self.degree(*a).cmp(&self.degree(*b))
                 });
-                for j in row2.iter() {
+                for j in row2 {
                     // If it's the last column ptr it's invalid
-                     if *j >= last_row {
-                        if !lines_visited.contains_key(&j) {
+                     if j >= last_row {
+                        if lines_visited[j] == std::usize::MAX {
                             *n -= 1;
-                            lines_visited.insert(*j, *n);
+                            lines_visited[j] = *n;
                         }
-                        continue;
-                    } else if !lines_visited.contains_key(j) {
-                        to_visit.push_back(*j);
-                        // println!("{:?}", to_visit);
+                        continue; // ?
+                    } else if lines_visited[j] == std::usize::MAX {
+                        to_visit.push_back(j);
                     }
                 }
                 *n -= 1;
-                lines_visited.insert(i, *n);
+                lines_visited[i] = *n;
             }
         }
     }
 
 
-    fn reorder(&mut self, order: Vec<(usize, usize)>) {
+    fn reorder(&mut self, old_col: &Vec<usize>) {
         // let mut v = vec![0f64; self.v.len()];
         let n = std::cmp::max(self.m, self.n); // TODO: revisar
         let mut row_offset = Vec::with_capacity(n);
@@ -152,7 +131,8 @@ impl Matrix {
         // let mut j_tmp: usize;
 
         row_offset.push(0);
-        for (old, new) in order {
+        for (old, new) in old_col.iter().enumerate() {
+            dbg!(new, old);
             /*  Change V's if its the case
             // TODO
             // if self.v.len() > 0 {
@@ -162,8 +142,7 @@ impl Matrix {
             // }
             // Change col_offsets */
             for e in self.get_columns_of_row(old) {
-                col_index.push(*e); // Verify oprder
-                // col_index.push(*order.get(e).unwrap_or_else(|| panic!("Did not found index {}", i)));
+                col_index.push(old_col[*e]); // Verify oprder
             }
             // Calculate row offset (size of old row)
             row_offset.push(col_index.len());
