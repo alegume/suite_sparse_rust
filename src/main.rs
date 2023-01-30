@@ -4,7 +4,6 @@ use std::time::{Instant};
 // use std::thread::sleep;
 mod matrix_csr;
 
-
 fn main() {
     let now = Instant::now();
     // let file = "apache2.mtx"; // ~2.8M
@@ -15,8 +14,9 @@ fn main() {
     // let file = "mcca.mtx";
     // let file = "lns__131.mtx";
     // let file = "bcspwr01.mtx";
+    // let file = "test2.mtx";
     // let file = "test1.mtx";
-    let file = "test2.mtx";
+    let file = "test3.mtx";
 
     let mut matrix = matrix_csr::mm_file_to_csr(file);
     println!("Time to create Matrix = {}ms", now.elapsed().as_millis());
@@ -30,7 +30,7 @@ fn main() {
     matrix.cmr();
     println!("Time of CMr= {}ms", now.elapsed().as_millis());
     println!("{:?}", matrix);
-    // println!("BW: {}", matrix.bandwidth());
+    println!("BW: {}", matrix.bandwidth());
 
     // println!("|V|{:?}; |row|{:?}; |col|{:?}; ", matrix.v.len(), matrix.row_index.len(), matrix.col_index.len());
     // sleep(Duration::new(5, 0));

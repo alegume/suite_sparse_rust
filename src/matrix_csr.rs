@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
 use std::collections::HashMap;
+use std::collections::hash_map;
 
 #[derive(Debug, Clone)]
 pub struct Matrix {
@@ -37,7 +38,7 @@ impl Matrix {
 
         // Each entry on row_index represents a ROW!
         while n_row < self.row_index.len() - 1 {
-            let row = self.get_row(n_row);
+            let row = self.get_columns_of_row(n_row);
             for j in row { // Columns in a row
                 if n_row.abs_diff(*j as usize) > bandwidth {
                     bandwidth = n_row.abs_diff(*j as usize);
@@ -48,8 +49,14 @@ impl Matrix {
         bandwidth
     }
 
-    // Get the nth row of matrix
-    fn get_row(&self, n:usize) -> &[usize] {
+    fn get_columns_of_row(&self, n:usize) -> &[usize] {
+        let start = self.row_index[n] as usize;
+        let stop = self.row_index[n + 1] as usize;
+        let row = &self.col_index[start..stop];
+        row
+    }
+
+    fn get_values_of_row(&self, n:usize) -> &[usize] {
         let start = self.row_index[n] as usize;
         let stop = self.row_index[n + 1] as usize;
         let row = &self.col_index[start..stop];
@@ -77,7 +84,6 @@ impl Matrix {
         let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
         let last_row = self.row_index.len() - 1;
         let mut n:usize = std::cmp::max(self.m, self.n); 
-        // let degrees = self.degrees();
 
         for i in 0..self.row_index.len() - 1 {
             // if lines_visited.contains_key(&i) { 
@@ -85,7 +91,7 @@ impl Matrix {
             if i >= last_row {
                 if !lines_visited.contains_key(&i) { 
                     n -= 1;
-                    lines_visited.insert(i, n);
+                    lines_visited.insert(n, i);
                 } 
                 continue;
             } else {
@@ -99,70 +105,36 @@ impl Matrix {
             }
         }
 
-        self.reorder(&lines_visited);
-    }
-
-    fn reorder(&mut self, order: &HashMap<usize, usize>) {
-        let mut v = vec![0f64; self.v.len()];
-        let n = std::cmp::max(self.m, self.n);
-        let mut row_offset = vec![0usize; n + 1];
-        let mut col_index = vec![0usize; n];
-        let mut j_tmp: usize;
-
-        for old in 0..n {
-            let new = order.get(&old).unwrap_or_else(|| panic!("Did not found index {}", old));
-            if self.v.len() > 0 {
-                v[*new] = self.v[old];
-            }
-            // Change col_offsets
-            j_tmp = self.col_index[*order.get(new).expect("a")]; // j_tmp = col[j^t] 
-            col_index[*new] = *order.get(&j_tmp).unwrap(); // col[j_new] = j_tmp^t
-            // Calculate row offset (size of old row)
-            if old > 0 { // first position is always 0
-                let row_size = if self.m > self.n {
-                    // self.get_row(old).len()
-                    1
-                } else { 1 };
-                row_offset[old] = row_offset[old - 1] + row_size;
-            }
-
-            // row_index[*new] = self.row_index[*old];
-            // pos = *order.get(&i).expect("Error while reordering in CMr");
-            // v_tmp = self.v[i];
-
+        // dbg!(&lines_visited);
+        // invert the HashMap and create a vec of transpositio (old, new)
+        let mut order:Vec<(usize, usize)> = Vec::with_capacity(self.m);
+        for i in 1..self.m {
+            let old = lines_visited.get(&i).unwrap_or_else(|| panic!("Did not found index {}", i));
+            order.push((*old, i));
         }
-        // Last item is invariant (number of non zeros in the matrix)
-        row_offset[n] = self.m;
-
-        // Change matrix
-        self.v = v;
-        self.col_index = col_index;
-        self.row_index = row_offset;
+        self.reorder(order);
     }
-
 
     fn cycle_throw_queue(&self, to_visit:&mut VecDeque<usize>, lines_visited:&mut HashMap<usize, usize>, last_row:usize, n: &mut usize) {
         while let Some(i) = to_visit.pop_front() {
             if !lines_visited.contains_key(&i) { 
-                let row = self.get_row(i); // get row of i (neighbours of i)
-                // const abc = row.();
-                let mut row2 = row.to_vec();
+                let row = self.get_columns_of_row(i); // get row of i (neighbours of i)
+                let mut row2 = row.to_vec(); // Make a copy
                 // Sort by degree
-                // row2.reverse();
                 row2.sort_by(|a, b| {
                     self.degree(*a).cmp(&self.degree(*b))
-                    // self.degrees()[*n]
                 });
                 for j in row2.iter() {
-                    // If it's the last column PTR it's invalid
-                    if *j >= last_row {
+                    // If it's the last column ptr it's invalid
+                     if *j >= last_row {
                         if !lines_visited.contains_key(&j) {
                             *n -= 1;
                             lines_visited.insert(*j, *n);
                         }
                         continue;
-                    } else if !lines_visited.contains_key(&j) {
+                    } else if !lines_visited.contains_key(j) {
                         to_visit.push_back(*j);
+                        // println!("{:?}", to_visit);
                     }
                 }
                 *n -= 1;
@@ -170,6 +142,38 @@ impl Matrix {
             }
         }
     }
+
+
+    fn reorder(&mut self, order: Vec<(usize, usize)>) {
+        // let mut v = vec![0f64; self.v.len()];
+        let n = std::cmp::max(self.m, self.n); // TODO: revisar
+        let mut row_offset = Vec::with_capacity(n);
+        let mut col_index = Vec::with_capacity(n);
+        // let mut j_tmp: usize;
+
+        row_offset.push(0);
+        for (old, new) in order {
+            /*  Change V's if its the case
+            // TODO
+            // if self.v.len() > 0 {
+            //     for e in &self.v[i..i+1] {
+            //         v.push(*e);
+            //     }
+            // }
+            // Change col_offsets */
+            for e in self.get_columns_of_row(old) {
+                col_index.push(*e); // Verify oprder
+                // col_index.push(*order.get(e).unwrap_or_else(|| panic!("Did not found index {}", i)));
+            }
+            // Calculate row offset (size of old row)
+            row_offset.push(col_index.len());
+        }
+        // Change matrix
+        // self.v = v;
+        self.col_index = col_index;
+        self.row_index = row_offset;
+    }
+
 }
 
 
