@@ -111,7 +111,6 @@ impl Matrix {
                             *n -= 1;
                             lines_visited[j] = *n;
                         }
-                        continue; // ?
                     } else if lines_visited[j] == std::usize::MAX {
                         to_visit.push_back(j);
                     }
@@ -132,7 +131,7 @@ impl Matrix {
 
         row_offset.push(0);
         for (old, new) in old_col.iter().enumerate() {
-            dbg!(new, old);
+            // dbg!(new, old);
             /*  Change V's if its the case
             // TODO
             // if self.v.len() > 0 {
@@ -141,7 +140,9 @@ impl Matrix {
             //     }
             // }
             // Change col_offsets */
-            for e in self.get_columns_of_row(old) {
+            let old_pos = old_col.iter().position(|&x| x == old).unwrap();
+            for e in self.get_columns_of_row(old_pos) {
+                // let new_e = old_col[old_col[*e]];
                 col_index.push(old_col[*e]); // Verify oprder
             }
             // Calculate row offset (size of old row)
