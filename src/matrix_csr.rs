@@ -90,7 +90,7 @@ impl Matrix {
                 self.cycle_throw_queue(&mut to_visit, &mut lines_visited, last_row, &mut n);
             }
         }
-        dbg!(&lines_visited);
+        // dbg!(&lines_visited);
 
         self.reorder(&lines_visited);
     }
@@ -122,15 +122,20 @@ impl Matrix {
     }
 
 
-    fn reorder(&mut self, old_col: &Vec<usize>) {
+    fn reorder(&mut self, new_rows: &Vec<usize>) {
         // let mut v = vec![0f64; self.v.len()];
         let n = std::cmp::max(self.m, self.n); // TODO: revisar
         let mut row_offset = Vec::with_capacity(n);
         let mut col_index = Vec::with_capacity(n);
         // let mut j_tmp: usize;
 
+        let mut old_rows:Vec<usize> = vec![0; self.m];
+        for (i, x) in new_rows.iter().enumerate() {
+            old_rows[*x] = i;
+        }
+
         row_offset.push(0);
-        for (old, new) in old_col.iter().enumerate() {
+        for (_, new) in old_rows.iter().enumerate() {
             // dbg!(new, old);
             /*  Change V's if its the case
             // TODO
@@ -140,11 +145,12 @@ impl Matrix {
             //     }
             // }
             // Change col_offsets */
-            let old_pos = old_col.iter().position(|&x| x == old).unwrap();
-            for e in self.get_columns_of_row(old_pos) {
-                // let new_e = old_col[old_col[*e]];
-                col_index.push(old_col[*e]); // Verify oprder
+            // let row = new_rows.iter().position(|&x| x == *old).unwrap();
+            let start = col_index.len();
+            for e in self.get_columns_of_row(*new) {
+                col_index.push(new_rows[*e]); // Verify optimization
             }
+            col_index[start..].sort(); // Sort by columns
             // Calculate row offset (size of old row)
             row_offset.push(col_index.len());
         }
