@@ -136,21 +136,20 @@ impl Matrix {
 
         row_offset.push(0);
         for new in old_rows.iter() {
-            // dbg!(new, old);
             // Change col_offsets 
             let start = col_index.len();
             let old_cols = self.get_columns_of_row(*new);
             for e in old_cols {
-                col_index.push(new_rows[*e]); // Verify optimization
+                col_index.push(new_rows[*e]); // TODO: Verify optimization
             }
             //  Change V's if its the case
             if self.v.len() > 0 {
                 let values = self.get_values_of_row(*new);
                 // dbg!(values);
                 let mut v_slc:Vec<(&usize,&f64)> = col_index[start..].iter().zip(values.iter()).collect();
-                println!("{:?}", v_slc);
+                // println!("{:?}", v_slc);
                 v_slc.sort_by_key(|e| e.0);
-                println!("{:?}\n", v_slc);
+                // println!("{:?}\n", v_slc);
                 for (_, value) in v_slc {
                     v.push(*value);
                 }
