@@ -81,7 +81,7 @@ impl Matrix {
         let mut lines_visited:Vec<usize> = vec![std::usize::MAX; self.m];
         // push_back to add to the queue and pop_front to remove from the queue.
         let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
-        let last_row = self.row_index.len() - 1; // TODO:: usar M
+        let last_row = self.m;
         let mut n:usize = std::cmp::max(self.m, self.n); 
 
         for i in 0..last_row {
@@ -142,6 +142,7 @@ impl Matrix {
             for e in old_cols {
                 col_index.push(new_rows[*e]); // TODO: Verify optimization
             }
+            col_index[start..].sort(); // Sort last part by columns
             //  Change V's if its the case
             if self.v.len() > 0 {
                 let values = self.get_values_of_row(*new);
@@ -153,8 +154,6 @@ impl Matrix {
                 for (_, value) in v_slc {
                     v.push(*value);
                 }
-            } else {
-                col_index[start..].sort(); // Sort last part by columns
             }
 
             // Calculate row offset (size of old row)
