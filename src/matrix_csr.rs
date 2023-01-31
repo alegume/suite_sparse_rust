@@ -127,7 +127,7 @@ impl Matrix {
         let n = std::cmp::max(self.m, self.n); // TODO: revisar
         let mut row_offset = Vec::with_capacity(n);
         let mut col_index = Vec::with_capacity(n);
-        // let mut j_tmp: usize;
+        let mut v:Vec<f64> = Vec::with_capacity(self.v.len());
 
         let mut old_rows:Vec<usize> = vec![0; self.m];
         for (i, x) in new_rows.iter().enumerate() {
@@ -135,27 +135,34 @@ impl Matrix {
         }
 
         row_offset.push(0);
-        for (_, new) in old_rows.iter().enumerate() {
+        for new in old_rows.iter() {
             // dbg!(new, old);
-            /*  Change V's if its the case
-            // TODO
-            // if self.v.len() > 0 {
-            //     for e in &self.v[i..i+1] {
-            //         v.push(*e);
-            //     }
-            // }
-            // Change col_offsets */
-            // let row = new_rows.iter().position(|&x| x == *old).unwrap();
+            // Change col_offsets 
             let start = col_index.len();
-            for e in self.get_columns_of_row(*new) {
+            let old_cols = self.get_columns_of_row(*new);
+            for e in old_cols {
                 col_index.push(new_rows[*e]); // Verify optimization
             }
-            col_index[start..].sort(); // Sort by columns
+            //  Change V's if its the case
+            if self.v.len() > 0 {
+                let values = self.get_values_of_row(*new);
+                // dbg!(values);
+                let mut v_slc:Vec<(&usize,&f64)> = col_index[start..].iter().zip(values.iter()).collect();
+                println!("{:?}", v_slc);
+                v_slc.sort_by_key(|e| e.0);
+                println!("{:?}\n", v_slc);
+                for (_, value) in v_slc {
+                    v.push(*value);
+                }
+            } else {
+                col_index[start..].sort(); // Sort last part by columns
+            }
+
             // Calculate row offset (size of old row)
             row_offset.push(col_index.len());
         }
         // Change matrix
-        // self.v = v;
+        self.v = v;
         self.col_index = col_index;
         self.row_index = row_offset;
     }
