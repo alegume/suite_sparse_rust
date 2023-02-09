@@ -1,4 +1,5 @@
 use std::collections::VecDeque;
+use std::cmp::max;
 
 #[derive(Debug, Clone)]
 pub struct Matrix {
@@ -20,11 +21,11 @@ pub struct Element {
 }
 
 impl Matrix {
-    pub fn new(v_size:usize, row_size:usize, col_size:usize, m:usize, n:usize) -> Self {
+    pub fn new(v_size:usize, n_non_zero:usize, m:usize, n:usize) -> Self {
         Self {
             v: Vec::with_capacity(v_size),
-            row_index: Vec::with_capacity(row_size),
-            col_index: Vec::with_capacity(col_size),
+            row_index: Vec::with_capacity(m+1),
+            col_index: Vec::with_capacity(n_non_zero),
             m,
             n,
         }
@@ -48,17 +49,19 @@ impl Matrix {
     }
 
     fn get_columns_of_row(&self, n:usize) -> &[usize] {
-        let start = self.row_index[n] as usize;
-        let stop = self.row_index[n + 1] as usize;
-        let row = &self.col_index[start..stop];
-        row
+        // if n < self.m {
+            let start = self.row_index[n];
+            let stop = self.row_index[n + 1];
+            &self.col_index[start..stop]
+        // } else { &[] }
     }
 
     fn get_values_of_row(&self, n:usize) -> &[f64] {
-        let start = self.row_index[n] as usize;
-        let stop = self.row_index[n + 1] as usize;
-        let row = &self.v[start..stop];
-        row
+        if n < self.m {
+            let start = self.row_index[n] as usize;
+            let stop = self.row_index[n + 1] as usize;
+            &self.v[start..stop]
+        } else { &[] }
     }
 
     // Vec of degrees of each row
@@ -78,7 +81,7 @@ impl Matrix {
     // TODO: find pseudoperipheral vertex with GL algo
     pub fn cmr(&mut self) {
         // lines_visited = old_col (old columns to new ones)
-        let mut lines_visited:Vec<usize> = vec![std::usize::MAX; self.m];
+        let mut lines_visited:Vec<usize> = vec![std::usize::MAX; max(self.m, self.n)];
         // push_back to add to the queue and pop_front to remove from the queue.
         let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
         let last_row = self.m;
@@ -97,7 +100,18 @@ impl Matrix {
 
     fn cycle_throw_queue(&self, to_visit:&mut VecDeque<usize>, lines_visited:&mut Vec<usize>, last_row:usize, n: &mut usize) {
         while let Some(i) = to_visit.pop_front() {
+            // TESTS:
+            // if i >= last_row {
+            //     println!("104.Aqui {}", i);
+            //     if lines_visited[i] == std::usize::MAX {
+            //         *n -= 1;
+            //         lines_visited[i] = *n;
+            //     }
+
+            // } else 
+
             if lines_visited[i] == std::usize::MAX { 
+                println!("104.Aqui {}", i);
                 let row = self.get_columns_of_row(i); // get row of i (neighbours of i)
                 let mut row2 = row.to_vec(); // Make a copy
                 // Sort by degree
@@ -113,6 +127,7 @@ impl Matrix {
                         }
                     } else if lines_visited[j] == std::usize::MAX {
                         to_visit.push_back(j);
+                        println!("120.Aqui {}", j);
                     }
                 }
                 *n -= 1;
@@ -123,12 +138,12 @@ impl Matrix {
 
     fn reorder(&mut self, new_rows: &Vec<usize>) {
         // let mut v = vec![0f64; self.v.len()];
-        let n = std::cmp::max(self.m, self.n); // TODO: revisar
+        let n = std::cmp::max(self.m, self.n);
         let mut row_offset = Vec::with_capacity(n);
         let mut col_index = Vec::with_capacity(n);
         let mut v:Vec<f64> = Vec::with_capacity(self.v.len());
 
-        let mut old_rows:Vec<usize> = vec![0; self.m];
+        let mut old_rows:Vec<usize> = vec![0; n];
         for (i, x) in new_rows.iter().enumerate() {
             old_rows[*x] = i;
         }
@@ -175,7 +190,7 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
     if let Some(_) = coordinates[0].v {
         len_v = coordinates.len();
     } else { len_v = 0 }
-    let mut matrix = Matrix::new(len_v, coordinates.len(), coordinates.len(), m, n);
+    let mut matrix = Matrix::new(len_v, coordinates.len(), m, n);
 
     // Sort in regard of i and then j
     coordinates.sort_by_key(|e| (e.i, e.j) );
@@ -379,18 +394,17 @@ mod tests {
         matrix.cmr();
         assert_eq!(matrix.bandwidth(), 2);
         
-        // let file = "test2.mtx";
-        // let mut matrix = mm_file_to_csr(file);
-        // assert_eq!(matrix.bandwidth(), 2);
-        // println!("{:?}", matrix);
-        // assert_eq!(matrix.degrees(), [2, 2, 3, 1]);
-        // matrix.cmr();
-        // assert_eq!(matrix.bandwidth(), 2);
+        let file = "test2.mtx";
+        let mut matrix = mm_file_to_csr(file);
+        assert_eq!(matrix.bandwidth(), 2);
+        println!("{:?}", matrix);
+        assert_eq!(matrix.degrees(), [2, 2, 3, 1]);
+        matrix.cmr();
+        assert_eq!(matrix.bandwidth(), 2);
 
         let file = "test3.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 3);
-        println!("{:?}", matrix);
         assert_eq!(matrix.degrees(), [3, 3, 2, 4]);
         matrix.cmr();
         // assert_eq!(matrix.bandwidth(), 2);
