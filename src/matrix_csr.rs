@@ -11,6 +11,7 @@ pub struct Matrix {
     pub row_index:Vec<usize>, // indices (in v and row_index) where the rows starts
     m: usize,
     n: usize,
+    nz_len: usize,
 }
 
 #[derive(Debug, PartialEq)]
@@ -21,13 +22,14 @@ pub struct Element {
 }
 
 impl Matrix {
-    pub fn new(v_size:usize, n_non_zero:usize, m:usize, n:usize) -> Self {
+    pub fn new(v_size:usize, m:usize, n:usize, nz_len:usize) -> Self {
         Self {
             v: Vec::with_capacity(v_size),
             row_index: Vec::with_capacity(m+1),
-            col_index: Vec::with_capacity(n_non_zero),
+            col_index: Vec::with_capacity(nz_len),
             m,
             n,
+            nz_len
         }
     }
 
@@ -51,6 +53,7 @@ impl Matrix {
     fn get_columns_of_row(&self, n:usize) -> &[usize] {
         // if n < self.m {
             let start = self.row_index[n];
+            // dbg!(self.row_index.len());
             let stop = self.row_index[n + 1];
             &self.col_index[start..stop]
         // } else { &[] }
@@ -84,32 +87,21 @@ impl Matrix {
         let mut lines_visited:Vec<usize> = vec![std::usize::MAX; max(self.m, self.n)];
         // push_back to add to the queue and pop_front to remove from the queue.
         let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
-        let last_row = self.m;
         let mut n:usize = std::cmp::max(self.m, self.n); 
 
-        for i in 0..last_row {
+        for i in 0..self.m {
             if lines_visited[i] == std::usize::MAX {
                 to_visit.push_back(i);
-                self.cycle_throw_queue(&mut to_visit, &mut lines_visited, last_row, &mut n);
+                self.cycle_throw_queue(&mut to_visit, &mut lines_visited, &mut n);
             }
         }
         // dbg!(&lines_visited);
 
-        self.reorder(&lines_visited);
+        // self.reorder(&lines_visited);
     }
 
-    fn cycle_throw_queue(&self, to_visit:&mut VecDeque<usize>, lines_visited:&mut Vec<usize>, last_row:usize, n: &mut usize) {
+    fn cycle_throw_queue(&self, to_visit:&mut VecDeque<usize>, lines_visited:&mut Vec<usize>, n: &mut usize) {
         while let Some(i) = to_visit.pop_front() {
-            // TESTS:
-            // if i >= last_row {
-            //     println!("104.Aqui {}", i);
-            //     if lines_visited[i] == std::usize::MAX {
-            //         *n -= 1;
-            //         lines_visited[i] = *n;
-            //     }
-
-            // } else 
-
             if lines_visited[i] == std::usize::MAX { 
                 println!("104.Aqui {}", i);
                 let row = self.get_columns_of_row(i); // get row of i (neighbours of i)
@@ -120,7 +112,7 @@ impl Matrix {
                 });
                 for j in row2 {
                     // If it's the last column ptr it's invalid
-                     if j >= last_row {
+                     if j >= self.m {
                         if lines_visited[j] == std::usize::MAX {
                             *n -= 1;
                             lines_visited[j] = *n;
@@ -137,13 +129,12 @@ impl Matrix {
     }
 
     fn reorder(&mut self, new_rows: &Vec<usize>) {
-        // let mut v = vec![0f64; self.v.len()];
-        let n = std::cmp::max(self.m, self.n);
-        let mut row_offset = Vec::with_capacity(n);
-        let mut col_index = Vec::with_capacity(n);
+        // let n = std::cmp::max(self.m, self.n);
+        let mut row_offset = Vec::with_capacity(self.m);
+        let mut col_index = Vec::with_capacity(self.col_index.len());
         let mut v:Vec<f64> = Vec::with_capacity(self.v.len());
 
-        let mut old_rows:Vec<usize> = vec![0; n];
+        let mut old_rows:Vec<usize> = vec![0; self.m];
         for (i, x) in new_rows.iter().enumerate() {
             old_rows[*x] = i;
         }
@@ -152,6 +143,7 @@ impl Matrix {
         for new in old_rows.iter() {
             // Change col_offsets 
             let start = col_index.len();
+            dbg!("aqui");
             let old_cols = self.get_columns_of_row(*new);
             for e in old_cols {
                 col_index.push(new_rows[*e]); // TODO: Verify optimization
@@ -190,24 +182,55 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
     if let Some(_) = coordinates[0].v {
         len_v = coordinates.len();
     } else { len_v = 0 }
-    let mut matrix = Matrix::new(len_v, coordinates.len(), m, n);
+    let mut matrix = Matrix::new(len_v, m, n, coordinates.len());
+
+    // // Verify if all rows exists
+    // for n in 0..matrix.m {
+    //     if !coordinates.iter().any(|e| e.i == n) {
+    //         println!("NAO TEm {n}");
+    //         let el = Element{
+    //             i: n,
+    //             j: j.parse::<usize>().unwrap() - 1,
+    //             v: None,
+    //         };
+    //         coordinates.push(el);
+    //     }
+    // }
 
     // Sort in regard of i and then j
-    coordinates.sort_by_key(|e| (e.i, e.j) );
+    coordinates.sort_unstable_by_key(|e| (e.i, e.j) );
 
-    // row_index always starts the first line
-    matrix.row_index.push(coordinates[0].i);
+
+    // row_index always starts whit 0 (first line)
+    matrix.row_index.push(0);
     for el in &coordinates {
-        if let Some(v) = el.v { matrix.v.push(v); }
-        matrix.col_index.push(el.j);
-        // // println!("i:{:?}, j:{:?}, lr:{:?}, col.len{:?}, ", el.i, el.j, matrix.row_index.len(), matrix.col_index.len());
-        // Each (row_index[n+1] - row_index[n]) represent a row
-        if el.i > matrix.row_index.len() - 1 {
-            matrix.row_index.push(matrix.col_index.len() - 1);
+        if let Some(v) = el.v { 
+            matrix.v.push(v);
         }
+        matrix.col_index.push(el.j);
+        // Each (row_index[n+1] - row_index[n]) represent a row
+        let last_row = matrix.row_index.len();
+        if el.i == last_row {
+            // println!("{} - {}", el.i, last_row);
+            matrix.row_index.push(matrix.col_index.len() - 1);
+        } else if el.i > last_row { // There are empty rows
+            let diff = el.i - last_row;
+            dbg!(el.i, last_row, diff);
+            // add empty row before
+            for _ in 0..diff {
+                // matrix.row_index.push(*matrix.row_index.last().unwrap());
+                matrix.row_index.push(last_row);
+            }
+            // matrix.row_index.push(matrix.col_index.len() - 1);
+        }
+        else {println!("EROOOO")}
     } 
+
     // The last element is NNZ , i.e., the fictitious index in V immediately after the last valid index NNZ - 1
     matrix.row_index.push(coordinates.len());
+    // println!("{:?}", coordinates);
+    assert_eq!(matrix.row_index.len(), m + 1);
+    assert_eq!(matrix.col_index.len(), matrix.nz_len);
 
     matrix
 }

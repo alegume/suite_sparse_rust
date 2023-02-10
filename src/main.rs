@@ -27,7 +27,7 @@ fn main() {
     println!("BW: {}", matrix.bandwidth());
 
     let now = Instant::now();
-    matrix.cmr();
+    // matrix.cmr();
     println!("Time of CMr= {}ms", now.elapsed().as_millis());
     // println!("{:?}", matrix);
     println!("BW: {}", matrix.bandwidth());
