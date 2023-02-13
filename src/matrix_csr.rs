@@ -245,7 +245,7 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
             matrix.col_index.push(el.j);
         }
         if row.len() > 0 {
-            matrix.row_index.push(row.len());
+            matrix.row_index.push(matrix.col_index.len() - 1);
         } else {
             matrix.row_index.push(matrix.row_index.last().copied().unwrap());
         }
