@@ -14,7 +14,7 @@ pub struct Matrix {
     nz_len: usize,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Element {
     v: Option<f64>,
     i: usize,
@@ -177,14 +177,14 @@ impl Matrix {
 pub fn mm_file_to_csr(file: &str) -> Matrix {
     let mut coordinates: Vec<Element>;
     let (n, m): (usize, usize); 
-    (coordinates, n, m) = read_matrix_market_file(file);
+    (coordinates, m, n) = read_matrix_market_file(file);
     let len_v: usize;
     if let Some(_) = coordinates[0].v {
         len_v = coordinates.len();
     } else { len_v = 0 }
     let mut matrix = Matrix::new(len_v, m, n, coordinates.len());
 
-    // // Verify if all rows exists
+    /*  // Verify if all rows exists
     // for n in 0..matrix.m {
     //     if !coordinates.iter().any(|e| e.i == n) {
     //         println!("NAO TEm {n}");
@@ -196,6 +196,7 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
     //         coordinates.push(el);
     //     }
     // }
+    */
 
     // Sort in regard of i and then j
     coordinates.sort_unstable_by_key(|e| (e.i, e.j) );
@@ -203,6 +204,8 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
 
     // row_index always starts whit 0 (first line)
     matrix.row_index.push(0);
+
+    /*
     for el in &coordinates {
         if let Some(v) = el.v { 
             matrix.v.push(v);
@@ -222,13 +225,35 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
                 matrix.row_index.push(last_row);
             }
             // matrix.row_index.push(matrix.col_index.len() - 1);
+        } else {
+            dbg!(el.i, last_row);
+            println!("EROOOO");
         }
-        else {println!("EROOOO")}
-    } 
+    } */
+
+    for i in 0..m {
+        let row: Vec<&Element> = coordinates.iter()
+            .filter(|e| e.i == i)
+            // .map(|e| e.i) // 
+            .collect();
+        // println!("{:?}", row);
+
+        for el in row.iter() {
+            if let Some(v) = el.v { 
+                matrix.v.push(v);
+            }
+            matrix.col_index.push(el.j);
+        }
+        if row.len() > 0 {
+            matrix.row_index.push(row.len());
+        } else {
+            matrix.row_index.push(matrix.row_index.last().copied().unwrap());
+        }
+    }
 
     // The last element is NNZ , i.e., the fictitious index in V immediately after the last valid index NNZ - 1
-    matrix.row_index.push(coordinates.len());
-    // println!("{:?}", coordinates);
+    // matrix.row_index.push(len_v);
+    println!("{:?}", coordinates);
     assert_eq!(matrix.row_index.len(), m + 1);
     assert_eq!(matrix.col_index.len(), matrix.nz_len);
 
@@ -246,7 +271,7 @@ pub fn read_matrix_market_file(filename: &str) -> (Vec<Element>, usize, usize) {
     let mut header:bool = false;
     let mut nz_len:usize = 0;
     let mut coordinates = Vec::<Element>::new();
-    let (mut n, mut m): (usize, usize)= (0, 0); 
+    let (mut m, mut n): (usize, usize)= (0, 0); 
     
     for line in reader.lines() {
         // Format => I1  J1  M(I1, J1)
@@ -285,7 +310,7 @@ pub fn read_matrix_market_file(filename: &str) -> (Vec<Element>, usize, usize) {
         }
     }
     assert_eq!(coordinates.len(), nz_len);
-    (coordinates, n, m)
+    (coordinates, m, n)
 }
 
 
@@ -315,7 +340,7 @@ mod tests {
     #[test]
     fn read_matrix_market_file_test() {
         let file = "test1.mtx";
-        let (coordinates, n, m) = read_matrix_market_file(file);
+        let (coordinates, m, n) = read_matrix_market_file(file);
         let coo = vec![
             Element{
                 v: Some(5.0),
@@ -347,7 +372,7 @@ mod tests {
         assert_eq!(n, 3);
 
         let file = "test2.mtx";
-        let (coordinates, n, m) = read_matrix_market_file(file);
+        let (coordinates, m, n) = read_matrix_market_file(file);
         // println!("coordinates:{:?}", coordinates);
         let coo = vec![
             Element{
