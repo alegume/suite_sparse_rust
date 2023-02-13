@@ -8,7 +8,7 @@ fn main() {
     let now = Instant::now();
     // let file = "apache2.mtx"; // ~2.8M
     // let file = "pwtk.mtx"; //~6M
-    let file = "Roget.mtx"; // ~5k
+    // let file = "Roget.mtx"; // ~5k
     // let file = "nasa2910.mtx"; // ~88k
     // let file = "will199.mtx";
     // let file = "mcca.mtx";

@@ -183,24 +183,8 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
         len_v = coordinates.len();
     } else { len_v = 0 }
     let mut matrix = Matrix::new(len_v, m, n, coordinates.len());
-
-    /*  // Verify if all rows exists
-    // for n in 0..matrix.m {
-    //     if !coordinates.iter().any(|e| e.i == n) {
-    //         println!("NAO TEm {n}");
-    //         let el = Element{
-    //             i: n,
-    //             j: j.parse::<usize>().unwrap() - 1,
-    //             v: None,
-    //         };
-    //         coordinates.push(el);
-    //     }
-    // }
-    */
-
     // Sort in regard of i and then j
     coordinates.sort_unstable_by_key(|e| (e.i, e.j) );
-
 
     // row_index always starts whit 0 (first line)
     matrix.row_index.push(0);
@@ -236,7 +220,6 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
             .filter(|e| e.i == i)
             // .map(|e| e.i) // 
             .collect();
-        // println!("{:?}", row);
 
         for el in row.iter() {
             if let Some(v) = el.v { 
@@ -244,8 +227,9 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
             }
             matrix.col_index.push(el.j);
         }
+
         if row.len() > 0 {
-            matrix.row_index.push(matrix.col_index.len() - 1);
+            matrix.row_index.push(matrix.col_index.len());
         } else {
             matrix.row_index.push(matrix.row_index.last().copied().unwrap());
         }
@@ -253,7 +237,7 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
 
     // The last element is NNZ , i.e., the fictitious index in V immediately after the last valid index NNZ - 1
     // matrix.row_index.push(len_v);
-    println!("{:?}", coordinates);
+    // println!("{:?}", coordinates);
     assert_eq!(matrix.row_index.len(), m + 1);
     assert_eq!(matrix.col_index.len(), matrix.nz_len);
 
