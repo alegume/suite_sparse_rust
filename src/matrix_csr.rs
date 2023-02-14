@@ -407,6 +407,78 @@ mod tests {
         assert_eq!(coordinates.len(), coo.len());
         assert_eq!(m, 4);
         assert_eq!(n, 6);
+
+        let file = "test3.mtx";
+        let (coordinates, m, n) = read_matrix_market_file(file);
+        let coo = vec![
+            Element{
+                v: Some(2.0),
+                i: 0,
+                j: 0,
+            },
+            Element{
+                v: Some(3.0),
+                i: 0,
+                j: 1,
+            },
+            Element{
+                v: Some(1.0),
+                i: 0,
+                j: 3,
+            },
+            Element{
+                v: Some(3.0),
+                i: 1,
+                j: 0,
+            },
+            Element{
+                v: Some(2.0),
+                i: 1,
+                j: 1,
+            },
+            Element{
+                v: Some(5.0),
+                i: 1,
+                j: 3,
+            },
+            Element{
+                v: Some(2.0),
+                i: 2,
+                j: 2,
+            },
+            Element{
+                v: Some(4.0),
+                i: 2,
+                j: 3,
+            },
+            Element{
+                v: Some(1.0),
+                i: 3,
+                j: 0,
+            },
+            Element{
+                v: Some(5.0),
+                i: 3,
+                j: 1,
+            },
+            Element{
+                v: Some(4.0),
+                i: 3,
+                j: 2,
+            },
+            Element{
+                v: Some(2.0),
+                i: 3,
+                j: 3,
+            },
+        ];
+        let mut it = coordinates.iter();
+        for el in coo.iter() {
+            assert_eq!(Some(el), it.next());
+        }
+        assert_eq!(coordinates.len(), coo.len());
+        assert_eq!(m, 4);
+        assert_eq!(n, 4);
     }
 
     #[test]
