@@ -20,18 +20,22 @@ fn main() {
 
     let mut matrix = matrix_csr::mm_file_to_csr(file);
     println!("Time to create Matrix = {}ms", now.elapsed().as_millis());
-    // println!("{:?}", matrix);
+    println!("{:?}", matrix);
 
     let now = Instant::now();
     println!("Time to compute BW= {}ms", now.elapsed().as_millis());
     println!("BW: {}", matrix.bandwidth());
 
     let now = Instant::now();
-    // matrix.cmr();
+    matrix.cmr(matrix.col_index[0]);
     println!("Time of CMr= {}ms", now.elapsed().as_millis());
     // println!("{:?}", matrix);
     println!("BW: {}", matrix.bandwidth());
 
     // println!("|V|{:?}; |row|{:?}; |col|{:?}; ", matrix.v.len(), matrix.row_index.len(), matrix.col_index.len());
     // sleep(Duration::new(5, 0));
+
+    println!("{:e}", std::f64::MIN);
+    println!("{:}", 9.0e-320f64);
+
 }

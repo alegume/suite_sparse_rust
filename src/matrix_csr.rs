@@ -82,17 +82,21 @@ impl Matrix {
     }
 
     // TODO: find pseudoperipheral vertex with GL algo
-    pub fn cmr(&mut self) {
+    pub fn cmr(&mut self, start_v: usize) {
         // lines_visited = old_col (old columns to new ones)
         let mut lines_visited:Vec<usize> = vec![std::usize::MAX; max(self.m, self.n)];
         // push_back to add to the queue and pop_front to remove from the queue.
-        let mut to_visit: VecDeque<usize> = VecDeque::from([self.col_index[0]]);
+        let mut to_visit: VecDeque<usize> = VecDeque::from([start_v]);
         let mut n:usize = std::cmp::max(self.m, self.n); 
 
+        // Proceeds whit CMr based on vertex start_v
+        self.cycle_through_queue_bfs(&mut to_visit, &mut lines_visited, &mut n);
+
+        // Find if any vertex are left unvisited (e.g. diconected graph)
         for i in 0..self.m {
             if lines_visited[i] == std::usize::MAX {
                 to_visit.push_back(i);
-                self.cycle_throw_queue(&mut to_visit, &mut lines_visited, &mut n);
+                self.cycle_through_queue_bfs(&mut to_visit, &mut lines_visited, &mut n);
             }
         }
         // dbg!(&lines_visited);
@@ -100,26 +104,22 @@ impl Matrix {
         // self.reorder(&lines_visited);
     }
 
-    fn cycle_throw_queue(&self, to_visit:&mut VecDeque<usize>, lines_visited:&mut Vec<usize>, n: &mut usize) {
+    // Cycle through queue in breadth-first search and reverse labeling
+    fn cycle_through_queue_bfs(&self, to_visit:&mut VecDeque<usize>, lines_visited:&mut Vec<usize>, n: &mut usize) {
         while let Some(i) = to_visit.pop_front() {
             if lines_visited[i] == std::usize::MAX { 
-                println!("104.Aqui {}", i);
-                let row = self.get_columns_of_row(i); // get row of i (neighbours of i)
+                let row = self.get_columns_of_row(i); // Get row of i (neighbours of i)
                 let mut row2 = row.to_vec(); // Make a copy
                 // Sort by degree
                 row2.sort_by(|a, b| {
                     self.degree(*a).cmp(&self.degree(*b))
                 });
                 for j in row2 {
-                    // If it's the last column ptr it's invalid
-                     if j >= self.m {
-                        if lines_visited[j] == std::usize::MAX {
-                            *n -= 1;
-                            lines_visited[j] = *n;
-                        }
-                    } else if lines_visited[j] == std::usize::MAX {
+                    if j < self.m && lines_visited[j] == std::usize::MAX {
                         to_visit.push_back(j);
-                        println!("120.Aqui {}", j);
+                    } else if lines_visited[j] == std::usize::MAX {
+                        *n -= 1;
+                        lines_visited[j] = *n;
                     }
                 }
                 *n -= 1;
@@ -218,7 +218,6 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
     for i in 0..m {
         let row: Vec<&Element> = coordinates.iter()
             .filter(|e| e.i == i)
-            // .map(|e| e.i) // 
             .collect();
 
         for el in row.iter() {
@@ -235,9 +234,6 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
         }
     }
 
-    // The last element is NNZ , i.e., the fictitious index in V immediately after the last valid index NNZ - 1
-    // matrix.row_index.push(len_v);
-    // println!("{:?}", coordinates);
     assert_eq!(matrix.row_index.len(), m + 1);
     assert_eq!(matrix.col_index.len(), matrix.nz_len);
 
@@ -502,7 +498,7 @@ mod tests {
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 2);
         assert_eq!(matrix.degrees(), [1, 1, 1, 1]);
-        matrix.cmr();
+        matrix.cmr(matrix.col_index[0]);
         assert_eq!(matrix.bandwidth(), 2);
         
         let file = "test2.mtx";
@@ -510,20 +506,20 @@ mod tests {
         assert_eq!(matrix.bandwidth(), 2);
         println!("{:?}", matrix);
         assert_eq!(matrix.degrees(), [2, 2, 3, 1]);
-        matrix.cmr();
+        matrix.cmr(matrix.col_index[0]);
         assert_eq!(matrix.bandwidth(), 2);
 
         let file = "test3.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 3);
         assert_eq!(matrix.degrees(), [3, 3, 2, 4]);
-        matrix.cmr();
+        matrix.cmr(matrix.col_index[0]);
         // assert_eq!(matrix.bandwidth(), 2);
 
         let file = "bcspwr01.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 38);
-        // matrix.cmr();
+        // matrix.cmr(matrix.col_index[0]);
         // assert_eq!(matrix.bandwidth(), 8);
         // CMr 8
 
