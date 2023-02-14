@@ -319,6 +319,14 @@ mod tests {
         assert_eq!(matrix.row_index, [0, 2, 4, 7, 8]);
         assert_eq!(matrix.m, 4);
         assert_eq!(matrix.n, 6);
+
+        let file = "test3.mtx";
+        let matrix = mm_file_to_csr(file);
+        assert_eq!(matrix.v, [2.0, 3.0, 1.0, 3.0, 2.0, 5.0, 2.0, 4.0, 1.0, 5.0, 4.0, 2.0]);
+        assert_eq!(matrix.col_index, [0, 1, 3, 0, 1, 3, 2, 3, 0, 1, 2, 3]);
+        assert_eq!(matrix.row_index, [0, 3, 6, 8, 12]);
+        assert_eq!(matrix.m, 4);
+        assert_eq!(matrix.n, 4);
     }
 
     #[test]
@@ -357,7 +365,6 @@ mod tests {
 
         let file = "test2.mtx";
         let (coordinates, m, n) = read_matrix_market_file(file);
-        // println!("coordinates:{:?}", coordinates);
         let coo = vec![
             Element{
                 v: Some(10.0),
