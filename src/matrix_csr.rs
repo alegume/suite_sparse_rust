@@ -81,9 +81,7 @@ impl Matrix {
         } else { 0 }
     }
 
-    // TODO: find pseudoperipheral vertex with GL algo
     pub fn cmr(&mut self, start_v: usize) {
-        // lines_visited = old_col (old columns to new ones)
         let mut lines_visited:Vec<usize> = vec![std::usize::MAX; max(self.m, self.n)];
         // push_back to add to the queue and pop_front to remove from the queue.
         let mut to_visit: VecDeque<usize> = VecDeque::from([start_v]);
@@ -100,8 +98,7 @@ impl Matrix {
             }
         }
         // dbg!(&lines_visited);
-
-        // self.reorder(&lines_visited);
+        self.reorder(&lines_visited);
     }
 
     // Cycle through queue in breadth-first search and reverse labeling
@@ -129,21 +126,24 @@ impl Matrix {
     }
 
     fn reorder(&mut self, new_rows: &Vec<usize>) {
-        // let n = std::cmp::max(self.m, self.n);
         let mut row_offset = Vec::with_capacity(self.m);
         let mut col_index = Vec::with_capacity(self.col_index.len());
         let mut v:Vec<f64> = Vec::with_capacity(self.v.len());
+        let mut old_rows:Vec<usize> = vec![0; max(self.m, self.n)];
 
-        let mut old_rows:Vec<usize> = vec![0; self.m];
-        for (i, x) in new_rows.iter().enumerate() {
-            old_rows[*x] = i;
+        for (i, val) in new_rows.iter().enumerate() {
+            old_rows[*val] = i;
         }
 
         row_offset.push(0);
         for new in old_rows.iter() {
+            // If n_columns > n_rows create empty row
+            if new >= &self.m {
+                row_offset.push(row_offset.last().copied().unwrap());
+                continue;
+            }
             // Change col_offsets 
             let start = col_index.len();
-            dbg!("aqui");
             let old_cols = self.get_columns_of_row(*new);
             for e in old_cols {
                 col_index.push(new_rows[*e]); // TODO: Verify optimization
@@ -152,11 +152,8 @@ impl Matrix {
             //  Change V's if its the case
             if self.v.len() > 0 {
                 let values = self.get_values_of_row(*new);
-                // dbg!(values);
                 let mut v_slc:Vec<(&usize,&f64)> = col_index[start..].iter().zip(values.iter()).collect();
-                // println!("{:?}", v_slc);
                 v_slc.sort_by_key(|e| e.0);
-                // println!("{:?}\n", v_slc);
                 for (_, value) in v_slc {
                     v.push(*value);
                 }
@@ -166,6 +163,8 @@ impl Matrix {
             row_offset.push(col_index.len());
         }
         // Change matrix
+        self.m = max(self.m, self.n);
+        self.n = self.n;
         self.v = v;
         self.col_index = col_index;
         self.row_index = row_offset;
@@ -188,32 +187,6 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
 
     // row_index always starts whit 0 (first line)
     matrix.row_index.push(0);
-
-    /*
-    for el in &coordinates {
-        if let Some(v) = el.v { 
-            matrix.v.push(v);
-        }
-        matrix.col_index.push(el.j);
-        // Each (row_index[n+1] - row_index[n]) represent a row
-        let last_row = matrix.row_index.len();
-        if el.i == last_row {
-            // println!("{} - {}", el.i, last_row);
-            matrix.row_index.push(matrix.col_index.len() - 1);
-        } else if el.i > last_row { // There are empty rows
-            let diff = el.i - last_row;
-            dbg!(el.i, last_row, diff);
-            // add empty row before
-            for _ in 0..diff {
-                // matrix.row_index.push(*matrix.row_index.last().unwrap());
-                matrix.row_index.push(last_row);
-            }
-            // matrix.row_index.push(matrix.col_index.len() - 1);
-        } else {
-            dbg!(el.i, last_row);
-            println!("EROOOO");
-        }
-    } */
 
     for i in 0..m {
         let row: Vec<&Element> = coordinates.iter()
@@ -500,6 +473,7 @@ mod tests {
         assert_eq!(matrix.degrees(), [1, 1, 1, 1]);
         matrix.cmr(matrix.col_index[0]);
         assert_eq!(matrix.bandwidth(), 2);
+        // TODO: insert new matrix to assert
         
         let file = "test2.mtx";
         let mut matrix = mm_file_to_csr(file);
@@ -514,7 +488,7 @@ mod tests {
         assert_eq!(matrix.bandwidth(), 3);
         assert_eq!(matrix.degrees(), [3, 3, 2, 4]);
         matrix.cmr(matrix.col_index[0]);
-        // assert_eq!(matrix.bandwidth(), 2);
+        assert_eq!(matrix.bandwidth(), 2);
 
         let file = "bcspwr01.mtx";
         let mut matrix = mm_file_to_csr(file);
