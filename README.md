@@ -3,4 +3,4 @@
 
 
 #### TODO
-    Verify and ignore self cicle in graph (i=j) in symmetrix matrices
+    George Liu pseudo algo
