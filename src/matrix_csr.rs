@@ -493,38 +493,44 @@ mod tests {
         let file = "bcspwr01.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 38);
-        // matrix.cmr(matrix.col_index[0]);
+        matrix.cmr(matrix.col_index[0]);
         // assert_eq!(matrix.bandwidth(), 8);
         // CMr 8
 
         let file = "lns__131.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 111);
+        matrix.cmr(matrix.col_index[0]);
         // CMr 39
 
         let file = "mcca.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 65);
+        matrix.cmr(matrix.col_index[0]);
         // CMr 3
 
         let file = "will199.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 169);
+        matrix.cmr(matrix.col_index[0]);
         // CMr 115
 
         let file = "662_bus.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 335);
+        matrix.cmr(matrix.col_index[0]);
         // CMr 112
 
         let file = "dwt__361.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 50);
+        matrix.cmr(matrix.col_index[0]);
         // CMr 25
 
         let file = "sherman4.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 368);
+        matrix.cmr(matrix.col_index[0]);
         // CMr 0??
     }
 
