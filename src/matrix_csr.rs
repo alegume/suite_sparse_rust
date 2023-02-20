@@ -5,6 +5,10 @@ pub struct Matrix {
     /* ROW_INDEX[j] is the total number of nonzeros above row j.
     Each (row_index[n+1] - row_index[n]) represent a row
     */
+    // TODO: use Option here
+    // pub v:Option<Vec<f64>>,
+    // Or leave that way and use into_iter() to convert
+    // Vec<Option<f64>> to Option<Vec<f64>>
     pub v:Vec<f64>, // non zeros values
     pub col_index:Vec<usize>, // column indices of values in v
     pub row_index:Vec<usize>, // indices (in v and row_index) where the rows starts
