@@ -1,6 +1,8 @@
 use std::collections::VecDeque;
 use std::cmp::max;
 
+use crate::read_files::{Element, read_matrix_market_file_coordinates};
+
 #[derive(Debug, Clone)]
 pub struct Matrix {
     /* ROW_INDEX[j] is the total number of nonzeros above row j.
@@ -13,17 +15,11 @@ pub struct Matrix {
     pub v:Vec<f64>, // non zeros values
     pub col_index:Vec<usize>, // column indices of values in v
     pub row_index:Vec<usize>, // indices (in v and row_index) where the rows starts
-    m: usize,
-    n: usize,
-    nz_len: usize,
+    pub m: usize,
+    pub n: usize,
+    pub nz_len: usize,
 }
 
-#[derive(Debug, PartialEq, Clone, Copy)]
-pub struct Element {
-    v: Option<f64>,
-    i: usize,
-    j: usize,
-}
 
 impl Matrix {
     pub fn new(v_size:usize, m:usize, n:usize, nz_len:usize) -> Self {
@@ -180,7 +176,7 @@ impl Matrix {
 pub fn mm_file_to_csr(file: &str) -> Matrix {
     let mut coordinates: Vec<Element>;
     let (n, m): (usize, usize); 
-    (coordinates, m, n) = read_matrix_market_file(file);
+    (coordinates, m, n) = read_matrix_market_file_coordinates(file);
     let len_v: usize;
     if let Some(_) = coordinates[0].v {
         len_v = coordinates.len();
@@ -217,58 +213,6 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
     matrix
 }
 
-pub fn read_matrix_market_file(filename: &str) -> (Vec<Element>, usize, usize) {
-    // Indices are 1-based, i.e. A(1,1) is the first element.
-    use std::fs;
-    use std::io::{BufRead, BufReader};
-
-    let filename = "instances/".to_owned() + filename;
-    let file = fs::File::open(filename).unwrap();
-    let reader = BufReader::new(file);
-    let mut header:bool = false;
-    let mut nz_len:usize = 0;
-    let mut coordinates = Vec::<Element>::new();
-    let (mut m, mut n): (usize, usize)= (0, 0); 
-    
-    for line in reader.lines() {
-        // Format => I1  J1  M(I1, J1)
-        let line = line.unwrap();
-        if line.starts_with("%") { continue; }
-        let mut text = line.splitn(3, ' ');
-    
-        let i:&str = text.next().unwrap().trim();
-        let j:&str = text.next().unwrap().trim();
-        // Reading V
-        if let Some(v) = text.next() {
-            if !header { // first line of file => (rows:m, columns:n, entries)
-                nz_len = v.trim().parse().expect("Error reading first line of file.mtx");
-                header = true;
-                m = i.parse::<usize>().unwrap();
-                n = j.parse::<usize>().unwrap();
-                // assert_eq!(i, j);
-                continue;
-            }
-            if let Ok(v) = v.trim().parse() {
-                // 1-based indices (-1)
-                let el = Element{
-                    i: i.parse::<usize>().unwrap() - 1,
-                    j: j.parse::<usize>().unwrap() - 1,
-                    v: Some(v),
-                };
-                coordinates.push(el);
-            } else { panic!("Can't catch v value ({v});"); }
-        } else { // Coordinate matrix only (don't have V's)
-            let el = Element{
-                i: i.parse::<usize>().unwrap() - 1,
-                j: j.parse::<usize>().unwrap() - 1,
-                v: None,
-            };
-            coordinates.push(el);
-        }
-    }
-    assert_eq!(coordinates.len(), nz_len);
-    (coordinates, m, n)
-}
 
 
 #[cfg(test)]
@@ -300,165 +244,6 @@ mod tests {
         assert_eq!(matrix.row_index, [0, 3, 6, 8, 12]);
         assert_eq!(matrix.m, 4);
         assert_eq!(matrix.n, 4);
-    }
-
-    #[test]
-    fn read_matrix_market_file_test() {
-        let file = "test1.mtx";
-        let (coordinates, m, n) = read_matrix_market_file(file);
-        let coo = vec![
-            Element{
-                v: Some(5.0),
-                i: 0,
-                j: 0,
-            },
-            Element{
-                v: Some(8.0),
-                i: 1,
-                j: 1,
-            },
-            Element{
-                v: Some(3.0),
-                i: 2,
-                j: 2,
-            },
-            Element{
-                v: Some(6.0),
-                i: 3,
-                j: 1,
-            },
-        ];
-        let mut it = coordinates.iter();
-        for el in coo.iter() {
-            assert_eq!(Some(el), it.next());
-        }
-        assert_eq!(coordinates.len(), coo.len());
-        assert_eq!(m, 4);
-        assert_eq!(n, 3);
-
-        let file = "test2.mtx";
-        let (coordinates, m, n) = read_matrix_market_file(file);
-        let coo = vec![
-            Element{
-                v: Some(10.0),
-                i: 0,
-                j: 0,
-            },
-            Element{
-                v: Some(20.0),
-                i: 0,
-                j: 1,
-            },
-            Element{
-                v: Some(30.0),
-                i: 1,
-                j: 1,
-            },
-            Element{
-                v: Some(40.0),
-                i: 1,
-                j: 3,
-            },
-            Element{
-                v: Some(60.0),
-                i: 2,
-                j: 3,
-            },
-            Element{
-                v: Some(80.0),
-                i: 3,
-                j: 5,
-            },
-            Element{
-                v: Some(70.0),
-                i: 2,
-                j: 4,
-            },
-            Element{
-                v: Some(50.0),
-                i: 2,
-                j: 2,
-            },
-        ];
-        let mut it = coordinates.iter();
-        for el in coo.iter() {
-            assert_eq!(Some(el), it.next());
-        }
-        assert_eq!(coordinates.len(), coo.len());
-        assert_eq!(m, 4);
-        assert_eq!(n, 6);
-
-        let file = "test3.mtx";
-        let (coordinates, m, n) = read_matrix_market_file(file);
-        let coo = vec![
-            Element{
-                v: Some(2.0),
-                i: 0,
-                j: 0,
-            },
-            Element{
-                v: Some(3.0),
-                i: 0,
-                j: 1,
-            },
-            Element{
-                v: Some(1.0),
-                i: 0,
-                j: 3,
-            },
-            Element{
-                v: Some(3.0),
-                i: 1,
-                j: 0,
-            },
-            Element{
-                v: Some(2.0),
-                i: 1,
-                j: 1,
-            },
-            Element{
-                v: Some(5.0),
-                i: 1,
-                j: 3,
-            },
-            Element{
-                v: Some(2.0),
-                i: 2,
-                j: 2,
-            },
-            Element{
-                v: Some(4.0),
-                i: 2,
-                j: 3,
-            },
-            Element{
-                v: Some(1.0),
-                i: 3,
-                j: 0,
-            },
-            Element{
-                v: Some(5.0),
-                i: 3,
-                j: 1,
-            },
-            Element{
-                v: Some(4.0),
-                i: 3,
-                j: 2,
-            },
-            Element{
-                v: Some(2.0),
-                i: 3,
-                j: 3,
-            },
-        ];
-        let mut it = coordinates.iter();
-        for el in coo.iter() {
-            assert_eq!(Some(el), it.next());
-        }
-        assert_eq!(coordinates.len(), coo.len());
-        assert_eq!(m, 4);
-        assert_eq!(n, 4);
     }
 
     #[test]

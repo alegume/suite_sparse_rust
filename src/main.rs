@@ -3,6 +3,7 @@ use std::time::Instant;
 // use std::time::{Duration};
 // use std::thread::sleep;
 mod matrix_csr;
+mod read_files;
 
 fn main() {
     // let file = "apache2.mtx"; // ~2.8M
@@ -11,9 +12,9 @@ fn main() {
     // let file = "nasa2910.mtx"; // ~88k
     // let file = "will199.mtx";
     // let file = "mcca.mtx";
-    let file = "lns__131.mtx";
+    // let file = "lns__131.mtx";
     // let file = "bcspwr01.mtx";
-    // let file = "test2.mtx";
+    let file = "test2.mtx";
     // let file = "test3.mtx";
     // let file = "test1.mtx";
 
