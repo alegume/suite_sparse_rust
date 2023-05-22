@@ -221,7 +221,7 @@ mod tests {
 
     #[test]
     fn mm_file_to_csr_test() {
-        let file = "test1.mtx";
+        let file = "./instances/test1.mtx";
         let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.v, [5.0, 8.0, 3.0, 6.0]);
         assert_eq!(matrix.col_index, [0, 1, 2, 1]);
@@ -229,7 +229,7 @@ mod tests {
         assert_eq!(matrix.m, 4);
         assert_eq!(matrix.n, 3);
 
-        let file = "test2.mtx";
+        let file = "./instances/test2.mtx";
         let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.v, [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]);
         assert_eq!(matrix.col_index, [0, 1, 1, 3, 2, 3, 4, 5]);
@@ -237,7 +237,7 @@ mod tests {
         assert_eq!(matrix.m, 4);
         assert_eq!(matrix.n, 6);
 
-        let file = "test3.mtx";
+        let file = "./instances/test3.mtx";
         let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.v, [2.0, 3.0, 1.0, 3.0, 2.0, 5.0, 2.0, 4.0, 1.0, 5.0, 4.0, 2.0]);
         assert_eq!(matrix.col_index, [0, 1, 3, 0, 1, 3, 2, 3, 0, 1, 2, 3]);
@@ -249,14 +249,14 @@ mod tests {
     #[test]
     fn bw_test() {
         /* Stress tests  */
-        // let file = "apache2.mtx";
+        // let file = "./instances/apache2.mtx";
         // let mut matrix = mm_file_to_csr(file);
         // assert_eq!(matrix.bandwidth(), 65837);
-        // let file = "pwtk.mtx";
+        // let file = "./instances/pwtk.mtx";
         // let mut matrix = mm_file_to_csr(file);
         // assert_eq!(matrix.bandwidth(), 189331);
 
-        let file = "test1.mtx";
+        let file = "./instances/test1.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 2);
         assert_eq!(matrix.degrees(), [1, 1, 1, 1]);
@@ -264,7 +264,7 @@ mod tests {
         assert_eq!(matrix.bandwidth(), 2);
         // TODO: insert new matrix to assert
         
-        let file = "test2.mtx";
+        let file = "./instances/test2.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 2);
         println!("{:?}", matrix);
@@ -272,51 +272,51 @@ mod tests {
         matrix.cmr(matrix.col_index[0]);
         assert_eq!(matrix.bandwidth(), 2);
 
-        let file = "test3.mtx";
+        let file = "./instances/test3.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 3);
         assert_eq!(matrix.degrees(), [3, 3, 2, 4]);
         matrix.cmr(matrix.col_index[0]);
         assert_eq!(matrix.bandwidth(), 2);
 
-        let file = "bcspwr01.mtx";
+        let file = "./instances/bcspwr01.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 38);
         matrix.cmr(matrix.col_index[0]);
         // assert_eq!(matrix.bandwidth(), 8);
         // CMr 8
 
-        let file = "lns__131.mtx";
+        let file = "./instances/lns__131.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 111);
         matrix.cmr(matrix.col_index[0]);
         // CMr 39
 
-        let file = "mcca.mtx";
+        let file = "./instances/mcca.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 65);
         matrix.cmr(matrix.col_index[0]);
         // CMr 3
 
-        let file = "will199.mtx";
+        let file = "./instances/will199.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 169);
         matrix.cmr(matrix.col_index[0]);
         // CMr 115
 
-        let file = "662_bus.mtx";
+        let file = "./instances/662_bus.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 335);
         matrix.cmr(matrix.col_index[0]);
         // CMr 112
 
-        let file = "dwt__361.mtx";
+        let file = "./instances/dwt__361.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 50);
         matrix.cmr(matrix.col_index[0]);
         // CMr 25
 
-        let file = "sherman4.mtx";
+        let file = "./instances/sherman4.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 368);
         matrix.cmr(matrix.col_index[0]);

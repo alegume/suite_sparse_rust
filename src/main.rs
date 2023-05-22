@@ -37,7 +37,7 @@ fn experimentation(file: &str) {
     matrix.cmr(matrix.col_index[0]);
     let bw_1 = matrix.bandwidth();
     let total_time = now.elapsed().as_millis();
-    let file = &file[16..];
+    let file = &file[16..]; // Formating instance name
     let file = &file[..file.len()-4];
     println!("{}, {}, {}, {}, {}", file, matrix.m, bw_0, bw_1, total_time);
 }

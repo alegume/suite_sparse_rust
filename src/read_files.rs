@@ -12,7 +12,6 @@ pub fn read_matrix_market_file_coordinates(filename: &str) -> (Vec<Element>, usi
     use std::fs;
     use std::io::{BufRead, BufReader};
 
-    // let filename = "instances/".to_owned() + filename;
     let file = fs::File::open(filename).unwrap();
     let reader = BufReader::new(file);
     let mut header:bool = false;
@@ -62,11 +61,11 @@ pub fn read_matrix_market_file_coordinates(filename: &str) -> (Vec<Element>, usi
 
 
 mod tests {
-    // use super::*;
+    use super::*;
 
     #[test]
     fn read_matrix_market_file_test() {
-        let file = "test1.mtx";
+        let file = "./instances/test1.mtx";
         let (coordinates, m, n) = read_matrix_market_file_coordinates(file);
         let coo = vec![
             Element{
@@ -98,7 +97,7 @@ mod tests {
         assert_eq!(m, 4);
         assert_eq!(n, 3);
 
-        let file = "test2.mtx";
+        let file = "./instances/test2.mtx";
         let (coordinates, m, n) = read_matrix_market_file_coordinates(file);
         let coo = vec![
             Element{
@@ -150,7 +149,7 @@ mod tests {
         assert_eq!(m, 4);
         assert_eq!(n, 6);
 
-        let file = "test3.mtx";
+        let file = "./instances/test3.mtx";
         let (coordinates, m, n) = read_matrix_market_file_coordinates(file);
         let coo = vec![
             Element{
