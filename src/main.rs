@@ -10,12 +10,11 @@ mod read_files;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let mut n:usize = 0;
+    let mut n:usize = 1;
     if let Some(arg1) = &args.get(1) {
         n = arg1.parse::<usize>().unwrap();
     }
-    
-    // .parse::<usize>().unwrap_or(1);
+
     /*let files = vec![
     // "apache2.mtx", // ~2.8M
     // "pwtk.mtx", //~6M
@@ -30,6 +29,7 @@ fn main() {
     "test1.mtx",
     ];*/
 
+    // let files = fs::read_dir("./instances/tests").unwrap();
     let files = fs::read_dir("./instances/IPO").unwrap();
     println!("instancia, n, bw_0, bw_1, tempo(ms), Algo");
     for file in files {
@@ -50,16 +50,17 @@ fn experimentation(file: &str, n: &usize) {
     let file = &file[..file.len()-4];
     println!("{}, {}, {}, {}, {}, CMr ({})", file, matrix.m, bw_0, bw_1, total_time, matrix.col_index[0]);
     // ----------------------
-    for i in 0..*n {
+    let mut rng = rand::thread_rng();
+    let mut v: usize = rng.gen_range(1..matrix.m);
+    for _ in 0..*n {
         let now = Instant::now();
-        let mut rng = rand::thread_rng();
         let mut matrix = matrix_original.clone();
         let bw_0 = matrix.bandwidth();
-        let v: usize = rng.gen_range(1..matrix.m);
         matrix.cmr(matrix.col_index[v]);
         let bw_1 = matrix.bandwidth();
         let total_time = now.elapsed().as_millis();
         println!("{}, {}, {}, {}, {}, CMr-Rand ({})", file, matrix.m, bw_0, bw_1, total_time, v);
+        v = matrix.col_index[matrix.m-1];
     }
     
 }
