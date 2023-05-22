@@ -33,8 +33,8 @@ fn main() {
 
 fn experimentation(file: &str) {
     let now = Instant::now();
-    let mut matrix = matrix_csr::mm_file_to_csr(file);
-    let mut matrix_bkp = matrix.clone();
+    let matrix_original = matrix_csr::mm_file_to_csr(file);
+    let mut matrix = matrix_original.clone();
     let bw_0 = matrix.bandwidth();
     matrix.cmr(matrix.col_index[0]);
     let bw_1 = matrix.bandwidth();
@@ -45,7 +45,7 @@ fn experimentation(file: &str) {
     // ----------------------
     let now = Instant::now();
     let mut rng = rand::thread_rng();
-    let mut matrix = matrix_bkp.clone();
+    let mut matrix = matrix_original.clone();
     let bw_0 = matrix.bandwidth();
     let v: usize = rng.gen_range(1..matrix.m);
     matrix.cmr(matrix.col_index[v]);
