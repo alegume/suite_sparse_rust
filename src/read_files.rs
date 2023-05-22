@@ -12,7 +12,7 @@ pub fn read_matrix_market_file_coordinates(filename: &str) -> (Vec<Element>, usi
     use std::fs;
     use std::io::{BufRead, BufReader};
 
-    let filename = "instances/".to_owned() + filename;
+    // let filename = "instances/".to_owned() + filename;
     let file = fs::File::open(filename).unwrap();
     let reader = BufReader::new(file);
     let mut header:bool = false;
