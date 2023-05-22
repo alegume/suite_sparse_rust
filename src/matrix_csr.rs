@@ -12,9 +12,9 @@ pub struct Matrix {
     // pub v:Option<Vec<f64>>,
     // Or leave that way and use into_iter() to convert
     // Vec<Option<f64>> to Option<Vec<f64>>
-    pub v:Vec<f64>, // non zeros values
-    pub col_index:Vec<usize>, // column indices of values in v
-    pub row_index:Vec<usize>, // indices (in v and row_index) where the rows starts
+    pub v: Vec<f64>, // non zeros values
+    pub col_index: Vec<usize>, // column indices of values in v
+    pub row_index: Vec<usize>, // indices (in v and row_index) where the rows starts
     pub m: usize,
     pub n: usize,
     pub nz_len: usize,

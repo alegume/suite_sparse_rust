@@ -6,36 +6,32 @@ mod matrix_csr;
 mod read_files;
 
 fn main() {
-    // let file = "apache2.mtx"; // ~2.8M
-    // let file = "pwtk.mtx"; //~6M
-    // let file = "Roget.mtx"; // ~5k
-    // let file = "nasa2910.mtx"; // ~88k
-    // let file = "will199.mtx";
-    // let file = "mcca.mtx";
-    // let file = "lns__131.mtx";
-    // let file = "bcspwr01.mtx";
-    let file = "test2.mtx";
-    // let file = "test3.mtx";
-    // let file = "test1.mtx";
 
+    let files = vec![
+    // "apache2.mtx", // ~2.8M
+    // "pwtk.mtx", //~6M
+    // "Roget.mtx", // ~5k
+    // "nasa2910.mtx", // ~88k
+    "will199.mtx",
+    "mcca.mtx",
+    "lns__131.mtx",
+    "bcspwr01.mtx",
+    "test2.mtx",
+    "test3.mtx",
+    "test1.mtx",
+    ];
+    println!("instancia, n, bw_0, bw_1, tempo(ms)");
+    for file in files {
+        experimentation(file);
+    }
+}
+
+fn experimentation(file: &str) {
     let now = Instant::now();
     let mut matrix = matrix_csr::mm_file_to_csr(file);
-    println!("Time to create Matrix = {}ms", now.elapsed().as_millis());
-    // println!("{:?}", matrix);
-
-    let now = Instant::now();
-    println!("BW: {}", matrix.bandwidth());
-    println!("Time to compute BW= {}ms", now.elapsed().as_millis());
-
-    let now = Instant::now();
+    let bw_0 = matrix.bandwidth();
     matrix.cmr(matrix.col_index[0]);
-    println!("Time of CMr= {}ms", now.elapsed().as_millis());
-    // println!("{:?}", matrix);
-
-    let now = Instant::now();
-    println!("BW: {}", matrix.bandwidth());
-    println!("Time to compute BW= {}ms", now.elapsed().as_millis());
-
-    // println!("|V|{:?}; |row|{:?}; |col|{:?}; ", matrix.v.len(), matrix.row_index.len(), matrix.col_index.len());
-    // sleep(Duration::new(5, 0));
+    let bw_1 = matrix.bandwidth();
+    let total_time = now.elapsed().as_millis();
+    println!("{}, {}, {}, {}, {}", file, matrix.m, bw_0, bw_1, total_time);
 }

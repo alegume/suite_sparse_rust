@@ -62,7 +62,7 @@ pub fn read_matrix_market_file_coordinates(filename: &str) -> (Vec<Element>, usi
 
 
 mod tests {
-    use super::*;
+    // use super::*;
 
     #[test]
     fn read_matrix_market_file_test() {
