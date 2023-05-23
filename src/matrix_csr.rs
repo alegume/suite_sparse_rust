@@ -232,7 +232,7 @@ impl Matrix {
         let mut n_row:usize = 0;
 
         print!("\n    ");
-        for n in 0..self.n+1 {
+        for n in 0..self.n {
             print!("{} | ", n);
         }
         println!();
