@@ -191,10 +191,20 @@ impl Matrix {
         while n_row < self.row_index.len() - 1 {
             let row = self.get_columns_of_row(n_row);
             for j in row { // Columns in a row
+                if *j == n_row {continue;}
                 if n_row.abs_diff(*j) == self.bw {
-                let row_j = self.get_columns_of_row(*j);
-                    criticals_neighbours.insert(n_row, row.to_vec());
-                    criticals_neighbours.insert( *j, row_j.to_vec());
+                    let row: Vec<usize> = row.to_vec();
+                    let row = row.clone()
+                        .into_iter()
+                        .filter(|value| *value != n_row)
+                        .collect();
+                    let row_j: Vec<usize> = self.get_columns_of_row(*j).to_vec();
+                    let row_j = row_j.clone()
+                        .into_iter()
+                        .filter(|value| *value != *j)
+                        .collect();
+                    criticals_neighbours.insert(n_row, row);
+                    criticals_neighbours.insert( *j, row_j);
                 }
             }
             n_row += 1;
@@ -204,19 +214,18 @@ impl Matrix {
 
     pub fn local_search(&mut self, solution: &mut Vec<usize>) {
         let mut criticals_neighbours:HashMap<usize, Vec<usize>> = HashMap::new();
-        self.print();
+        // self.print();
         // let bw_0 = self.bandwidth();
-        // for (u, v) in &self.criticals_neighbours {
-        //     let neighbour_u = self.get_columns_of_row(*u);
-        //     let neighbour_v = self.get_columns_of_row(*v);
-        //     println!("N({:?}) = {:?}", u, neighbour_u);
-        //     println!("N({:?}) = {:?}", v, neighbour_v);
-            
-             
-        // }
+
         criticals_neighbours = self.criticals_neighbours();
-        dbg!(criticals_neighbours);
-        // dbg!(solution);
+        dbg!(&criticals_neighbours);
+        println!("{:?}", solution);
+        for (u, neighbours) in criticals_neighbours {
+            for v in neighbours {
+                solution.swap(u, v);
+                println!("({}, {}) s={:?}", u, v, solution);
+            }
+        }
     }
     
     pub fn ils(&mut self) {
@@ -224,7 +233,7 @@ impl Matrix {
         // TODO:gerar vertice aleatoria para inicio
         let mut rng = rand::thread_rng();
         let v: usize = rng.gen_range(1..self.m);
-        let mut new_rows = self.cmr(self.col_index[v]);
+        let mut new_rows = self.cmr(self.col_index[v]).clone();
 
         self.criticals_neighbours();
         // println!("\tcriticals = {:?}", self.criticals);
