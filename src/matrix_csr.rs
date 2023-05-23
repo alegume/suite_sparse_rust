@@ -232,14 +232,14 @@ impl Matrix {
         let mut n_row:usize = 0;
 
         print!("\n    ");
-        for n in 1..self.n+1 {
+        for n in 0..self.n+1 {
             print!("{} | ", n);
         }
         println!();
         // Each entry on row_index represents a ROW!
         while n_row < self.row_index.len() - 1 {
             let row = self.get_columns_of_row(n_row);
-            print!("{} |", n_row+1);
+            print!("{} |", n_row);
             let mut count: usize = 0;
             for j in row { // Columns in a row
                 let j = j + 1;
