@@ -212,20 +212,43 @@ impl Matrix {
         criticals_neighbours
     }
 
-    pub fn local_search(&mut self, solution: &mut Vec<usize>) {
-        let mut criticals_neighbours:HashMap<usize, Vec<usize>> = HashMap::new();
+    pub fn local_search(&mut self, solution: &mut Vec<usize>) -> Vec<usize>{
+        // let mut criticals_neighbours:HashMap<usize, Vec<usize>> = HashMap::new();
         // self.print();
-        // let bw_0 = self.bandwidth();
+        let mut bw_0 = self.bandwidth();
+        dbg!(bw_0);
+        let mut solution_0 = solution.clone();
+        // let mut improved:bool = false;
 
-        criticals_neighbours = self.criticals_neighbours();
-        dbg!(&criticals_neighbours);
-        println!("{:?}", solution);
-        for (u, neighbours) in criticals_neighbours {
+        // criticals_neighbours = self.criticals_neighbours();
+        // dbg!(&criticals_neighbours);
+        // println!("s={:?}", solution);
+        // let mut bw_1: usize = self.m;
+        for (u, neighbours) in self.criticals_neighbours() {
             for v in neighbours {
                 solution.swap(u, v);
-                println!("({}, {}) s={:?}", u, v, solution);
+                // println!("({}, {}) s={:?}", u, v, solution);
+                self.reorder(&solution);
+                let bw_1 = self.bandwidth();
+                if bw_1 < bw_0 {
+                    // println!("({}, {}) s={:?}", u, v, solution);
+                    // println!("bw_1={}, bw_0={})", bw_1, bw_0);
+                    solution_0 = solution.clone();
+                    bw_0 = bw_1;
+                    // improved = true;
+                } else {
+                    solution.swap(u, v);
+                    self.reorder(&solution);
+                }
             }
+            // if !improved {
+            //     self.reorder(&solution_0);
+            // }
         }
+        // Considera o melhor
+        self.reorder(&solution_0);
+        self.bandwidth();
+        solution_0
     }
     
     pub fn ils(&mut self) {
@@ -233,13 +256,12 @@ impl Matrix {
         // TODO:gerar vertice aleatoria para inicio
         let mut rng = rand::thread_rng();
         let v: usize = rng.gen_range(1..self.m);
-        let mut new_rows = self.cmr(self.col_index[v]).clone();
-
-        self.criticals_neighbours();
+        
         // println!("\tcriticals = {:?}", self.criticals);
         for _ in 0..1 {
+            let mut new_rows = self.cmr(self.col_index[0]);
+            self.reorder(&new_rows);
             self.local_search(&mut new_rows);
-
         }
     }
 
