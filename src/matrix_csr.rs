@@ -1,5 +1,7 @@
 use std::collections::VecDeque;
 use std::cmp::max;
+use rand::Rng;
+
 
 use crate::read_files::{Element, read_matrix_market_file_coordinates};
 
@@ -15,6 +17,7 @@ pub struct Matrix {
     pub v: Vec<f64>, // non zeros values
     pub col_index: Vec<usize>, // column indices of values in v
     pub row_index: Vec<usize>, // indices (in v and row_index) where the rows starts
+    pub criticals: Vec<usize>, // Critical vertex (max bw)
     pub m: usize,
     pub n: usize,
     pub nz_len: usize,
@@ -27,6 +30,8 @@ impl Matrix {
             v: Vec::with_capacity(v_size),
             row_index: Vec::with_capacity(m+1),
             col_index: Vec::with_capacity(nz_len),
+            //  TODO: tune this capacity
+            criticals: Vec::with_capacity(30),
             m,
             n,
             nz_len
@@ -168,6 +173,40 @@ impl Matrix {
         self.v = v;
         self.col_index = col_index;
         self.row_index = row_offset;
+    }
+
+    
+    pub fn criticals(&mut self, bw:usize) {
+        let mut n_row:usize = 0;
+        let mut v:Vec<usize> = Vec::new();
+
+        // Each entry on row_index represents a ROW!
+        while n_row < self.row_index.len() - 1 {
+            let row = self.get_columns_of_row(n_row);
+            for j in row { // Columns in a row
+                if n_row.abs_diff(*j) == bw {
+                    // TODO: Adicionar diretamente
+                    v.push(n_row);
+                    v.push(*j);
+                }
+            }
+            n_row += 1;
+        }
+        self.criticals.append(&mut v);
+    }
+    
+    pub fn ils(&mut self) {
+        // let mut rng = rand::thread_rng();
+        // let mut v: usize = rng.gen_range(1..self.m);
+        let bw_0 = self.bandwidth();
+        self.criticals(bw_0);
+        println!("\t{:?}", self.criticals);
+        self.cmr(self.col_index[0]);
+        let bw_0 = self.bandwidth();
+        self.criticals.clear();
+        self.criticals(bw_0);
+        println!("\tCMr = {:?}", self.criticals);
+
     }
 
 }

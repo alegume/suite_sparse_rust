@@ -3,7 +3,6 @@ use std::time::Instant;
 // use std::time::{Duration};
 // use std::thread::sleep;
 use std::fs;
-use rand::Rng;
 use std::env;
 mod matrix_csr;
 mod read_files;
@@ -50,17 +49,14 @@ fn experimentation(file: &str, n: &usize) {
     let file = &file[..file.len()-4];
     println!("{}, {}, {}, {}, {}, CMr ({})", file, matrix.m, bw_0, bw_1, total_time, matrix.col_index[0]);
     // ----------------------
-    let mut rng = rand::thread_rng();
-    let mut v: usize = rng.gen_range(1..matrix.m);
+
     for _ in 0..*n {
         let now = Instant::now();
         let mut matrix = matrix_original.clone();
-        let bw_0 = matrix.bandwidth();
-        matrix.cmr(matrix.col_index[v]);
+        matrix.ils();
         let bw_1 = matrix.bandwidth();
         let total_time = now.elapsed().as_millis();
-        println!("{}, {}, {}, {}, {}, CMr-Rand ({})", file, matrix.m, bw_0, bw_1, total_time, v);
-        v = matrix.col_index[matrix.m-1];
+        println!("{}, {}, {}, {}, {}, ILS", file, matrix.m, bw_0, bw_1, total_time);
     }
     
 }
