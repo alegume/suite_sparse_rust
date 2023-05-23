@@ -19,6 +19,7 @@ pub struct Matrix {
     pub col_index: Vec<usize>, // column indices of values in v
     pub row_index: Vec<usize>, // indices (in v and row_index) where the rows starts
     pub criticals: HashMap<usize, usize>, // Critical vertex (max bw)
+    pub bw: usize, // Current bandwidth
     pub m: usize,
     pub n: usize,
     pub nz_len: usize,
@@ -33,13 +34,14 @@ impl Matrix {
             col_index: Vec::with_capacity(nz_len),
             //  TODO: tune this capacity
             criticals: HashMap::new(),
+            bw: 0,
             m,
             n,
             nz_len
         }
     }
 
-    pub fn bandwidth(&self) -> usize {
+    pub fn bandwidth(&mut self) -> usize {
         let mut bandwidth:usize = 0;
         let mut n_row:usize = 0;
 
@@ -53,6 +55,8 @@ impl Matrix {
             }
             n_row += 1;
         }
+        self.bw = bandwidth;
+        // TODO: remover return
         bandwidth
     }
 
@@ -177,38 +181,38 @@ impl Matrix {
     }
 
     
-    pub fn criticals(&mut self, bw:usize) {
+    pub fn criticals(&mut self) {
         let mut n_row:usize = 0;
-        let mut v:Vec<usize> = Vec::new();
+        let mut criticals:HashMap<usize, usize> = HashMap::new();
 
         // Each entry on row_index represents a ROW!
         while n_row < self.row_index.len() - 1 {
             let row = self.get_columns_of_row(n_row);
             for j in row { // Columns in a row
-                if n_row.abs_diff(*j) == bw {
+                if n_row.abs_diff(*j) == self.bw {
                     // TODO: Adicionar diretamente
-                    self.criticals.insert(n_row, *j);
-                    dbg!(n_row);
-                    dbg!(*j);
+                    criticals.insert(n_row, *j);
                 }
             }
             n_row += 1;
         }
-        self.criticals.append(&mut v);
+        self.criticals = criticals;
     }
     
     pub fn ils(&mut self) {
+        // !!!!!!!!! Não pode começar pelos criticos??????
+        // TODO:gerar vertice aleatoria para inicio
         // let mut rng = rand::thread_rng();
         // let mut v: usize = rng.gen_range(1..self.m);
         let bw_0 = self.bandwidth();
-        self.criticals(bw_0);
-        println!("\t{:?}", self.criticals);
-        self.cmr(self.col_index[0]);
+        self.criticals();
+        println!("\tcriticals: {:?}", self.criticals);
+        self.cmr(self.col_index[self.m]);
         let bw_0 = self.bandwidth();
-        self.criticals.clear();
-        self.criticals(bw_0);
-        println!("\tCMr = {:?}", self.criticals);
-
+        // self.criticals.clear();
+        self.criticals();
+        println!("\tcriticals = {:?}", self.criticals);
+        // self.local_search();
     }
 
 }

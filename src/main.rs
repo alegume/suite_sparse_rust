@@ -28,8 +28,8 @@ fn main() {
     "test1.mtx",
     ];*/
 
-    let files = fs::read_dir("./instances/tests").unwrap();
-    // let files = fs::read_dir("./instances/IPO").unwrap();
+    // let files = fs::read_dir("./instances/tests").unwrap();
+    let files = fs::read_dir("./instances/IPO").unwrap();
     println!("instancia, n, bw_0, bw_1, tempo(ms), Algo");
     for file in files {
         // println!("{}", file.unwrap().path().into_os_string().into_string().unwrap().as_str());
@@ -57,6 +57,6 @@ fn experimentation(file: &str, n: &usize) {
         let bw_1 = matrix.bandwidth();
         let total_time = now.elapsed().as_millis();
         println!("{}, {}, {}, {}, {}, ILS", file, matrix.m, bw_0, bw_1, total_time);
+        // dbg!(matrix);
     }
-    dbg!(matrix);
 }
