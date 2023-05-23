@@ -42,8 +42,8 @@ fn experimentation(file: &str, n: &usize) {
     let matrix_original = matrix_csr::mm_file_to_csr(file);
     let mut matrix = matrix_original.clone();
 
-    print!("{}", file);
-    matrix_original.print();
+    // print!("{}", file);
+    // matrix_original.print();
 
     let bw_0 = matrix.bandwidth();
     matrix.cmr(matrix.col_index[0]);

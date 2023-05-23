@@ -18,7 +18,7 @@ pub struct Matrix {
     pub v: Vec<f64>, // non zeros values
     pub col_index: Vec<usize>, // column indices of values in v
     pub row_index: Vec<usize>, // indices (in v and row_index) where the rows starts
-    pub criticals: HashMap<usize, usize>, // Critical vertex (max bw)
+    // pub criticals_neighbours: HashMap<usize, Vec::<usize>>, // Critical vertex (max bw)
     pub bw: usize, // Current bandwidth
     pub m: usize,
     pub n: usize,
@@ -33,7 +33,7 @@ impl Matrix {
             row_index: Vec::with_capacity(m+1),
             col_index: Vec::with_capacity(nz_len),
             //  TODO: tune this capacity
-            criticals: HashMap::new(),
+            // criticals_neighbours: HashMap::new(),
             bw: 0,
             m,
             n,
@@ -182,9 +182,9 @@ impl Matrix {
     }
 
 
-    pub fn criticals(&mut self) {
+    pub fn criticals_neighbours(&mut self) -> HashMap<usize, Vec<usize>>{
         let mut n_row:usize = 0;
-        let mut criticals:HashMap<usize, usize> = HashMap::new();
+        let mut criticals_neighbours:HashMap<usize, Vec<usize>> = HashMap::new();
 
         self.bandwidth(); // Calculate self.bw
         // Each entry on row_index represents a ROW!
@@ -192,24 +192,30 @@ impl Matrix {
             let row = self.get_columns_of_row(n_row);
             for j in row { // Columns in a row
                 if n_row.abs_diff(*j) == self.bw {
-                    // TODO: Adicionar diretamente
-                    criticals.insert(n_row, *j);
+                let row_j = self.get_columns_of_row(*j);
+                    criticals_neighbours.insert(n_row, row.to_vec());
+                    criticals_neighbours.insert( *j, row_j.to_vec());
                 }
             }
             n_row += 1;
         }
-        self.criticals = criticals;
+        criticals_neighbours
     }
 
-    pub fn local_search(&self, solution: &mut Vec<usize>) {
+    pub fn local_search(&mut self, solution: &mut Vec<usize>) {
+        let mut criticals_neighbours:HashMap<usize, Vec<usize>> = HashMap::new();
         self.print();
-        for (u, v) in &self.criticals {
-            let row = self.get_columns_of_row(*u); // Get row of i (neighbours of u)
-            println!("N({:?}) = {:?}", u, row);
-            let row = self.get_columns_of_row(*v); // Get row of i (neighbours of v)
-            println!("N({:?}) = {:?}", v, row);
-
-        }
+        // let bw_0 = self.bandwidth();
+        // for (u, v) in &self.criticals_neighbours {
+        //     let neighbour_u = self.get_columns_of_row(*u);
+        //     let neighbour_v = self.get_columns_of_row(*v);
+        //     println!("N({:?}) = {:?}", u, neighbour_u);
+        //     println!("N({:?}) = {:?}", v, neighbour_v);
+            
+             
+        // }
+        criticals_neighbours = self.criticals_neighbours();
+        dbg!(criticals_neighbours);
         // dbg!(solution);
     }
     
@@ -220,7 +226,7 @@ impl Matrix {
         let v: usize = rng.gen_range(1..self.m);
         let mut new_rows = self.cmr(self.col_index[v]);
 
-        self.criticals();
+        self.criticals_neighbours();
         // println!("\tcriticals = {:?}", self.criticals);
         for _ in 0..1 {
             self.local_search(&mut new_rows);
