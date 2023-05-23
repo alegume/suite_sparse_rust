@@ -31,7 +31,7 @@ impl Matrix {
             row_index: Vec::with_capacity(m+1),
             col_index: Vec::with_capacity(nz_len),
             //  TODO: tune this capacity
-            criticals: Vec::with_capacity(30),
+            criticals: Vec::new(),
             m,
             n,
             nz_len
@@ -139,7 +139,7 @@ impl Matrix {
         for (i, val) in new_rows.iter().enumerate() {
             old_rows[*val] = i;
         }
-
+        // Starts with 0
         row_offset.push(0);
         for new in old_rows.iter() {
             // If n_columns > n_rows create empty row
@@ -148,9 +148,9 @@ impl Matrix {
                 continue;
             }
             // Change col_offsets 
-            let start = col_index.len();
+            let start = col_index.len(); // Where new colum starts
             let old_cols = self.get_columns_of_row(*new);
-            for e in old_cols {
+            for e in old_cols { // New columns
                 col_index.push(new_rows[*e]); // TODO: Verify optimization
             }
             col_index[start..].sort(); // Sort last part by columns
@@ -188,6 +188,8 @@ impl Matrix {
                     // TODO: Adicionar diretamente
                     v.push(n_row);
                     v.push(*j);
+                    dbg!(n_row);
+                    dbg!(*j);
                 }
             }
             n_row += 1;
