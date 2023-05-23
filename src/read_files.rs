@@ -52,10 +52,13 @@ pub fn read_matrix_market_file_coordinates(filename: &str) -> (Vec<Element>, usi
                 j: j.parse::<usize>().unwrap() - 1,
                 v: None,
             };
-            coordinates.push(el);
+            if i != j { // Self reference not alowed
+                coordinates.push(el);
+            }
         }
     }
-    assert_eq!(coordinates.len(), nz_len);
+    // Do not work if i == j
+    // assert_eq!(coordinates.len(), nz_len);
     (coordinates, m, n)
 }
 
