@@ -260,7 +260,7 @@ mod tests {
 
     #[test]
     fn mm_file_to_csr_test() {
-        let file = "./instances/test1.mtx";
+        let file = "./instances/tests/test1.mtx";
         let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.v, [5.0, 8.0, 3.0, 6.0]);
         assert_eq!(matrix.col_index, [0, 1, 2, 1]);
@@ -268,7 +268,7 @@ mod tests {
         assert_eq!(matrix.m, 4);
         assert_eq!(matrix.n, 3);
 
-        let file = "./instances/test2.mtx";
+        let file = "./instances/tests/test2.mtx";
         let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.v, [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]);
         assert_eq!(matrix.col_index, [0, 1, 1, 3, 2, 3, 4, 5]);
@@ -276,7 +276,7 @@ mod tests {
         assert_eq!(matrix.m, 4);
         assert_eq!(matrix.n, 6);
 
-        let file = "./instances/test3.mtx";
+        let file = "./instances/tests/test3.mtx";
         let matrix = mm_file_to_csr(file);
         assert_eq!(matrix.v, [2.0, 3.0, 1.0, 3.0, 2.0, 5.0, 2.0, 4.0, 1.0, 5.0, 4.0, 2.0]);
         assert_eq!(matrix.col_index, [0, 1, 3, 0, 1, 3, 2, 3, 0, 1, 2, 3]);
@@ -288,14 +288,14 @@ mod tests {
     #[test]
     fn bw_test() {
         /* Stress tests  */
-        // let file = "./instances/apache2.mtx";
+        // let file = "./instances/tests/apache2.mtx";
         // let mut matrix = mm_file_to_csr(file);
         // assert_eq!(matrix.bandwidth(), 65837);
-        // let file = "./instances/pwtk.mtx";
+        // let file = "./instances/tests/pwtk.mtx";
         // let mut matrix = mm_file_to_csr(file);
         // assert_eq!(matrix.bandwidth(), 189331);
 
-        let file = "./instances/test1.mtx";
+        let file = "./instances/tests/test1.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 2);
         assert_eq!(matrix.degrees(), [1, 1, 1, 1]);
@@ -303,7 +303,7 @@ mod tests {
         assert_eq!(matrix.bandwidth(), 2);
         // TODO: insert new matrix to assert
         
-        let file = "./instances/test2.mtx";
+        let file = "./instances/tests/test2.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 2);
         println!("{:?}", matrix);
@@ -311,7 +311,7 @@ mod tests {
         matrix.cmr(matrix.col_index[0]);
         assert_eq!(matrix.bandwidth(), 2);
 
-        let file = "./instances/test3.mtx";
+        let file = "./instances/tests/test3.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 3);
         assert_eq!(matrix.degrees(), [3, 3, 2, 4]);

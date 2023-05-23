@@ -66,7 +66,7 @@ mod tests {
 
     #[test]
     fn read_matrix_market_file_test() {
-        let file = "./instances/test1.mtx";
+        let file = "./instances/tests/test1.mtx";
         let (coordinates, m, n) = read_matrix_market_file_coordinates(file);
         let coo = vec![
             Element{
@@ -98,7 +98,7 @@ mod tests {
         assert_eq!(m, 4);
         assert_eq!(n, 3);
 
-        let file = "./instances/test2.mtx";
+        let file = "./instances/tests/test2.mtx";
         let (coordinates, m, n) = read_matrix_market_file_coordinates(file);
         let coo = vec![
             Element{
@@ -150,7 +150,7 @@ mod tests {
         assert_eq!(m, 4);
         assert_eq!(n, 6);
 
-        let file = "./instances/test3.mtx";
+        let file = "./instances/tests/test3.mtx";
         let (coordinates, m, n) = read_matrix_market_file_coordinates(file);
         let coo = vec![
             Element{
