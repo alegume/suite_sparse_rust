@@ -56,7 +56,7 @@ fn experimentation(file: &str, n: &usize) {
         matrix.ils();
         let bw_1 = matrix.bandwidth();
         let total_time = now.elapsed().as_millis();
-        println!("{}, {}, {}, {}, {}, ILS", file, matrix.m, bw_0, bw_1, total_time);
+        println!("{}, {}, {}, {}, {}, ILS", file, matrix.m, bw_0, matrix.bw, total_time);
         // dbg!(matrix);
     }
 }

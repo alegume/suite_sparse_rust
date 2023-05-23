@@ -185,6 +185,7 @@ impl Matrix {
         let mut n_row:usize = 0;
         let mut criticals:HashMap<usize, usize> = HashMap::new();
 
+        self.bandwidth(); // Calculate self.bw
         // Each entry on row_index represents a ROW!
         while n_row < self.row_index.len() - 1 {
             let row = self.get_columns_of_row(n_row);
@@ -204,11 +205,9 @@ impl Matrix {
         // TODO:gerar vertice aleatoria para inicio
         // let mut rng = rand::thread_rng();
         // let mut v: usize = rng.gen_range(1..self.m);
-        let bw_0 = self.bandwidth();
         self.criticals();
         println!("\tcriticals: {:?}", self.criticals);
         self.cmr(self.col_index[self.m]);
-        let bw_0 = self.bandwidth();
         // self.criticals.clear();
         self.criticals();
         println!("\tcriticals = {:?}", self.criticals);
