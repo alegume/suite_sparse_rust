@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
 use std::cmp::max;
+use std::collections::HashMap;
 use rand::Rng;
 
 
@@ -17,7 +18,7 @@ pub struct Matrix {
     pub v: Vec<f64>, // non zeros values
     pub col_index: Vec<usize>, // column indices of values in v
     pub row_index: Vec<usize>, // indices (in v and row_index) where the rows starts
-    pub criticals: Vec<usize>, // Critical vertex (max bw)
+    pub criticals: HashMap<usize, usize>, // Critical vertex (max bw)
     pub m: usize,
     pub n: usize,
     pub nz_len: usize,
@@ -31,7 +32,7 @@ impl Matrix {
             row_index: Vec::with_capacity(m+1),
             col_index: Vec::with_capacity(nz_len),
             //  TODO: tune this capacity
-            criticals: Vec::new(),
+            criticals: HashMap::new(),
             m,
             n,
             nz_len
@@ -186,8 +187,7 @@ impl Matrix {
             for j in row { // Columns in a row
                 if n_row.abs_diff(*j) == bw {
                     // TODO: Adicionar diretamente
-                    v.push(n_row);
-                    v.push(*j);
+                    self.criticals.insert(n_row, *j);
                     dbg!(n_row);
                     dbg!(*j);
                 }
