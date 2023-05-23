@@ -91,7 +91,7 @@ impl Matrix {
         } else { 0 }
     }
 
-    pub fn cmr(&mut self, start_v: usize) {
+    pub fn cmr(&mut self, start_v: usize) -> Vec<usize>{
         let mut lines_visited:Vec<usize> = vec![std::usize::MAX; max(self.m, self.n)];
         // push_back to add to the queue and pop_front to remove from the queue.
         let mut to_visit: VecDeque<usize> = VecDeque::from([start_v]);
@@ -109,6 +109,7 @@ impl Matrix {
         }
         // dbg!(&lines_visited);
         self.reorder(&lines_visited);
+        lines_visited
     }
 
     // Cycle through queue in breadth-first search and reverse labeling
@@ -199,19 +200,27 @@ impl Matrix {
         }
         self.criticals = criticals;
     }
+
+    pub fn local_search(&self, solution: &mut Vec<usize>) {
+        for v in &self.criticals {
+            // dbg!(v);
+        }
+        // dbg!(solution);
+    }
     
     pub fn ils(&mut self) {
         // !!!!!!!!! Não pode começar pelos criticos??????
         // TODO:gerar vertice aleatoria para inicio
-        // let mut rng = rand::thread_rng();
-        // let mut v: usize = rng.gen_range(1..self.m);
+        let mut rng = rand::thread_rng();
+        let v: usize = rng.gen_range(1..self.m);
+        let mut new_rows = self.cmr(self.col_index[v]);
+
         self.criticals();
-        println!("\tcriticals: {:?}", self.criticals);
-        self.cmr(self.col_index[self.m]);
-        // self.criticals.clear();
-        self.criticals();
-        println!("\tcriticals = {:?}", self.criticals);
-        // self.local_search();
+        // println!("\tcriticals = {:?}", self.criticals);
+        for _ in 0..1 {
+            self.local_search(&mut new_rows);
+
+        }
     }
 
 }
