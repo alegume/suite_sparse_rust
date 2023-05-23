@@ -40,23 +40,25 @@ fn main() {
 fn experimentation(file: &str, n: &usize) {
     let now = Instant::now();
     let matrix_original = matrix_csr::mm_file_to_csr(file);
-    let mut matrix = matrix_original.clone();
-    let bw_0 = matrix.bandwidth();
-    matrix.cmr(matrix.col_index[0]);
-    matrix.bandwidth();
-    let total_time = now.elapsed().as_millis();
-    let file = &file[16..]; // Formating instance name
-    let file = &file[..file.len()-4];
-    println!("{}, {}, {}, {}, {}, CMr ({})", file, matrix.m, bw_0, matrix.bw, total_time, matrix.col_index[0]);
-    // ----------------------
+    print!("{}", file);
+    matrix_original.print();
+    // let mut matrix = matrix_original.clone();
+    // let bw_0 = matrix.bandwidth();
+    // matrix.cmr(matrix.col_index[0]);
+    // matrix.bandwidth();
+    // let total_time = now.elapsed().as_millis();
+    // let file = &file[16..]; // Formating instance name
+    // let file = &file[..file.len()-4];
+    // println!("{}, {}, {}, {}, {}, CMr ({})", file, matrix.m, bw_0, matrix.bw, total_time, matrix.col_index[0]);
+    // // ----------------------
 
-    for _ in 0..*n {
-        let now = Instant::now();
-        let mut matrix = matrix_original.clone();
-        matrix.ils();
-        matrix.bandwidth();
-        let total_time = now.elapsed().as_millis();
-        println!("{}, {}, {}, {}, {}, ILS", file, matrix.m, bw_0, matrix.bw, total_time);
-        // dbg!(matrix);
-    }
+    // for _ in 0..*n {
+    //     let now = Instant::now();
+    //     let mut matrix = matrix_original.clone();
+    //     matrix.ils();
+    //     matrix.bandwidth();
+    //     let total_time = now.elapsed().as_millis();
+    //     println!("{}, {}, {}, {}, {}, ILS", file, matrix.m, bw_0, matrix.bw, total_time);
+    //     // dbg!(matrix);
+    // }
 }

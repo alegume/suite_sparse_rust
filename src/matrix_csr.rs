@@ -56,7 +56,7 @@ impl Matrix {
             n_row += 1;
         }
         self.bw = bandwidth;
-        // TODO: remover return
+        // TODO: remover return?
         bandwidth
     }
 
@@ -181,7 +181,7 @@ impl Matrix {
         self.row_index = row_offset;
     }
 
-    
+
     pub fn criticals(&mut self) {
         let mut n_row:usize = 0;
         let mut criticals:HashMap<usize, usize> = HashMap::new();
@@ -202,8 +202,13 @@ impl Matrix {
     }
 
     pub fn local_search(&self, solution: &mut Vec<usize>) {
-        for v in &self.criticals {
-            // dbg!(v);
+        self.print();
+        for (u, v) in &self.criticals {
+            let row = self.get_columns_of_row(*u); // Get row of i (neighbours of u)
+            println!("N({:?}) = {:?}", u, row);
+            let row = self.get_columns_of_row(*v); // Get row of i (neighbours of v)
+            println!("N({:?}) = {:?}", v, row);
+
         }
         // dbg!(solution);
     }
@@ -223,6 +228,35 @@ impl Matrix {
         }
     }
 
+    pub fn print(&self) {
+        let mut n_row:usize = 0;
+
+        print!("\n    ");
+        for n in 1..self.n+1 {
+            print!("{} | ", n);
+        }
+        println!();
+        // Each entry on row_index represents a ROW!
+        while n_row < self.row_index.len() - 1 {
+            let row = self.get_columns_of_row(n_row);
+            print!("{} |", n_row+1);
+            let mut count: usize = 0;
+            for j in row { // Columns in a row
+                let j = j + 1;
+                for _ in 1..j-count {
+                    print!(" 0 |");
+                }
+                count = j;
+                // println!("\tj={} count={}", j, count);
+                print!(" x |");
+            }
+            if count < self.n {
+                print!(" 0 |");
+            }
+            n_row += 1;
+            println!();
+        }
+    }
 }
 
 

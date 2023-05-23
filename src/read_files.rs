@@ -57,8 +57,8 @@ pub fn read_matrix_market_file_coordinates(filename: &str) -> (Vec<Element>, usi
             }
         }
     }
-    // Do not work if i == j
-    // assert_eq!(coordinates.len(), nz_len);
+    // assert_eq!(coordinates.len(), nz_len); // Do not work if i == j
+    assert!(coordinates.len() <= nz_len);
     (coordinates, m, n)
 }
 
