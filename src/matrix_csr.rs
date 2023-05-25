@@ -21,6 +21,7 @@ pub struct Matrix {
     // pub criticals_neighbours: HashMap<usize, Vec::<usize>>, // Critical vertex (max bw)
     pub bw: usize, // Current bandwidth
     pub max_degree: usize,
+    pub min_bw: usize,
     pub m: usize,
     pub n: usize,
     pub nz_len: usize,
@@ -37,6 +38,7 @@ impl Matrix {
             // criticals_neighbours: HashMap::new(),
             bw: 0,
             max_degree: 0,
+            min_bw: 0,
             m,
             n,
             nz_len
@@ -331,7 +333,7 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
             matrix.row_index.push(matrix.row_index.last().copied().unwrap());
         }
     }
-
+    matrix.min_bw = matrix.max_degree / 2;
     assert_eq!(matrix.row_index.len(), m + 1);
     assert_eq!(matrix.col_index.len(), matrix.nz_len);
 

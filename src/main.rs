@@ -1,36 +1,26 @@
-#![allow(dead_code)]
+#![allow(dead_code, unused)]
 use std::time::Instant;
 // use std::time::{Duration};
 // use std::thread::sleep;
 use std::fs;
 use std::env;
+use std::process::abort;
 mod matrix_csr;
 mod read_files;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let mut n:usize = 1;
+    let mut n: usize = 1;
+    let mut dir: String = String::from("input/tests/");
+
     if let Some(arg1) = &args.get(1) {
         n = arg1.parse::<usize>().unwrap();
     }
+    if let Some(arg2) = &args.get(2) {
+        dir = format!("input/{}/", arg2);
+    }
 
-    /*let files = vec![
-    // "apache2.mtx", // ~2.8M
-    // "pwtk.mtx", //~6M
-    // "Roget.mtx", // ~5k
-    // "nasa2910.mtx", // ~88k
-    "will199.mtx",
-    "mcca.mtx",
-    "lns__131.mtx",
-    "bcspwr01.mtx",
-    "test2.mtx",
-    "test3.mtx",
-    "test1.mtx",
-    ];*/
-
-    let files = fs::read_dir("./instances/tests").unwrap();
-    // let files = fs::read_dir("./instances/IPO").unwrap();
-    println!("instancia, n, bw_0, bw_1, tempo(ms), Algo");
+    let files = fs::read_dir(dir.as_str()).unwrap();
     for file in files {
         experimentation(file.unwrap().path().into_os_string().into_string().unwrap().as_str(), &n);
     }
@@ -39,22 +29,23 @@ fn main() {
 fn experimentation(file: &str, n: &usize) {
     let matrix_original = matrix_csr::mm_file_to_csr(file);
     let mut matrix = matrix_original.clone();
-    
-    print!("{}", file);
-    matrix_original.print();
+
+    // print!("{}", file);
+    // matrix_original.print();
     // println!("{:?}", matrix);
     let now = Instant::now();
     let bw_0 = matrix.bandwidth();
-    // let order = matrix.cmr(matrix.col_index[0]);
+    let order = matrix.cmr(matrix.col_index[0]);
     matrix.bandwidth();
     let total_time = now.elapsed().as_millis();
     let file = &file[16..]; // Formating instance name
     let file = &file[..file.len()-4];
-    println!("{}, {}, {}, {}, {}, CMr ({})", file, matrix.m, bw_0, matrix.bw, total_time, matrix.col_index[0]);
+    println!("instancia, n, bw_0, bw_1, max_degree, tempo(ms), Algo");
+    println!("{}, {}, {}, {}, {}, {}, CMr ({})", file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]);
     // ----------------------
     // dbg!(order);
     // matrix.print();
-    println!("{:?}", matrix);
+    // println!("{:?}", matrix);
     
 
     // for _ in 0..*n {
