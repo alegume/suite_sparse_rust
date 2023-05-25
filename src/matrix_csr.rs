@@ -20,6 +20,7 @@ pub struct Matrix {
     pub row_index: Vec<usize>, // indices (in v and row_index) where the rows starts
     // pub criticals_neighbours: HashMap<usize, Vec::<usize>>, // Critical vertex (max bw)
     pub bw: usize, // Current bandwidth
+    pub max_degree: usize,
     pub m: usize,
     pub n: usize,
     pub nz_len: usize,
@@ -32,9 +33,10 @@ impl Matrix {
             v: Vec::with_capacity(v_size),
             row_index: Vec::with_capacity(m+1),
             col_index: Vec::with_capacity(nz_len),
-            //  TODO: tune this capacity
+            //  TODO: tune this capacity or remove
             // criticals_neighbours: HashMap::new(),
             bw: 0,
+            max_degree: 0,
             m,
             n,
             nz_len
@@ -326,6 +328,8 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
 
         if row.len() > 0 {
             matrix.row_index.push(matrix.col_index.len());
+            // Find max_degree
+            if row.len() > matrix.max_degree {matrix.max_degree = row.len();}
         } else {
             matrix.row_index.push(matrix.row_index.last().copied().unwrap());
         }
