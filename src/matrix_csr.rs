@@ -218,14 +218,10 @@ impl Matrix {
         // let mut criticals_neighbours:HashMap<usize, Vec<usize>> = HashMap::new();
         // self.print();
         let mut bw_0 = self.bandwidth();
-        dbg!(bw_0);
+        // dbg!(bw_0);
         let mut solution_0 = solution.clone();
-        // let mut improved:bool = false;
+        let mut improved:bool = false;
 
-        // criticals_neighbours = self.criticals_neighbours();
-        // dbg!(&criticals_neighbours);
-        // println!("s={:?}", solution);
-        // let mut bw_1: usize = self.m;
         for (u, neighbours) in self.criticals_neighbours() {
             for v in neighbours {
                 solution.swap(u, v);
@@ -233,15 +229,16 @@ impl Matrix {
                 self.reorder(&solution);
                 let bw_1 = self.bandwidth();
                 if bw_1 < bw_0 {
-                    // println!("({}, {}) s={:?}", u, v, solution);
-                    // println!("bw_1={}, bw_0={})", bw_1, bw_0);
+                    println!("({}, {}) s={:?}", u, v, solution);
+                    println!("bw_1={}, bw_0={})", bw_1, bw_0);
                     solution_0 = solution.clone();
                     bw_0 = bw_1;
-                    // improved = true;
-                } else {
-                    solution.swap(u, v);
-                    self.reorder(&solution);
-                }
+                    improved = true;
+                } 
+                // else {
+                //     solution.swap(u, v);
+                //     self.reorder(&solution);
+                // }
             }
             // if !improved {
             //     self.reorder(&solution_0);
@@ -250,6 +247,7 @@ impl Matrix {
         // Considera o melhor
         self.reorder(&solution_0);
         self.bandwidth();
+        println!("SELF.bw={}, bw_0={})", self.bw, bw_0);
         solution_0
     }
     
@@ -262,7 +260,6 @@ impl Matrix {
         // println!("\tcriticals = {:?}", self.criticals);
         for _ in 0..1 {
             let mut new_rows = self.cmr(self.col_index[0]);
-            self.reorder(&new_rows);
             self.local_search(&mut new_rows);
         }
     }
