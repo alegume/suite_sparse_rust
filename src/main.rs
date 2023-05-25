@@ -20,6 +20,8 @@ fn main() {
         dir = format!("input/{}/", arg2);
     }
 
+    println!("instancia, n, bw_0, bw_1, max_degree, tempo(ms), Algo");
+
     let files = fs::read_dir(dir.as_str()).unwrap();
     for file in files {
         experimentation(file.unwrap().path().into_os_string().into_string().unwrap().as_str(), &n);
@@ -31,22 +33,28 @@ fn experimentation(file: &str, n: &usize) {
     let mut matrix = matrix_original.clone();
 
     // print!("{}", file);
-    // matrix_original.print();
     // println!("{:?}", matrix);
     let now = Instant::now();
     let bw_0 = matrix.bandwidth();
     let order = matrix.cmr(matrix.col_index[0]);
     matrix.bandwidth();
     let total_time = now.elapsed().as_millis();
-    let file = &file[16..]; // Formating instance name
-    let file = &file[..file.len()-4];
-    println!("instancia, n, bw_0, bw_1, max_degree, tempo(ms), Algo");
-    println!("{}, {}, {}, {}, {}, {}, CMr ({})", file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]);
-    // ----------------------
-    // dbg!(order);
-    // matrix.print();
-    // println!("{:?}", matrix);
     
+    let file = &file[10..]; // Formating instance name
+    let file = &file[..file.len()-4];
+    println!("{}, {}, {}, {}, {}, {}, CMr ({})", file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]);
+    
+    // ----------------------
+    matrix_original.print();
+    println!("{:?}", matrix_original);
+    print!("o={:?}", order);
+    matrix.print();
+    println!("{:?}\n", matrix);
+    
+    matrix.reorder(&vec![3,2,1,0]);
+    matrix.print();
+    println!("{:?}\n", matrix);
+    abort();
 
     // for _ in 0..*n {
     //     let now = Instant::now();

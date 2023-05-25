@@ -140,7 +140,7 @@ impl Matrix {
         }
     }
 
-    fn reorder(&mut self, new_rows: &Vec<usize>) {
+    pub fn reorder(&mut self, new_rows: &Vec<usize>) {
         let mut row_offset = Vec::with_capacity(self.m);
         let mut col_index = Vec::with_capacity(self.col_index.len());
         let mut v:Vec<f64> = Vec::with_capacity(self.v.len());
@@ -294,6 +294,7 @@ impl Matrix {
             n_row += 1;
             println!();
         }
+        println!();
     }
 }
 
