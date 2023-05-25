@@ -45,15 +45,16 @@ fn experimentation(file: &str, n: &usize) {
     // println!("{:?}", matrix);
     let now = Instant::now();
     let bw_0 = matrix.bandwidth();
-    let order = matrix.cmr(matrix.col_index[0]);
+    // let order = matrix.cmr(matrix.col_index[0]);
     matrix.bandwidth();
     let total_time = now.elapsed().as_millis();
     let file = &file[16..]; // Formating instance name
     let file = &file[..file.len()-4];
     println!("{}, {}, {}, {}, {}, CMr ({})", file, matrix.m, bw_0, matrix.bw, total_time, matrix.col_index[0]);
     // ----------------------
-    dbg!(order);
-    matrix.print();
+    // dbg!(order);
+    // matrix.print();
+    println!("{:?}", matrix);
     
 
     // for _ in 0..*n {
