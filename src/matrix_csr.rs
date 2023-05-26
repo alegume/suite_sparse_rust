@@ -245,13 +245,14 @@ impl Matrix {
     // Swap vertices if it's good and update bw
     pub fn vertices_swap_bw_update(&mut self, u: &usize, v: &usize) -> bool {
         // Test if swap is good
-        let mut old_bw_u:usize = 0;
-        let mut old_bw_v:usize = 0;
-        let mut bw_u:usize = 0;
-        let mut bw_v:usize = 0;
+        // let mut old_bw_u:usize = 0;
+        // let mut old_bw_v:usize = 0;
+        // let mut bw_u:usize = 0;
+        // let mut bw_v:usize = 0;
 
+        // TODO: deal with it
+        assert!(u < v);
         // Swap the values in col_index
-        // TODO!! exchange the order of values in col_index
         for x in &mut self.col_index {
             if *x == *u {
                 *x = *v
@@ -259,29 +260,46 @@ impl Matrix {
                 *x = *u
             }
         }
-        println!("{:?}", self.col_index);
-        // self.col_index.iter_mut()
-        // .filter(|x| *x == u).for_each(|x| *x = 0);;
+        // println!("{:?}", [self.col_index.to_owned(), vec![99,88,77]].join(&55));
+        // Swap the order of values in col_index
+        let start_col_u = self.row_index[*u];
+        let stop_col_u = self.row_index[*u + 1];
+        let start_col_v = self.row_index[*v];
+        let stop_col_v = self.row_index[*v + 1];
+        // let new_stop = self.row_index[*v + 1] - self.row_index[*v];
 
+        let first_part:Vec<usize> = self.col_index[..start_col_u].to_owned();
+        let old_col_u:Vec<usize> = self.col_index[start_col_u..stop_col_u].to_owned();
+        let middle:Vec<usize> = self.col_index[stop_col_u..start_col_v].to_owned();
+        let old_col_v:Vec<usize> = self.col_index[start_col_v..stop_col_v].to_owned();
+        let last:Vec<usize> = self.col_index[stop_col_v..].to_owned();
 
-        assert!(u < v);
+        println!("f={:?}",&first_part);
+        println!("o_v={:?}",&old_col_v);
+        println!("middle={:?}",&middle);
+        println!("o_u={:?}", &old_col_u);
+        println!("l={:?}", &last);
+
+        let diamond = [first_part, old_col_v, middle, old_col_u, last].concat();
+        println!("{:?}",diamond);
+
+        
 
         // Fix row_index for u
-        let start = self.row_index[*u];
-        let stop = self.row_index[*u + 1];
-        let new_stop = self.row_index[*v + 1] - self.row_index[*v];
+        // let start = self.row_index[*u];
+        // let stop = self.row_index[*u + 1];
+        // let new_stop = self.row_index[*v + 1] - self.row_index[*v];
 
-        for j in stop..self.row_index[*v] {
-            self.row_index[j] += new_stop - stop;
-        }
-        
+        // for j in stop..self.row_index[*v] {
+        //     self.row_index[j] += new_stop - stop;
+        // }
+
         // Fix row_index for u
         
-        true
         // TODO!! Update bw 
-
+        self.bandwidth();
+        true
  /*
-
         // bw of original vertex u
         let u_neighbour = self.get_columns_of_row(*u);
         // for j in u_neighbour { // Columns in a row
