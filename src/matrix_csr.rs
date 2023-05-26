@@ -244,15 +244,9 @@ impl Matrix {
 
     // Swap vertices if it's good and update bw
     pub fn vertices_swap_bw_update(&mut self, u: &usize, v: &usize) -> bool {
-        // Test if swap is good
-        // let mut old_bw_u:usize = 0;
-        // let mut old_bw_v:usize = 0;
-        // let mut bw_u:usize = 0;
-        // let mut bw_v:usize = 0;
-
         // TODO: deal with it
         assert!(u < v);
-        // Swap the values in col_index
+        //// Swap the values in col_index
         for x in &mut self.col_index {
             if *x == *u {
                 *x = *v
@@ -260,90 +254,61 @@ impl Matrix {
                 *x = *u
             }
         }
-        // println!("{:?}", [self.col_index.to_owned(), vec![99,88,77]].join(&55));
-        // Swap the order of values in col_index
+        //// Swap the order of values in col_index
         let start_col_u = self.row_index[*u];
         let stop_col_u = self.row_index[*u + 1];
         let start_col_v = self.row_index[*v];
         let stop_col_v = self.row_index[*v + 1];
-        // let new_stop = self.row_index[*v + 1] - self.row_index[*v];
-
         let mut first_part:Vec<usize> = self.col_index[..start_col_u].to_owned();
         let mut old_col_u:Vec<usize> = self.col_index[start_col_u..stop_col_u].to_owned();
         let mut middle:Vec<usize> = self.col_index[stop_col_u..start_col_v].to_owned();
         let mut old_col_v:Vec<usize> = self.col_index[start_col_v..stop_col_v].to_owned();
         let mut last:Vec<usize> = self.col_index[stop_col_v..].to_owned();
         // Sort columns to respect CSR definitions
-        old_col_u.sort_unstable();
-        old_col_v.sort_unstable();
-        first_part.sort_unstable();
-        middle.sort_unstable();
-        last.sort_unstable();
-        
-        println!("f={:?}",&first_part);
-        println!("o_v={:?}",&old_col_v);
-        println!("middle={:?}",&middle);
-        println!("o_u={:?}", &old_col_u);
-        println!("l={:?}", &last);
-
-        let diamond = [first_part, old_col_v, middle, old_col_u, last].concat();
-        println!("{:?}",diamond);
+        // This does not work because first, middle and last must be sorted line by line
+        // old_col_u.sort_unstable();
+        // old_col_v.sort_unstable();
+        // first_part.sort_unstable();
+        // middle.sort_unstable();
+        // last.sort_unstable();
+        // println!("f={:?}",&first_part);
+        // println!("o_v={:?}",&old_col_v);
+        // println!("middle={:?}",&middle);
+        // println!("o_u={:?}", &old_col_u);
+        // println!("l={:?}", &last);
 
 
-        // Fix row_index for u
-        // let start = self.row_index[*u];
-        // let stop = self.row_index[*u + 1];
-        // let new_stop = self.row_index[*v + 1] - self.row_index[*v];
+        // Replace with correct columns
+        self.col_index = [first_part, old_col_v, middle, old_col_u, last].concat();
 
-        // for j in stop..self.row_index[*v] {
-        //     self.row_index[j] += new_stop - stop;
-        // }
+        //// Fix row_index for u (first part is already ok)
+        let diff_u = (stop_col_v - start_col_v);
+        dbg!(diff_u);
+        self.row_index[u+1] = start_col_u + (diff_u);
+        // update in between
+        for i in u+2..v+1 {
+            self.row_index[i] += diff_u;
+        }
+        // Fix for v
+        let diff_v = (stop_col_u - start_col_u);
+        self.row_index[v+1] = self.row_index[*v] + diff_v;
+        // update lasts
+        for i in v+2..self.m-1 {
+            self.row_index[i] += diff_v;
+        }
+        println!("{:?}", self.row_index);
+        // self.row_index[stop_col_u+1] = start_col_u;
+        // let first_part:usize = ;
+        // let old_col_u:usize = ;
+        // let middle:usize = ;
+        // let old_col_v:usize = ;
+        // let last:usize = ;
 
-        // Fix row_index for u
+        /// Fix row_index for u
         
         // TODO!! Update bw 
         self.bandwidth();
         true
- /*
-        // bw of original vertex u
-        let u_neighbour = self.get_columns_of_row(*u);
-        // for j in u_neighbour { // Columns in a row
-        //     if u.abs_diff(*j as usize) > old_bw_u {
-        //         old_bw_u = u.abs_diff(*j as usize);
-        //     }
-        // }
-        dbg!(u, v, old_bw_u, old_bw_v);
-        // // bw of original vertex v
-        let v_neighbour = self.get_columns_of_row(*v);
-        // for j in v_neighbour { // Columns in a row
-        //     if v.abs_diff(*j as usize) > old_bw_v {
-        //         old_bw_v = v.abs_diff(*j as usize);
-        //     }
-        // }
-
-        // bw of vertex u if swap occurs
-        for j in v_neighbour { // Columns in a row
-            if u.abs_diff(*j as usize) > bw_u {
-                bw_u = u.abs_diff(*j as usize);
-            }
-        }
-        // bw of vertex v if swap occurs
-        for j in u_neighbour { // Columns in a row
-            if v.abs_diff(*j as usize) > bw_v {
-                bw_v = v.abs_diff(*j as usize);
-            }
-        }
-        dbg!(u, v, bw_u, bw_v);
-
-        // TODO: rever
-        return (bw_u < self.bw) && (bw_v < self.bw);
-
-        // TODO: Só aceitar troca se melhora a solucao?
-
-        // TODO: funcao Swap otimizada
-        // if () and () {
-        // }
- */
     }
 
     // Calculate bw of vertex u
