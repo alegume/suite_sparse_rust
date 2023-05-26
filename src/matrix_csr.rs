@@ -256,6 +256,7 @@ impl Matrix {
         // TODO: rever
         return (bw_u < self.bw) && (bw_v < self.bw);
 
+        // TODO: Só aceitar troca se melhora a solucao?
         // dbg!(u, v, bw_u, bw_v);
 
         // Swap
