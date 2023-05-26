@@ -89,6 +89,7 @@ impl Matrix {
             collect::<Vec<usize>>()
     }
 
+    // Degree of row i
     fn degree(&self, i:usize) -> usize {
         if i < self.row_index.len() - 1 {
             self.row_index[i+1] - self.row_index[i]
@@ -140,6 +141,7 @@ impl Matrix {
         }
     }
 
+    // Reorder vertex for cmr
     pub fn reorder(&mut self, new_rows: &Vec<usize>) {
         let mut row_offset = Vec::with_capacity(self.m);
         let mut col_index = Vec::with_capacity(self.col_index.len());
@@ -186,7 +188,7 @@ impl Matrix {
     }
 
 
-    pub fn criticals_neighbours(&mut self) -> HashMap<usize, Vec<usize>>{
+    /*pub fn criticals_neighbours_old(&mut self) -> HashMap<usize, Vec<usize>>{
         let mut n_row:usize = 0;
         let mut criticals_neighbours:HashMap<usize, Vec<usize>> = HashMap::new();
 
@@ -214,6 +216,30 @@ impl Matrix {
             n_row += 1;
         }
         criticals_neighbours
+    }*/
+
+    // Vertices in edges with bigest bandwidth
+    pub fn criticals_neighbours(&mut self) -> Vec<usize>{
+        let mut n_row:usize = 0;
+        let mut criticals_neighbours:Vec<usize> = Vec::new();
+
+        // TODO: remover
+        self.bandwidth(); // Calculate self.bw
+        while n_row < self.row_index.len() - 1 {
+            let row = self.get_columns_of_row(n_row);
+            for j in row { // Columns in a row
+                if *j == n_row {continue;}
+                if n_row.abs_diff(*j) == self.bw {
+                    criticals_neighbours.push(n_row);
+                    // criticals_neighbours.push(*j);
+                }
+            }
+            n_row += 1;
+        }
+        // TODO: optimize
+        criticals_neighbours.sort_unstable();
+        criticals_neighbours.dedup();
+        criticals_neighbours
     }
 
     // Swap vertices if it's good and update bw
@@ -231,7 +257,7 @@ impl Matrix {
         //         old_bw_u = u.abs_diff(*j as usize);
         //     }
         // }
-        // // dbg!(u, v, old_bw_u, old_bw_v);
+        dbg!(u, v, old_bw_u, old_bw_v);
         // // bw of original vertex v
         let v_neighbour = self.get_columns_of_row(*v);
         // for j in v_neighbour { // Columns in a row
@@ -252,14 +278,67 @@ impl Matrix {
                 bw_v = v.abs_diff(*j as usize);
             }
         }
+        dbg!(u, v, bw_u, bw_v);
 
         // TODO: rever
         return (bw_u < self.bw) && (bw_v < self.bw);
 
         // TODO: Só aceitar troca se melhora a solucao?
+
+        // TODO: funcao Swap otimizada
+        // if () and () {
+        // }
+
+        // Update bw 
+    }
+
+    // Calculate bw of vertex u
+    fn bw_vertex(&self, u:usize) -> usize {
+        let mut bw_v:usize = 0;
+
+        let u_neighbour = self.get_columns_of_row(u);
+        for v in u_neighbour { // Columns in a row
+            let diff: usize = u.abs_diff(*v as usize);
+            if diff > bw_v {
+                bw_v = diff;
+            }
+        }
+        bw_v
+    }
+
+    // Swap vertices if it's good and update bw
+    pub fn vertex_to_swap_with(&mut self, u: &usize) -> Vec<usize> {
+        // Test if swap is good
+        let mut old_bw_u:usize = 0;
+        let mut bw_u:usize = 0;
+        let mut v_best:&usize = u;
+
+        // bw of original vertex u
+        let u_neighbour = self.get_columns_of_row(*u);
+        for v in u_neighbour { // Columns in a row
+            // if u == v {continue;}
+            if u.abs_diff(*v as usize) > old_bw_u {
+                old_bw_u = u.abs_diff(*v as usize);
+                v_best = v;
+            }
+        }
+        // dbg!(u, old_bw_u, u_neighbour, v_best);
+        u_neighbour.to_vec().into_iter().filter(|x| x != u).collect()
+
+        // // bw of vertex u if swap occurs
+        // for v in u_neighbour { // Columns in a row
+        //     if u.abs_diff(*v as usize) > bw_u {
+        //         bw_u = u.abs_diff(*v as usize);
+        //     }
+        // }
+
         // dbg!(u, v, bw_u, bw_v);
 
-        // Swap
+        // TODO: rever
+
+        // TODO: Só aceitar troca se melhora a solucao?
+
+        // TODO: funcao Swap otimizada
         // if () and () {
         // }
 
@@ -275,24 +354,34 @@ impl Matrix {
         // let mut solution_0 = solution.clone();
         let mut improved:bool = false;
 
-        for (u, neighbours) in self.criticals_neighbours() {
-            for v in neighbours {
-                // println!("swap ({}, {}) s={:?}", u, v, solution);
+        for (u) in self.criticals_neighbours() {
+            let swaps = self.vertex_to_swap_with(&u);
+            for v in swaps {
+                println!("swap ({}, {}) s={:?}", u, v, solution);
                 // TODO: Só reordena se melhora
-                let swap:bool = self.vertex_swap_bw_update(&u, &v);
-                // self.bandwidth();
-                if swap {
-                    let u = solution.get(u).unwrap().clone();
-                    let v = solution.get(v).unwrap().clone();
+                // let swap:bool = self.vertex_swap_bw_update(&u, &v);
+                let u = solution.get(u).unwrap().clone();
+                let v = solution.get(v).unwrap().clone();
+                self.print();
+                println!("\t ANTES; o={:?}",solution);
+                solution.swap(u, v);
+                self.reorder(&solution);
+                self.bandwidth();
+                println!("\t mudou ({}, {}); o={:?}",u,v,solution);
+                if self.bw > bw_0 {
                     solution.swap(u, v);
                     self.reorder(&solution);
                     self.bandwidth();
-                    // println!("swap ({}, {}) s={:?}\n", u, v, solution);
-                    // println!("bf={}, bw_0={})", self.bw, bw_0);
-
+                    println!("\tpiorou");
+                    println!("\t ({:?}, {:?}); o={:?}",&u,&v, solution);
+                    self.print();
+                } else {
                     bw_0 = self.bw;
                     improved = true;
                 }
+                // println!("swap ({}, {}) s={:?}\n", u, v, solution);
+                // println!("bf={}, bw_0={})", self.bw, bw_0);
+
             }
             // if !improved {
             //     self.reorder(&solution_0);
@@ -315,6 +404,7 @@ impl Matrix {
         // println!("\tcriticals = {:?}", self.criticals);
         for _ in 0..1 {
             let mut new_rows = self.cmr(self.col_index[0]);
+            // self.print();
             self.local_search(&mut new_rows);
         }
     }
