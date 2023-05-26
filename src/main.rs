@@ -37,34 +37,39 @@ fn experimentation(file: &str, n: &usize) {
     let now = Instant::now();
     let bw_0 = matrix.bandwidth();
     let order = matrix.cmr(matrix.col_index[0]);
+    // matrix.cmr(matrix.col_index[0]);
     matrix.bandwidth();
     let total_time = now.elapsed().as_millis();
     
     let file = &file[10..]; // Formating instance name
     let file = &file[..file.len()-4];
-    println!("{}, {}, {}, {}, {}, {}, CMr ({})", file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]);
+    println!("{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, CMr ({})", file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]);
+
     
     // ----------------------
-    matrix_original.print();
-    println!("{:?}", matrix_original);
-    print!("o={:?}", order);
-    matrix.print();
-    println!("{:?}\n", matrix);
+    // matrix_original.print();
+    // // println!("{:?}", matrix_original);
+    // print!("o={:?}", order);
+    // matrix.print();
+    // // println!("{:?}\n", matrix);
     
-    matrix.reorder(&vec![3,2,1,0]);
-    matrix.print();
-    println!("{:?}\n", matrix);
-    abort();
+    // matrix.reorder(&vec![2,3,1,0]);
+    // matrix.print();
+    // println!("{:?}\n", matrix);
+    // abort();
+    // ----------------------
 
-    // for _ in 0..*n {
-    //     let now = Instant::now();
-    //     let mut matrix = matrix_original.clone();
-    //     // matrix.print();
-    //     matrix.ils();
-    //     // matrix.bandwidth();
-    //     let total_time = now.elapsed().as_millis();
-    //     println!("{}, {}, {}, {}, {}, ILS", file, matrix.m, bw_0, matrix.bw, total_time);
-    //     // print!("{}", file);
-    //     // matrix.print();
-    // }
+
+    for _ in 0..*n {
+        let now = Instant::now();
+        let mut matrix = matrix_original.clone();
+        // matrix.print();
+        matrix.ils();
+        matrix.bandwidth();
+        let total_time = now.elapsed().as_millis();
+        println!("{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, ils ({})", file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]);
+ 
+        // print!("{}", file);
+        // matrix.print();
+    }
 }

@@ -216,41 +216,93 @@ impl Matrix {
         criticals_neighbours
     }
 
+    // Swap vertices if it's good and update bw
+    pub fn vertex_swap_bw_update(&mut self, u: &usize, v: &usize) -> bool {
+        // Test if swap is good
+        let mut old_bw_u:usize = 0;
+        let mut old_bw_v:usize = 0;
+        let mut bw_u:usize = 0;
+        let mut bw_v:usize = 0;
+
+        // bw of original vertex u
+        let u_neighbour = self.get_columns_of_row(*u);
+        // for j in u_neighbour { // Columns in a row
+        //     if u.abs_diff(*j as usize) > old_bw_u {
+        //         old_bw_u = u.abs_diff(*j as usize);
+        //     }
+        // }
+        // // dbg!(u, v, old_bw_u, old_bw_v);
+        // // bw of original vertex v
+        let v_neighbour = self.get_columns_of_row(*v);
+        // for j in v_neighbour { // Columns in a row
+        //     if v.abs_diff(*j as usize) > old_bw_v {
+        //         old_bw_v = v.abs_diff(*j as usize);
+        //     }
+        // }
+
+        // bw of vertex u if swap occurs
+        for j in v_neighbour { // Columns in a row
+            if u.abs_diff(*j as usize) > bw_u {
+                bw_u = u.abs_diff(*j as usize);
+            }
+        }
+        // bw of vertex v if swap occurs
+        for j in u_neighbour { // Columns in a row
+            if v.abs_diff(*j as usize) > bw_v {
+                bw_v = v.abs_diff(*j as usize);
+            }
+        }
+
+        // TODO: rever
+        return (bw_u < self.bw) && (bw_v < self.bw);
+
+        // dbg!(u, v, bw_u, bw_v);
+
+        // Swap
+        // if () and () {
+        // }
+
+        // Update bw 
+    }
+
+
     pub fn local_search(&mut self, solution: &mut Vec<usize>) -> Vec<usize>{
         // let mut criticals_neighbours:HashMap<usize, Vec<usize>> = HashMap::new();
         // self.print();
         let mut bw_0 = self.bandwidth();
         // dbg!(bw_0);
-        let mut solution_0 = solution.clone();
+        // let mut solution_0 = solution.clone();
         let mut improved:bool = false;
 
         for (u, neighbours) in self.criticals_neighbours() {
             for v in neighbours {
-                solution.swap(u, v);
-                // println!("({}, {}) s={:?}", u, v, solution);
-                self.reorder(&solution);
-                let bw_1 = self.bandwidth();
-                if bw_1 < bw_0 {
-                    println!("({}, {}) s={:?}", u, v, solution);
-                    println!("bw_1={}, bw_0={})", bw_1, bw_0);
-                    solution_0 = solution.clone();
-                    bw_0 = bw_1;
+                // println!("swap ({}, {}) s={:?}", u, v, solution);
+                // TODO: Só reordena se melhora
+                let swap:bool = self.vertex_swap_bw_update(&u, &v);
+                // self.bandwidth();
+                if swap {
+                    let u = solution.get(u).unwrap().clone();
+                    let v = solution.get(v).unwrap().clone();
+                    solution.swap(u, v);
+                    self.reorder(&solution);
+                    self.bandwidth();
+                    // println!("swap ({}, {}) s={:?}\n", u, v, solution);
+                    // println!("bf={}, bw_0={})", self.bw, bw_0);
+
+                    bw_0 = self.bw;
                     improved = true;
-                } 
-                // else {
-                //     solution.swap(u, v);
-                //     self.reorder(&solution);
-                // }
+                }
             }
             // if !improved {
             //     self.reorder(&solution_0);
             // }
         }
         // Considera o melhor
-        self.reorder(&solution_0);
-        self.bandwidth();
-        println!("SELF.bw={}, bw_0={})", self.bw, bw_0);
-        solution_0
+        // self.reorder(&solution_0);
+        // self.bandwidth();
+        // println!("SELF.bw={}, bw_0={})", self.bw, bw_0);
+        // solution_0
+        vec![]
     }
     
     pub fn ils(&mut self) {
