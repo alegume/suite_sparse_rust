@@ -243,12 +243,44 @@ impl Matrix {
     }
 
     // Swap vertices if it's good and update bw
-    pub fn vertex_swap_bw_update(&mut self, u: &usize, v: &usize) -> bool {
+    pub fn vertices_swap_bw_update(&mut self, u: &usize, v: &usize) -> bool {
         // Test if swap is good
         let mut old_bw_u:usize = 0;
         let mut old_bw_v:usize = 0;
         let mut bw_u:usize = 0;
         let mut bw_v:usize = 0;
+
+        // Swap the values in col_index
+        // TODO!! exchange the order of values in col_index
+        for x in &mut self.col_index {
+            if *x == *u {
+                *x = *v
+            } else if *x == *v {
+                *x = *u
+            }
+        }
+        println!("{:?}", self.col_index);
+        // self.col_index.iter_mut()
+        // .filter(|x| *x == u).for_each(|x| *x = 0);;
+
+
+        assert!(u < v);
+
+        // Fix row_index for u
+        let start = self.row_index[*u];
+        let stop = self.row_index[*u + 1];
+        let new_stop = self.row_index[*v + 1] - self.row_index[*v];
+
+        for j in stop..self.row_index[*v] {
+            self.row_index[j] += new_stop - stop;
+        }
+        
+        // Fix row_index for u
+        
+        true
+        // TODO!! Update bw 
+
+ /*
 
         // bw of original vertex u
         let u_neighbour = self.get_columns_of_row(*u);
@@ -288,8 +320,7 @@ impl Matrix {
         // TODO: funcao Swap otimizada
         // if () and () {
         // }
-
-        // Update bw 
+ */
     }
 
     // Calculate bw of vertex u

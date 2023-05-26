@@ -32,7 +32,7 @@ fn experimentation(file: &str, n: &usize) {
     let matrix_original = matrix_csr::mm_file_to_csr(file);
     let mut matrix = matrix_original.clone();
 
-    // print!("{}", file);
+    print!("\n\n{}", file);
     // println!("{:?}", matrix);
     let now = Instant::now();
     let bw_0 = matrix.bandwidth();
@@ -47,8 +47,8 @@ fn experimentation(file: &str, n: &usize) {
 
     
     // ----------------------
-    // matrix_original.print();
-    // // println!("{:?}", matrix_original);
+    matrix_original.print();
+    println!("{:?}", matrix_original);
     // print!("o={:?}", order);
     // matrix.print();
     // // println!("{:?}\n", matrix);
@@ -64,12 +64,15 @@ fn experimentation(file: &str, n: &usize) {
         let now = Instant::now();
         let mut matrix = matrix_original.clone();
         // matrix.print();
-        matrix.ils();
+
+        matrix.vertices_swap_bw_update(&1, &2);
+
+        // matrix.ils();
         matrix.bandwidth();
-        let total_time = now.elapsed().as_millis();
-        println!("{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, ils ({})", file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]);
+        // let total_time = now.elapsed().as_millis();
+        // println!("{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, ils ({})", file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]);
  
-        // print!("{}", file);
-        // matrix.print();
+        matrix.print();
+        print!("{:?}", matrix);
     }
 }
