@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+use std::{collections::VecDeque, process::abort};
 use std::cmp::max;
 use std::collections::HashMap;
 use rand::Rng;
@@ -268,12 +268,18 @@ impl Matrix {
         let stop_col_v = self.row_index[*v + 1];
         // let new_stop = self.row_index[*v + 1] - self.row_index[*v];
 
-        let first_part:Vec<usize> = self.col_index[..start_col_u].to_owned();
-        let old_col_u:Vec<usize> = self.col_index[start_col_u..stop_col_u].to_owned();
-        let middle:Vec<usize> = self.col_index[stop_col_u..start_col_v].to_owned();
-        let old_col_v:Vec<usize> = self.col_index[start_col_v..stop_col_v].to_owned();
-        let last:Vec<usize> = self.col_index[stop_col_v..].to_owned();
-
+        let mut first_part:Vec<usize> = self.col_index[..start_col_u].to_owned();
+        let mut old_col_u:Vec<usize> = self.col_index[start_col_u..stop_col_u].to_owned();
+        let mut middle:Vec<usize> = self.col_index[stop_col_u..start_col_v].to_owned();
+        let mut old_col_v:Vec<usize> = self.col_index[start_col_v..stop_col_v].to_owned();
+        let mut last:Vec<usize> = self.col_index[stop_col_v..].to_owned();
+        // Sort columns to respect CSR definitions
+        old_col_u.sort_unstable();
+        old_col_v.sort_unstable();
+        first_part.sort_unstable();
+        middle.sort_unstable();
+        last.sort_unstable();
+        
         println!("f={:?}",&first_part);
         println!("o_v={:?}",&old_col_v);
         println!("middle={:?}",&middle);
@@ -283,7 +289,6 @@ impl Matrix {
         let diamond = [first_part, old_col_v, middle, old_col_u, last].concat();
         println!("{:?}",diamond);
 
-        
 
         // Fix row_index for u
         // let start = self.row_index[*u];

@@ -72,7 +72,7 @@ fn experimentation(file: &str, n: &usize) {
         // let total_time = now.elapsed().as_millis();
         // println!("{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, ils ({})", file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]);
  
-        matrix.print();
+        // matrix.print();
         print!("{:?}", matrix);
     }
 }
