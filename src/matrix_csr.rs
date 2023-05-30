@@ -13,6 +13,7 @@ pub struct Matrix {
     pub v: Vec<f64>, // non zeros values
     pub col_index: Vec<usize>, // column indices of values in v
     pub row_index: Vec<usize>, // indices (in v and row_index) where the rows starts
+    pub labels: Vec<usize>,
     pub bw: usize, // Current bandwidth
     pub max_degree: usize,
     pub min_bw: usize,
@@ -27,8 +28,7 @@ impl Matrix {
             v: Vec::with_capacity(v_size),
             row_index: Vec::with_capacity(m+1),
             col_index: Vec::with_capacity(nz_len),
-            //  TODO: tune this capacity or remove
-            // criticals_neighbours: HashMap::new(),
+            labels: Vec::with_capacity(max(m, n)),
             bw: 0,
             max_degree: 0,
             min_bw: 0,
@@ -41,14 +41,19 @@ impl Matrix {
     pub fn bandwidth(&mut self) -> usize {
         let mut bandwidth:usize = 0;
         let mut n_row:usize = 0;
+        let mut diff:usize = 0;
 
         // Each entry on row_index represents a ROW!
         while n_row < self.row_index.len() - 1 {
             let row = self.get_columns_of_row(n_row);
             for j in row { // Columns in a row
-                if n_row.abs_diff(*j as usize) > bandwidth {
-                    bandwidth = n_row.abs_diff(*j as usize);
+                diff = self.labels[n_row].abs_diff(self.labels[*j]);
+                if diff > bandwidth {
+                    bandwidth = diff;
                 }
+                // if n_row.abs_diff(*j as usize) > bandwidth {
+                //     bandwidth = n_row.abs_diff(*j as usize);
+                // }
             }
             n_row += 1;
         }
@@ -365,6 +370,7 @@ impl Matrix {
 }
 
 
+// Create matrix from HB file
 pub fn mm_file_to_csr(file: &str) -> Matrix {
     let mut coordinates: Vec<Element>;
     let (n, m): (usize, usize); 
@@ -399,6 +405,12 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
         } else {
             matrix.row_index.push(matrix.row_index.last().copied().unwrap());
         }
+        matrix.labels.push(i); // Original labels
+    }
+    if n > m {// In case it have more columns than rows
+        for i in 0..n-m {
+            matrix.labels.push(m+i);
+        }
     }
     matrix.min_bw = matrix.max_degree / 2;
     assert_eq!(matrix.row_index.len(), m + 1);
@@ -420,6 +432,7 @@ mod tests {
         assert_eq!(matrix.v, [5.0, 8.0, 3.0, 6.0]);
         assert_eq!(matrix.col_index, [0, 1, 2, 1]);
         assert_eq!(matrix.row_index, [0, 1, 2, 3, 4]);
+        assert_eq!(matrix.labels, [0, 1, 2, 3]);
         assert_eq!(matrix.m, 4);
         assert_eq!(matrix.n, 3);
 
@@ -428,6 +441,7 @@ mod tests {
         assert_eq!(matrix.v, [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]);
         assert_eq!(matrix.col_index, [0, 1, 1, 3, 2, 3, 4, 5]);
         assert_eq!(matrix.row_index, [0, 2, 4, 7, 8]);
+        assert_eq!(matrix.labels, [0, 1, 2, 3, 4, 5]);
         assert_eq!(matrix.m, 4);
         assert_eq!(matrix.n, 6);
 
@@ -436,6 +450,7 @@ mod tests {
         assert_eq!(matrix.v, [2.0, 3.0, 1.0, 3.0, 2.0, 5.0, 2.0, 4.0, 1.0, 5.0, 4.0, 2.0]);
         assert_eq!(matrix.col_index, [0, 1, 3, 0, 1, 3, 2, 3, 0, 1, 2, 3]);
         assert_eq!(matrix.row_index, [0, 3, 6, 8, 12]);
+        assert_eq!(matrix.labels, [0, 1, 2, 3]);
         assert_eq!(matrix.m, 4);
         assert_eq!(matrix.n, 4);
     }
@@ -460,6 +475,7 @@ mod tests {
         
         let file = "./input/tests/test2.mtx";
         let mut matrix = mm_file_to_csr(file);
+        println!("{:?}", matrix);
         assert_eq!(matrix.bandwidth(), 2);
         println!("{:?}", matrix);
         assert_eq!(matrix.degrees(), [2, 2, 3, 1]);
