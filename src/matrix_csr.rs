@@ -51,9 +51,6 @@ impl Matrix {
                 if diff > bandwidth {
                     bandwidth = diff;
                 }
-                // if n_row.abs_diff(*j as usize) > bandwidth {
-                //     bandwidth = n_row.abs_diff(*j as usize);
-                // }
             }
             n_row += 1;
         }
@@ -192,7 +189,7 @@ impl Matrix {
 
         //// Fix row_index for u (first part is already ok)
         let diff_u = (stop_col_v - start_col_v);
-        dbg!(diff_u);
+        // dbg!(diff_u);
         self.row_index[u+1] = start_col_u + (diff_u);
         // update in between
         for i in u+2..v+1 {

@@ -35,8 +35,8 @@ fn experimentation(file: &str, n: &usize) {
     matrix_original.v = Vec::new();
     let mut matrix = matrix_original.clone();
 
-    print!("\n\n{}", file);
-    println!("{:?}", matrix);
+    // print!("\n\n{}", file);
+    // println!("{:?}", matrix);
     let now = Instant::now();
     let bw_0 = matrix.bandwidth();
     let order = matrix.cmr(matrix.col_index[0]);
@@ -50,8 +50,8 @@ fn experimentation(file: &str, n: &usize) {
 
     
     // ----------------------
-    matrix_original.print();
-    println!("{:?}", matrix_original);
+    // matrix_original.print();
+    // println!("{:?}", matrix_original);
     // print!("o={:?}", order);
     // matrix.print();
     // // println!("{:?}\n", matrix);
@@ -62,7 +62,8 @@ fn experimentation(file: &str, n: &usize) {
     // abort();
     // ----------------------
 
-
+// !!!!!!!!!!!!!!!!!!!!!!!
+    return ();
     for _ in 0..*n {
         let now = Instant::now();
         let mut matrix = matrix_original.clone();
@@ -76,6 +77,6 @@ fn experimentation(file: &str, n: &usize) {
         // println!("{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, ils ({})", file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]);
  
         // matrix.print();
-        print!("{:?}", matrix);
+        // print!("{:?}", matrix);
     }
 }
