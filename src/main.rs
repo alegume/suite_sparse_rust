@@ -7,6 +7,7 @@ use std::env;
 use std::process::abort;
 mod matrix_csr;
 mod read_files;
+mod cmr;
 
 fn main() {
     let args: Vec<String> = env::args().collect();

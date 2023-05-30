@@ -1,6 +1,4 @@
-// use crate::matrix_csr::Element;
-
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq)]
 pub struct Element {
     pub v: Option<f64>,
     pub i: usize,
