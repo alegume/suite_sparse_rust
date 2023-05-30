@@ -30,11 +30,13 @@ fn main() {
 }
 
 fn experimentation(file: &str, n: &usize) {
-    let matrix_original = matrix_csr::mm_file_to_csr(file);
+    let mut matrix_original = matrix_csr::mm_file_to_csr(file);
+    // !!! only for pattern matrix - drop v vector
+    matrix_original.v = Vec::new();
     let mut matrix = matrix_original.clone();
 
     print!("\n\n{}", file);
-    // println!("{:?}", matrix);
+    println!("{:?}", matrix);
     let now = Instant::now();
     let bw_0 = matrix.bandwidth();
     let order = matrix.cmr(matrix.col_index[0]);
