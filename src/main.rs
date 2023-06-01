@@ -34,7 +34,7 @@ fn experimentation(file: &str, n: &usize) {
     let mut matrix_original = matrix_csr::mm_file_to_csr(file);
     // !!! only for pattern matrix - drop v vector
     matrix_original.v = Vec::new();
-    let mut matrix = matrix_original.clone();
+    let mut matrix = matrix_original; // .clone();
 
     // print!("\n\n{}", file);
     // println!("{:?}", matrix);
@@ -70,12 +70,10 @@ fn experimentation(file: &str, n: &usize) {
         let mut matrix = matrix_original.clone();
         // matrix.print();
 
-        matrix.vertices_swap_bw_update(&1, &2);
-
-        // matrix.ils();
+        matrix.mils();
         matrix.bandwidth();
-        // let total_time = now.elapsed().as_millis();
-        // println!("{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, ils ({})", file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]);
+        let total_time = now.elapsed().as_millis();
+        println!("{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, ils ({})", file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]);
  
         // matrix.print();
         // print!("{:?}", matrix);

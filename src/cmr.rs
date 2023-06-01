@@ -27,7 +27,7 @@ impl Matrix {
     }
 
     // Cycle through queue in breadth-first search and reverse labeling
-    fn cycle_through_queue_bfs(&self, to_visit:&mut VecDeque<usize>, lines_visited:&mut Vec<usize>, n: &mut usize) {
+    fn cycle_through_queue_bfs(&self, to_visit:&mut VecDeque<usize>, lines_visited:&mut [usize], n: &mut usize) {
         while let Some(i) = to_visit.pop_front() {
             if lines_visited[i] == std::usize::MAX { 
                 let row = self.get_columns_of_row(i); // Get row of i (neighbours of i)
@@ -51,7 +51,7 @@ impl Matrix {
     }
 
     // Reorder vertex for cmr
-    pub fn reorder(&mut self, new_rows: &Vec<usize>) {
+    pub fn reorder(&mut self, new_rows: &[usize]) {
         let mut row_offset = Vec::with_capacity(self.m);
         let mut col_index = Vec::with_capacity(self.col_index.len());
         let mut v:Vec<f64> = Vec::with_capacity(self.v.len());

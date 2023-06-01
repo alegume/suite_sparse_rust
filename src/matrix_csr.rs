@@ -166,10 +166,9 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
     let mut coordinates: Vec<Element>;
     let (n, m): (usize, usize); 
     (coordinates, m, n) = read_matrix_market_file_coordinates(file);
-    let len_v: usize;
-    if let Some(_) = coordinates[0].v {
-        len_v = coordinates.len();
-    } else { len_v = 0 }
+    let len_v: usize = if coordinates[0].v.is_some() {
+         coordinates.len()
+    } else { 0 };
     let mut matrix = Matrix::new(len_v, m, n, coordinates.len());
     // Sort in regard of i and then j
     coordinates.sort_unstable_by_key(|e| (e.i, e.j) );
@@ -189,7 +188,7 @@ pub fn mm_file_to_csr(file: &str) -> Matrix {
             matrix.col_index.push(el.j);
         }
 
-        if row.len() > 0 {
+        if !row.is_empty() {
             matrix.row_index.push(matrix.col_index.len());
             // Find max_degree
             if row.len() > matrix.max_degree {matrix.max_degree = row.len();}
