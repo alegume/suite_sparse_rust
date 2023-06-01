@@ -64,11 +64,11 @@ fn experimentation(file: &str, n: &usize) {
     let now = Instant::now();
     // let mut matrix = matrix_original.clone();
     // matrix.print();
-    matrix_original.mils();
-    matrix_original.bandwidth();
+    let bw_0 = matrix_original.bandwidth();
+    matrix_original.mils(n);
     let total_time = now.elapsed().as_millis();
     println!(
-        "{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, ils ({})",
+        "{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, MILS ({})",
         file,
         matrix_original.m,
         bw_0,

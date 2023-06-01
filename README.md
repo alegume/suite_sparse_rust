@@ -2,6 +2,7 @@
 
 
 #### TODO
+    VErificar proposta com labels
     Implementar MILS
     Inserir restart (grasp ideas?)
     Primeiro trocar todo mundo, depois trocar pela ideia do NCHC
