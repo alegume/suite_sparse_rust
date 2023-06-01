@@ -50,7 +50,7 @@ fn experimentation(file: &str, n: &usize) {
 
     let now = Instant::now();
     let bw_0 = matrix.bandwidth();
-    let order = matrix.cmr(matrix.col_index[matrix.m]);
+    let order = matrix.cmr(matrix.col_index[0]);
     matrix.bandwidth();
     let total_time = now.elapsed().as_millis();
 

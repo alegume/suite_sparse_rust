@@ -92,12 +92,18 @@ impl Matrix {
 
         // Each entry on row_index represents a ROW!
         while n_row < self.row_index.len() - 1 {
+            let i = self.labels[n_row];
             let row = self.get_columns_of_row(n_row);
             for j in row {
+                if n_row == *j {
+                    continue;
+                }
+                let j = self.labels[*j];
                 // Columns in a row
-                diff = self.labels[n_row].abs_diff(self.labels[*j]);
+                diff = i.abs_diff(j);
                 if diff > bandwidth {
                     bandwidth = diff;
+                    println!("{},{} = {}", i, j, diff);
                 }
             }
             n_row += 1;
@@ -107,8 +113,10 @@ impl Matrix {
         bandwidth
     }
 
+    // TODO: refac with labels ????
     pub fn get_columns_of_row(&self, n: usize) -> &[usize] {
         // if n < self.m {
+        // let n = self.labels[n];
         let start = self.row_index[n];
         // dbg!(self.row_index.len());
         let stop = self.row_index[n + 1];
@@ -411,8 +419,11 @@ mod tests {
         assert_eq!(matrix2.degree(1), 3);
         assert_eq!(matrix2.degree(2), 2);
         assert_eq!(matrix2.degree(3), 4);
+        matrix2.print();
+        println!("{:?}", &order);
+
         matrix2.labels = order; // Change label according to CMr
-                                // matrix.print();
+
         assert_eq!(matrix2.bandwidth(), 2);
         assert_eq!(matrix2.degree(0), 4);
         assert_eq!(matrix2.degree(1), 2);
