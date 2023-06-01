@@ -44,12 +44,13 @@ fn experimentation(file: &str, n: &usize) {
     matrix_original.v = Vec::new();
     let mut matrix = matrix_original.clone();
 
-    print!("\n\n{}", file);
-    println!("{:?}", matrix);
+    // println!("\n\n{}", file);
+    // println!("{:?}", matrix);
+    // matrix.print();
+
     let now = Instant::now();
     let bw_0 = matrix.bandwidth();
-    let order = matrix.cmr(matrix.col_index[0]);
-    // matrix.cmr(matrix.col_index[0]);
+    let order = matrix.cmr(matrix.col_index[matrix.m]);
     matrix.bandwidth();
     let total_time = now.elapsed().as_millis();
 
@@ -62,7 +63,6 @@ fn experimentation(file: &str, n: &usize) {
 
     /// MILs
     let now = Instant::now();
-    // let mut matrix = matrix_original.clone();
     // matrix.print();
     let bw_0 = matrix_original.bandwidth();
     matrix_original.mils(n);
