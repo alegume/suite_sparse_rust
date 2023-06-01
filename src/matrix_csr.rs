@@ -100,19 +100,11 @@ impl Matrix {
         let mut n_row: usize = 0;
         let mut criticals_neighbours: Vec<usize> = Vec::new();
 
-        // TODO: remover
+        // TODO: remove?
         self.bandwidth(); // Calculate self.bw
         while n_row < self.row_index.len() - 1 {
-            let row = self.get_columns_of_row(n_row);
-            for j in row {
-                // Columns in a row
-                if *j == n_row {
-                    continue;
-                }
-                if n_row.abs_diff(*j) == self.bw {
-                    criticals_neighbours.push(n_row);
-                    // criticals_neighbours.push(*j);
-                }
+            if self.bw_vertex(n_row) == self.bw {
+                criticals_neighbours.push(n_row);
             }
             n_row += 1;
         }
