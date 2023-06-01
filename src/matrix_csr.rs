@@ -87,6 +87,7 @@ impl Matrix {
     }
 
     // Degree of row i
+    // TODO: refac with labels
     pub fn degree(&self, i: usize) -> usize {
         if i < self.row_index.len() - 1 {
             self.row_index[i + 1] - self.row_index[i]
@@ -100,7 +101,7 @@ impl Matrix {
         let mut n_row: usize = 0;
         let mut criticals_neighbours: Vec<usize> = Vec::new();
 
-        // TODO: remove?
+        // TODO: remove? Toda  vez que mudar label, recalcular!
         self.bandwidth(); // Calculate self.bw
         while n_row < self.row_index.len() - 1 {
             if self.bw_vertex(n_row) == self.bw {
@@ -345,5 +346,38 @@ mod tests {
         let file = "./input/tests/test3.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.criticals_neighbours(), vec![0, 3]);
+    }
+
+    #[test]
+    fn labels_test() {
+        let file = "./input/tests/test3.mtx";
+        let mut matrix = mm_file_to_csr(file);
+        let mut matrix2 = matrix.clone();
+        assert_eq!(matrix.bandwidth(), 3);
+        let order = matrix.cmr(matrix.col_index[0]);
+        assert_eq!(matrix.bandwidth(), 2);
+        assert_eq!(matrix2.bandwidth(), 3);
+        matrix2.labels = order;
+        assert_eq!(matrix2.bandwidth(), 2);
+
+        let file = "./input/general/lns__131.mtx";
+        let mut matrix = mm_file_to_csr(file);
+        let mut matrix2 = matrix.clone();
+        assert_eq!(matrix.bandwidth(), 111);
+        let order = matrix.cmr(matrix.col_index[0]);
+        assert_eq!(matrix.bandwidth(), 90);
+        assert_eq!(matrix2.bandwidth(), 111);
+        matrix2.labels = order;
+        assert_eq!(matrix2.bandwidth(), 90);
+
+        let file = "./input/general/mcca.mtx";
+        let mut matrix = mm_file_to_csr(file);
+        let mut matrix2 = matrix.clone();
+        assert_eq!(matrix.bandwidth(), 65);
+        let order = matrix.cmr(matrix.col_index[0]);
+        assert_eq!(matrix.bandwidth(), 59);
+        assert_eq!(matrix2.bandwidth(), 65);
+        matrix2.labels = order;
+        assert_eq!(matrix2.bandwidth(), 59);
     }
 }
