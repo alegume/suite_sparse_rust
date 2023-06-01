@@ -2,13 +2,13 @@
 use std::time::Instant;
 // use std::time::{Duration};
 // use std::thread::sleep;
-use std::fs;
 use std::env;
+use std::fs;
 use std::process::abort;
-mod matrix_csr;
-mod read_files;
 mod cmr;
+mod matrix_csr;
 mod mils;
+mod read_files;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -26,7 +26,15 @@ fn main() {
 
     let files = fs::read_dir(dir.as_str()).unwrap();
     for file in files {
-        experimentation(file.unwrap().path().into_os_string().into_string().unwrap().as_str(), &n);
+        experimentation(
+            file.unwrap()
+                .path()
+                .into_os_string()
+                .into_string()
+                .unwrap()
+                .as_str(),
+            &n,
+        );
     }
 }
 
@@ -34,7 +42,7 @@ fn experimentation(file: &str, n: &usize) {
     let mut matrix_original = matrix_csr::mm_file_to_csr(file);
     // !!! only for pattern matrix - drop v vector
     matrix_original.v = Vec::new();
-    let mut matrix = matrix_original; // .clone();
+    let mut matrix = matrix_original.clone();
 
     // print!("\n\n{}", file);
     // println!("{:?}", matrix);
@@ -44,38 +52,31 @@ fn experimentation(file: &str, n: &usize) {
     // matrix.cmr(matrix.col_index[0]);
     matrix.bandwidth();
     let total_time = now.elapsed().as_millis();
-    
+
     let file = &file[10..]; // Formating instance name
-    let file = &file[..file.len()-4];
-    println!("{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, CMr ({})", file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]);
+    let file = &file[..file.len() - 4];
+    println!(
+        "{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, CMr ({})",
+        file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]
+    );
 
-    
-    // ----------------------
-    // matrix_original.print();
-    // println!("{:?}", matrix_original);
-    // print!("o={:?}", order);
+    /// MILs
+    let now = Instant::now();
+    // let mut matrix = matrix_original.clone();
     // matrix.print();
-    // // println!("{:?}\n", matrix);
-    
-    // matrix.reorder(&vec![2,3,1,0]);
+    matrix_original.mils();
+    matrix_original.bandwidth();
+    let total_time = now.elapsed().as_millis();
+    println!(
+        "{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, ils ({})",
+        file,
+        matrix_original.m,
+        bw_0,
+        matrix_original.bw,
+        matrix.max_degree,
+        total_time,
+        matrix_original.col_index[0]
+    );
     // matrix.print();
-    // println!("{:?}\n", matrix);
-    // abort();
-    // ----------------------
-
-// !!!!!!!!!!!!!!!!!!!!!!!
-    return ;
-    for _ in 0..*n {
-        let now = Instant::now();
-        let mut matrix = matrix_original.clone();
-        // matrix.print();
-
-        matrix.mils();
-        matrix.bandwidth();
-        let total_time = now.elapsed().as_millis();
-        println!("{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, ils ({})", file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]);
- 
-        // matrix.print();
-        // print!("{:?}", matrix);
-    }
+    // print!("{:?}", matrix);
 }

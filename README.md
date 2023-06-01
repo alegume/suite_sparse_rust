@@ -2,13 +2,14 @@
 
 
 #### TODO
-    criar MILS crate
     Implementar MILS
     Inserir restart (grasp ideas?)
     Primeiro trocar todo mundo, depois trocar pela ideia do NCHC
 
     George Liu pseudo algo
 
+#### DONE
+    criar MILS crate
 
 #### IDEIAS
     Swap
