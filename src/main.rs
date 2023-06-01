@@ -8,6 +8,7 @@ use std::process::abort;
 mod matrix_csr;
 mod read_files;
 mod cmr;
+mod mils;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -63,7 +64,7 @@ fn experimentation(file: &str, n: &usize) {
     // ----------------------
 
 // !!!!!!!!!!!!!!!!!!!!!!!
-    return ();
+    return ;
     for _ in 0..*n {
         let now = Instant::now();
         let mut matrix = matrix_original.clone();

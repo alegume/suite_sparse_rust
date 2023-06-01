@@ -20,7 +20,7 @@ pub fn read_matrix_market_file_coordinates(filename: &str) -> (Vec<Element>, usi
     for line in reader.lines() {
         // Format => I1  J1  M(I1, J1)
         let line = line.unwrap();
-        if line.starts_with("%") { continue; }
+        if line.starts_with('%') { continue; }
         let mut text = line.splitn(3, ' ');
     
         let i:&str = text.next().unwrap().trim();

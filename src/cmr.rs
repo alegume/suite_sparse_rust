@@ -76,7 +76,7 @@ impl Matrix {
             }
             col_index[start..].sort(); // Sort last part by columns
             //  Change V's if its the case
-            if self.v.len() > 0 {
+            if !self.v.is_empty() {
                 let values = self.get_values_of_row(*new);
                 let mut v_slc:Vec<(&usize,&f64)> = col_index[start..].iter().zip(values.iter()).collect();
                 v_slc.sort_by_key(|e| e.0);
@@ -90,7 +90,6 @@ impl Matrix {
         }
         // Change matrix
         self.m = max(self.m, self.n);
-        self.n = self.n;
         self.v = v;
         self.col_index = col_index;
         self.row_index = row_offset;
