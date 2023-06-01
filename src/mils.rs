@@ -12,7 +12,7 @@ impl Matrix {
         let mut iter: usize = 0;
         // let mut bw = self.bandwidth();
         self.local_search();
-        while (iter < *n && (self.bw > self.max_degree / 2)) {
+        while (iter < *n && (self.bw > self.min_bw)) {
             iter += 1;
             // let r1 = self.perturbacao(self.labels);
         }

@@ -37,6 +37,54 @@ impl Matrix {
         }
     }
 
+    // Reorder matrix based on a new labeling
+    pub fn reorder(&mut self, new_rows: &[usize]) {
+        let mut row_offset = Vec::with_capacity(self.m);
+        let mut col_index = Vec::with_capacity(self.col_index.len());
+        let mut v: Vec<f64> = Vec::with_capacity(self.v.len());
+        let mut old_rows: Vec<usize> = vec![0; max(self.m, self.n)];
+
+        for (i, val) in new_rows.iter().enumerate() {
+            old_rows[*val] = i;
+        }
+        // Starts with 0
+        row_offset.push(0);
+        for new in old_rows.iter() {
+            // If n_columns > n_rows create empty row
+            if new >= &self.m {
+                row_offset.push(row_offset.last().copied().unwrap());
+                continue;
+            }
+            // Change col_offsets
+            let start = col_index.len(); // Where new colum starts
+            let old_cols = self.get_columns_of_row(*new);
+            for e in old_cols {
+                // New columns
+                col_index.push(new_rows[*e]); // TODO: Verify optimization
+            }
+            col_index[start..].sort(); // Sort last part by columns
+                                       //  Change V's if its the case
+            if !self.v.is_empty() {
+                let values = self.get_values_of_row(*new);
+                let mut v_slc: Vec<(&usize, &f64)> =
+                    col_index[start..].iter().zip(values.iter()).collect();
+                v_slc.sort_by_key(|e| e.0);
+                for (_, value) in v_slc {
+                    v.push(*value);
+                }
+            }
+
+            // Calculate row offset (size of old row)
+            row_offset.push(col_index.len());
+        }
+        // Change matrix
+        self.m = max(self.m, self.n);
+        self.v = v;
+        self.col_index = col_index;
+        self.row_index = row_offset;
+    }
+
+    // Calculate bandwidth of matrix and return it
     pub fn bandwidth(&mut self) -> usize {
         let mut bandwidth: usize = 0;
         let mut n_row: usize = 0;
@@ -78,18 +126,10 @@ impl Matrix {
         }
     }
 
-    // Vec of degrees of each row
-    pub fn degrees(&self) -> Vec<usize> {
-        self.row_index
-            .windows(2)
-            .map(|i| i[1] - i[0])
-            .collect::<Vec<usize>>()
-    }
-
     // Degree of row i
-    // TODO: refac with labels
     pub fn degree(&self, i: usize) -> usize {
         if i < self.row_index.len() - 1 {
+            let i = self.labels[i]; // Consider the label of i
             self.row_index[i + 1] - self.row_index[i]
         } else {
             0
@@ -268,7 +308,7 @@ mod tests {
         let file = "./input/tests/test1.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 2);
-        assert_eq!(matrix.degrees(), [1, 1, 1, 1]);
+        // assert_eq!(matrix.degrees(), [1, 1, 1, 1]);
         matrix.cmr(matrix.col_index[0]);
         assert_eq!(matrix.bandwidth(), 2);
         // TODO: insert new matrix to assert
@@ -278,14 +318,14 @@ mod tests {
         println!("{:?}", matrix);
         assert_eq!(matrix.bandwidth(), 2);
         println!("{:?}", matrix);
-        assert_eq!(matrix.degrees(), [2, 2, 3, 1]);
+        // assert_eq!(matrix.degrees(), [2, 2, 3, 1]);
         matrix.cmr(matrix.col_index[0]);
         assert_eq!(matrix.bandwidth(), 2);
 
         let file = "./input/tests/test3.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.bandwidth(), 3);
-        assert_eq!(matrix.degrees(), [3, 3, 2, 4]);
+        // assert_eq!(matrix.degrees(), [3, 3, 2, 4]);
         matrix.cmr(matrix.col_index[0]);
         assert_eq!(matrix.bandwidth(), 2);
 
@@ -349,16 +389,35 @@ mod tests {
     }
 
     #[test]
-    fn labels_test() {
+    fn labels_degree_test() {
         let file = "./input/tests/test3.mtx";
         let mut matrix = mm_file_to_csr(file);
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.bandwidth(), 3);
+        assert_eq!(matrix.degree(0), 3);
+        assert_eq!(matrix.degree(1), 3);
+        assert_eq!(matrix.degree(2), 2);
+        assert_eq!(matrix.degree(3), 4);
+        // matrix.print();
         let order = matrix.cmr(matrix.col_index[0]);
         assert_eq!(matrix.bandwidth(), 2);
+        assert_eq!(matrix.degree(0), 2);
+        assert_eq!(matrix.degree(1), 4);
+        assert_eq!(matrix.degree(2), 3);
+        assert_eq!(matrix.degree(3), 3);
+        // Assert that matrix2 == matrix
         assert_eq!(matrix2.bandwidth(), 3);
-        matrix2.labels = order;
+        assert_eq!(matrix2.degree(0), 3);
+        assert_eq!(matrix2.degree(1), 3);
+        assert_eq!(matrix2.degree(2), 2);
+        assert_eq!(matrix2.degree(3), 4);
+        matrix2.labels = order; // Change label according to CMr
+                                // matrix.print();
         assert_eq!(matrix2.bandwidth(), 2);
+        assert_eq!(matrix2.degree(0), 4);
+        assert_eq!(matrix2.degree(1), 2);
+        assert_eq!(matrix2.degree(2), 3);
+        assert_eq!(matrix2.degree(3), 3);
 
         let file = "./input/general/lns__131.mtx";
         let mut matrix = mm_file_to_csr(file);

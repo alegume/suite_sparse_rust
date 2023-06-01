@@ -44,8 +44,8 @@ fn experimentation(file: &str, n: &usize) {
     matrix_original.v = Vec::new();
     let mut matrix = matrix_original.clone();
 
-    // print!("\n\n{}", file);
-    // println!("{:?}", matrix);
+    print!("\n\n{}", file);
+    println!("{:?}", matrix);
     let now = Instant::now();
     let bw_0 = matrix.bandwidth();
     let order = matrix.cmr(matrix.col_index[0]);
