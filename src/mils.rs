@@ -21,32 +21,33 @@ impl Matrix {
         }
     }
 
-    fn perturbacao(&self, nivel: usize, h: &mut HashMap<usize, HashSet<usize>>) {
+    fn perturbacao(&mut self, nivel: usize, h: &mut HashMap<usize, HashSet<usize>>) {
         let mut iter = 1;
         let criticos = self.criticals();
         dbg!(&criticos);
         let options: HashSet<usize> = HashSet::from_iter(self.labels.iter().cloned());
-        while (iter <= nivel) {
+        while (iter <= nivel && self.bandwidth() > self.min_bw) {
             let v = criticos.choose(&mut rand::thread_rng()).unwrap();
-            dbg!(v);
+            // dbg!(v);
             let mut u: &usize = v;
-            let mut n_v: &mut HashSet<usize>;
-            if let Some(n_v) = h.get_mut(&v) {
+            if let Some(n_v) = h.get_mut(v) {
                 // Vec of vertices not in history of v
                 let n_v_copy = n_v.clone();
                 let diff: Vec<&usize> = options.symmetric_difference(&n_v_copy).collect();
-                let u = diff.choose(&mut rand::thread_rng()).unwrap();
-                n_v.insert(**u);
-                // print!("v= {}; h={:?}; ", v, h);
+                let u = *diff.choose(&mut rand::thread_rng()).unwrap();
+                n_v.insert(*u);
+                // print!("v= {};", v);
                 // print!("u={:?}; ", *u);
-                print!("o={:?}; ", &options);
-                println!("diff={:?}", diff);
+                // print!("o={:?}; ", &options);
+                // println!("diff={:?}", diff);
+                // dbg!(&h);
             } else {
                 let u = self.labels.choose(&mut rand::thread_rng()).unwrap();
                 h.insert(*v, HashSet::from([*u]));
+                print!("\t primeiro");
+                dbg!(&h);
             }
-            // println!("u={}; H={:?}", u, h);
-            // h.insert(*v, u);
+
             iter += 1;
         }
     }
