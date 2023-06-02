@@ -21,19 +21,21 @@ impl Matrix {
     // Proceeds with local search and change labels if a better labeling if found
     fn local_search(&mut self) {
         let criticos = self.criticals_neighbours();
-        // for v in criticos {
-        //     for u in vizinhos_criticos(&v) {}
-        // }
+        for v in criticos {
+            for u in self.vizinhos_criticos(&v) {}
+        }
     }
 
-    fn vizinhos_criticos(&self, v: &usize) {
+    fn vizinhos_criticos(&self, v: &usize) -> Vec<usize> {
         // TODO: Ordenar em ordem crescente  do valor |mid(v) − f (u)|
-        // let vizinhos_criticos: Vec<usize> = Vec::with_capacity(self.degree(v));
-
+        let vizinhos_criticos: Vec<usize> = Vec::with_capacity(self.degree(*v));
+        dbg!(v);
         let vizinhos = self.get_columns_of_row(*v);
+        dbg!(vizinhos);
         // if (abs(mid(v) - f(u)) < abs(mid(v) - f(v)) {
 
         // }
+        vizinhos_criticos
     }
 
     // println!("\tcriticals = {:?}", self.criticals);

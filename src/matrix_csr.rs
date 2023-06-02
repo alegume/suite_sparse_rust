@@ -92,31 +92,48 @@ impl Matrix {
 
         // Each entry on row_index represents a ROW!
         while n_row < self.row_index.len() - 1 {
-            let i = self.labels[n_row];
             let row = self.get_columns_of_row(n_row);
             for j in row {
                 if n_row == *j {
                     continue;
                 }
                 let j = self.labels[*j];
+                let i = self.labels[n_row];
                 // Columns in a row
                 diff = i.abs_diff(j);
                 if diff > bandwidth {
                     bandwidth = diff;
-                    println!("{},{} = {}", i, j, diff);
                 }
             }
             n_row += 1;
         }
         self.bw = bandwidth;
-        // TODO: remover return?
         bandwidth
     }
 
-    // TODO: refac with labels ????
+    // Calculate bw of vertex u
+    // TODO: refac with labels
+    fn bw_vertex(&self, v: usize) -> usize {
+        let mut bw_v: usize = 0;
+
+        let v_neighbour = self.get_columns_of_row(v);
+        for u in v_neighbour {
+            if v == *u {
+                continue;
+            }
+            let i = self.labels[v];
+            let j = self.labels[*u];
+            // Columns in a row
+            let diff: usize = i.abs_diff(j);
+            if diff > bw_v {
+                bw_v = diff;
+            }
+        }
+        bw_v
+    }
+
     pub fn get_columns_of_row(&self, n: usize) -> &[usize] {
         // if n < self.m {
-        // let n = self.labels[n];
         let start = self.row_index[n];
         // dbg!(self.row_index.len());
         let stop = self.row_index[n + 1];
@@ -162,22 +179,6 @@ impl Matrix {
         criticals_neighbours.sort_unstable();
         criticals_neighbours.dedup(); // remove duplications
         criticals_neighbours
-    }
-
-    // Calculate bw of vertex u
-    // TODO: refac with labels
-    fn bw_vertex(&self, u: usize) -> usize {
-        let mut bw_v: usize = 0;
-
-        let u_neighbour = self.get_columns_of_row(u);
-        for v in u_neighbour {
-            // Columns in a row
-            let diff: usize = u.abs_diff(*v);
-            if diff > bw_v {
-                bw_v = diff;
-            }
-        }
-        bw_v
     }
 
     pub fn print(&self) {
