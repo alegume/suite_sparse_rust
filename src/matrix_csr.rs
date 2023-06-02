@@ -127,19 +127,19 @@ impl Matrix {
             if diff > bw_v {
                 bw_v = diff;
             }
+            // println!("{}, {} = {}", i, j, diff);
         }
         bw_v
     }
 
+    // Get neighbours of vertex n
     pub fn get_columns_of_row(&self, n: usize) -> &[usize] {
-        // if n < self.m {
         let start = self.row_index[n];
-        // dbg!(self.row_index.len());
         let stop = self.row_index[n + 1];
         &self.col_index[start..stop]
-        // } else { &[] }
     }
 
+    // Get values os row n (neighbours of vertex n)
     pub fn get_values_of_row(&self, n: usize) -> &[f64] {
         if n < self.m {
             let start = self.row_index[n];
@@ -169,7 +169,8 @@ impl Matrix {
         self.bandwidth(); // Calculate self.bw
         while n_row < self.row_index.len() - 1 {
             if self.bw_vertex(n_row) == self.bw {
-                criticals_neighbours.push(n_row);
+                let i = self.labels[n_row];
+                criticals_neighbours.push(i);
             }
             n_row += 1;
         }
@@ -394,6 +395,13 @@ mod tests {
         let file = "./input/tests/test3.mtx";
         let mut matrix = mm_file_to_csr(file);
         assert_eq!(matrix.criticals(), vec![0, 3]);
+
+        let file = "./input/tests/test4-ipo.mtx";
+        let mut matrix = mm_file_to_csr(file);
+        assert_eq!(matrix.criticals(), vec![0, 5]);
+        matrix.labels = vec![2, 5, 1, 0, 3, 4];
+        assert_eq!(matrix.bandwidth(), 2);
+        assert_eq!(matrix.criticals(), vec![1, 2, 3, 4, 5]);
     }
 
     #[test]
@@ -420,10 +428,7 @@ mod tests {
         assert_eq!(matrix2.degree(2), 2);
         assert_eq!(matrix2.degree(3), 4);
         matrix2.print();
-        println!("{:?}", &order);
-
         matrix2.labels = order; // Change label according to CMr
-
         assert_eq!(matrix2.bandwidth(), 2);
         assert_eq!(matrix2.degree(0), 4);
         assert_eq!(matrix2.degree(1), 2);

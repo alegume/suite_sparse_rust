@@ -26,7 +26,7 @@ impl Matrix {
             for u in self.neighbour_of_criticals(&v) {
                 // println!("O{:?}", &self.labels);
                 self.labels.swap(v, u);
-                if self.bandwidth() < bw_0 {
+                if self.bandwidth() <= bw_0 {
                     bw_0 = self.bw;
                     println!("MELHOROU! {}", bw_0);
                     // println!("M{:?}", &self.labels);
