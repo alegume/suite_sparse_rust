@@ -2,7 +2,9 @@
 
 
 #### TODO
+    testar perturbacao (hashmap e hashset)
     Implementar MILS
+    refac print
     IMPLEMENTAR REGRAS  vizinhos_criticos!
     Inserir restart (grasp ideas?)
     Primeiro trocar todo mundo, depois trocar pela ideia do NCHC

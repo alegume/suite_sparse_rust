@@ -1,4 +1,6 @@
+use rand::seq::SliceRandom;
 use rand::Rng;
+use std::collections::{HashMap, HashSet};
 
 // use std::collections::HashMap;
 // use std::collections::VecDeque;
@@ -8,13 +10,39 @@ use crate::matrix_csr::Matrix;
 impl Matrix {
     // Main code for MILS
     pub fn mils(&mut self, n: &usize) {
-        let mut nivel: usize = 1;
+        let mut nivel: usize = 15;
         let mut iter: usize = 0;
-        // let mut bw = self.bandwidth();
+        let mut bw = self.bandwidth();
+        let mut h: HashMap<usize, HashSet<usize>> = HashMap::new();
         self.local_search();
-        while (iter < *n && (self.bw > self.min_bw)) {
+        while (iter < *n && (bw > self.min_bw)) {
             iter += 1;
-            // let r1 = self.perturbacao(self.labels);
+            self.perturbacao(nivel, &mut h);
+        }
+    }
+
+    fn perturbacao(&self, nivel: usize, h: &mut HashMap<usize, HashSet<usize>>) {
+        let mut iter = 1;
+        let criticos = self.criticals();
+        while (iter <= nivel) {
+            let v = criticos.choose(&mut rand::thread_rng()).unwrap();
+            // dbg!(v);
+            let mut u: usize = *v;
+            if let Some(mut n_v) = h.get(v) {
+                let options: HashSet<usize> = HashSet::from_iter(self.labels.iter().cloned());
+                let diff: Vec<&usize> = n_v.symmetric_difference(&options).collect();
+                let u = diff.choose(&mut rand::thread_rng()).unwrap();
+                // dbg!(h);
+                // dbg!(n_v);
+                // dbg!(&options);
+                // dbg!(diff);
+            } else {
+                let u = self.labels.choose(&mut rand::thread_rng()).unwrap();
+            }
+            h.insert(*v, HashSet::from([u]));
+            dbg!(&h);
+            // h.insert(*v, u);
+            iter += 1;
         }
     }
 
@@ -28,10 +56,12 @@ impl Matrix {
                 self.labels.swap(v, u);
                 if self.bandwidth() <= bw_0 {
                     bw_0 = self.bw;
-                    println!("MELHOROU! {}", bw_0);
+                    // println!("MELHOROU! {}", bw_0);
                     // println!("M{:?}", &self.labels);
                 } else {
+                    // Return to previous situation
                     self.labels.swap(v, u);
+                    self.bw = bw_0;
                     // println!("V{:?}", &self.labels);
                 }
             }

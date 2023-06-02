@@ -57,8 +57,8 @@ fn experimentation(file: &str, n: &usize) {
     let file = &file[10..]; // Formating instance name
     let file = &file[..file.len() - 4];
     println!(
-        "{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, CMr ({})",
-        file, matrix.m, bw_0, matrix.bw, matrix.max_degree, total_time, matrix.col_index[0]
+        "{}, n:{}, b0:{}, bf:{}, t:{}, CMr ({})",
+        file, matrix.m, bw_0, matrix.bw, total_time, matrix.col_index[0]
     );
 
     /// MILs
@@ -69,14 +69,8 @@ fn experimentation(file: &str, n: &usize) {
     matrix_original.mils(n);
     let total_time = now.elapsed().as_millis();
     println!(
-        "{}, n:{}, b0:{}, bf:{}, md:{}, t:{}, MILS ({})",
-        file,
-        matrix_original.m,
-        bw_0,
-        matrix_original.bw,
-        matrix.max_degree,
-        total_time,
-        matrix_original.col_index[0]
+        "{}, n:{}, b0:{}, bf:{}, t:{}, MILS ({})",
+        file, matrix_original.m, bw_0, matrix_original.bw, total_time, matrix_original.col_index[0]
     );
     // matrix.print();
     // print!("{:?}", matrix);

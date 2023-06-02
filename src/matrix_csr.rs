@@ -161,12 +161,10 @@ impl Matrix {
     }
 
     // Vertices in edges with bigest bandwidth
-    pub fn criticals(&mut self) -> Vec<usize> {
+    pub fn criticals(&self) -> Vec<usize> {
         let mut n_row: usize = 0;
         let mut criticals_neighbours: Vec<usize> = Vec::new();
 
-        // TODO: remove? Toda  vez que mudar label, recalcular!
-        self.bandwidth(); // Calculate self.bw
         while n_row < self.row_index.len() - 1 {
             if self.bw_vertex(n_row) == self.bw {
                 let i = self.labels[n_row];
