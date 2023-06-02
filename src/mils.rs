@@ -20,22 +20,32 @@ impl Matrix {
 
     // Proceeds with local search and change labels if a better labeling if found
     fn local_search(&mut self) {
-        let criticos = self.criticals_neighbours();
+        let criticos = self.criticals();
+        let mut bw_0 = self.bandwidth();
         for v in criticos {
-            for u in self.vizinhos_criticos(&v) {}
+            for u in self.neighbour_of_criticals(&v) {
+                // println!("O{:?}", &self.labels);
+                self.labels.swap(v, u);
+                if self.bandwidth() < bw_0 {
+                    bw_0 = self.bw;
+                    println!("MELHOROU! {}", bw_0);
+                    // println!("M{:?}", &self.labels);
+                } else {
+                    self.labels.swap(v, u);
+                    // println!("V{:?}", &self.labels);
+                }
+            }
         }
     }
 
-    fn vizinhos_criticos(&self, v: &usize) -> Vec<usize> {
+    fn neighbour_of_criticals(&self, v: &usize) -> Vec<usize> {
         // TODO: Ordenar em ordem crescente  do valor |mid(v) − f (u)|
-        let vizinhos_criticos: Vec<usize> = Vec::with_capacity(self.degree(*v));
-        dbg!(v);
-        let vizinhos = self.get_columns_of_row(*v);
-        dbg!(vizinhos);
+        // TODO: IMPLEMENTAR REGRAS
+        let neighbour_of_criticals: Vec<usize> = Vec::with_capacity(self.degree(*v));
+        let neighbour = self.get_columns_of_row(*v).to_owned();
         // if (abs(mid(v) - f(u)) < abs(mid(v) - f(v)) {
-
         // }
-        vizinhos_criticos
+        neighbour
     }
 
     // println!("\tcriticals = {:?}", self.criticals);

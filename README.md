@@ -2,14 +2,15 @@
 
 
 #### TODO
-    VErificar proposta com labels
     Implementar MILS
+    IMPLEMENTAR REGRAS  vizinhos_criticos!
     Inserir restart (grasp ideas?)
     Primeiro trocar todo mundo, depois trocar pela ideia do NCHC
 
     George Liu pseudo algo
 
 #### DONE
+    VErificar proposta com labels
     criar MILS crate
 
 #### IDEIAS

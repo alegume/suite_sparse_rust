@@ -112,7 +112,6 @@ impl Matrix {
     }
 
     // Calculate bw of vertex u
-    // TODO: refac with labels
     fn bw_vertex(&self, v: usize) -> usize {
         let mut bw_v: usize = 0;
 
@@ -162,7 +161,7 @@ impl Matrix {
     }
 
     // Vertices in edges with bigest bandwidth
-    pub fn criticals_neighbours(&mut self) -> Vec<usize> {
+    pub fn criticals(&mut self) -> Vec<usize> {
         let mut n_row: usize = 0;
         let mut criticals_neighbours: Vec<usize> = Vec::new();
 
@@ -386,15 +385,15 @@ mod tests {
     fn criticals_neighbours_test() {
         let file = "./input/tests/test1.mtx";
         let mut matrix = mm_file_to_csr(file);
-        assert_eq!(matrix.criticals_neighbours(), vec![3]);
+        assert_eq!(matrix.criticals(), vec![3]);
 
         let file = "./input/tests/test2.mtx";
         let mut matrix = mm_file_to_csr(file);
-        assert_eq!(matrix.criticals_neighbours(), vec![1, 2, 3]);
+        assert_eq!(matrix.criticals(), vec![1, 2, 3]);
 
         let file = "./input/tests/test3.mtx";
         let mut matrix = mm_file_to_csr(file);
-        assert_eq!(matrix.criticals_neighbours(), vec![0, 3]);
+        assert_eq!(matrix.criticals(), vec![0, 3]);
     }
 
     #[test]
