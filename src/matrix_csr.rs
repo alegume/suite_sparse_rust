@@ -386,22 +386,39 @@ mod tests {
     fn criticals_neighbours_test() {
         let file = "./input/tests/test1.mtx";
         let mut matrix = mm_file_to_csr(file);
+        let mut matrix2 = matrix.clone();
         assert_eq!(matrix.criticals(), vec![3]);
+        let order = matrix.cmr(0);
+        matrix2.labels = order;
+        assert_eq!(matrix.criticals(), matrix2.criticals());
 
         let file = "./input/tests/test2.mtx";
         let mut matrix = mm_file_to_csr(file);
+        let mut matrix2 = matrix.clone();
         assert_eq!(matrix.criticals(), vec![1, 2, 3]);
+        let order = matrix.cmr(0);
+        matrix2.labels = order;
+        assert_eq!(matrix.criticals(), matrix2.criticals());
 
         let file = "./input/tests/test3.mtx";
         let mut matrix = mm_file_to_csr(file);
+        let mut matrix2 = matrix.clone();
         assert_eq!(matrix.criticals(), vec![0, 3]);
+        let order = matrix.cmr(0);
+        matrix2.labels = order;
+        assert_eq!(matrix.criticals(), matrix2.criticals());
 
         let file = "./input/tests/test4-ipo.mtx";
         let mut matrix = mm_file_to_csr(file);
+        let mut matrix2 = matrix.clone();
+        assert_eq!(matrix.bandwidth(), 5);
         assert_eq!(matrix.criticals(), vec![0, 5]);
-        matrix.labels = vec![2, 5, 1, 0, 3, 4];
-        assert_eq!(matrix.bandwidth(), 2);
-        assert_eq!(matrix.criticals(), vec![1, 2, 3, 4, 5]);
+        matrix2.labels = vec![2, 5, 1, 0, 3, 4];
+        assert_eq!(matrix2.bandwidth(), 2);
+        assert_eq!(matrix2.criticals(), vec![1, 2, 3, 4, 5]);
+        let order = matrix.cmr(0);
+        matrix2.labels = order;
+        assert_eq!(matrix.criticals(), matrix2.criticals());
     }
 
     #[test]
