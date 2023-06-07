@@ -1,0 +1,89 @@
+instancia, n, bw_0, bw_1, max_degree, tempo(ms), Algo
+bcspwr01, n:39, b0:38, bf:38, t:0, CMr (30)
+bcspwr01, n:39, b0:38, bf:36, t:0, MILS (0)
+bcspwr02, n:49, b0:34, bf:34, t:0, CMr (3)
+bcspwr02, n:49, b0:34, bf:27, t:0, MILS (0)
+jgl011, n:11, b0:10, bf:10, t:0, CMr (1)
+jgl011, n:11, b0:10, bf:9, t:0, MILS (6)
+Trefethen_20, n:20, b0:16, bf:16, t:0, CMr (0)
+Trefethen_20, n:20, b0:16, bf:15, t:0, MILS (0)
+ibm32, n:32, b0:26, bf:29, t:0, CMr (11)
+ibm32, n:32, b0:26, bf:26, t:0, MILS (1)
+curtis54, n:54, b0:44, bf:36, t:0, CMr (1)
+curtis54, n:54, b0:44, bf:36, t:5, MILS (1)
+pores_1, n:30, b0:11, bf:14, t:0, CMr (0)
+pores_1, n:30, b0:11, bf:11, t:6, MILS (0)
+bcsstk01, n:48, b0:35, bf:35, t:0, CMr (0)
+bcsstk01, n:48, b0:35, bf:33, t:2, MILS (0)
+
+instancia, n, bw_0, bw_1, max_degree, tempo(ms), Algo
+bcspwr01, n:39, b0:38, bf:38, t:0, CMr
+bcspwr01, n:39, b0:38, bf:36, t:0, MILS,n=6
+bcspwr02, n:49, b0:34, bf:34, t:0, CMr
+bcspwr02, n:49, b0:34, bf:27, t:0, MILS,n=6
+jgl011, n:11, b0:10, bf:10, t:0, CMr
+jgl011, n:11, b0:10, bf:9, t:0, MILS,n=6
+Trefethen_20, n:20, b0:16, bf:16, t:0, CMr
+Trefethen_20, n:20, b0:16, bf:15, t:0, MILS,n=6
+ibm32, n:32, b0:26, bf:29, t:0, CMr
+ibm32, n:32, b0:26, bf:26, t:0, MILS,n=6
+curtis54, n:54, b0:44, bf:36, t:0, CMr
+curtis54, n:54, b0:44, bf:36, t:5, MILS,n=6
+pores_1, n:30, b0:11, bf:14, t:0, CMr
+pores_1, n:30, b0:11, bf:11, t:5, MILS,n=6
+bcsstk01, n:48, b0:35, bf:35, t:0, CMr
+bcsstk01, n:48, b0:35, bf:33, t:2, MILS,n=6
+
+instancia, n, bw_0, bw_1, max_degree, tempo(ms), Algo
+bcspwr01, n:39, b0:38, bf:38, t:0, CMr
+bcspwr01, n:39, b0:38, bf:36, t:3, MILS,n=16
+bcspwr02, n:49, b0:34, bf:34, t:0, CMr
+bcspwr02, n:49, b0:34, bf:27, t:4, MILS,n=16
+jgl011, n:11, b0:10, bf:10, t:0, CMr
+jgl011, n:11, b0:10, bf:9, t:2, MILS,n=16
+Trefethen_20, n:20, b0:16, bf:16, t:0, CMr
+Trefethen_20, n:20, b0:16, bf:15, t:2, MILS,n=16
+ibm32, n:32, b0:26, bf:29, t:0, CMr
+ibm32, n:32, b0:26, bf:26, t:2, MILS,n=16
+curtis54, n:54, b0:44, bf:36, t:0, CMr
+curtis54, n:54, b0:44, bf:36, t:10, MILS,n=16
+pores_1, n:30, b0:11, bf:14, t:0, CMr
+pores_1, n:30, b0:11, bf:11, t:14, MILS,n=16
+bcsstk01, n:48, b0:35, bf:35, t:0, CMr
+bcsstk01, n:48, b0:35, bf:33, t:6, MILS,n=16
+
+instancia, n, bw_0, bw_1, max_degree, tempo(ms), Algo
+bcspwr01, n:39, b0:38, bf:38, t:0, CMr
+bcspwr01, n:39, b0:38, bf:36, t:3442, MILS,n=600
+bcspwr02, n:49, b0:34, bf:34, t:0, CMr
+bcspwr02, n:49, b0:34, bf:27, t:4114, MILS,n=600
+jgl011, n:11, b0:10, bf:10, t:0, CMr
+jgl011, n:11, b0:10, bf:9, t:1111, MILS,n=600
+Trefethen_20, n:20, b0:16, bf:16, t:0, CMr
+Trefethen_20, n:20, b0:16, bf:15, t:1796, MILS,n=600
+ibm32, n:32, b0:26, bf:29, t:0, CMr
+ibm32, n:32, b0:26, bf:26, t:2790, MILS,n=600
+curtis54, n:54, b0:44, bf:36, t:0, CMr
+curtis54, n:54, b0:44, bf:36, t:4577, MILS,n=600
+pores_1, n:30, b0:11, bf:14, t:0, CMr
+pores_1, n:30, b0:11, bf:11, t:3012, MILS,n=600
+bcsstk01, n:48, b0:35, bf:35, t:0, CMr
+bcsstk01, n:48, b0:35, bf:32, t:4180, MILS,n=600
+
+instancia, n, bw_0, bw_1, max_degree, tempo(ms), Algo
+bcspwr01, n:39, b0:38, bf:38, t:0, CMr
+bcspwr01, n:39, b0:38, bf:36, t:395, MILS,n=200
+bcspwr02, n:49, b0:34, bf:34, t:0, CMr
+bcspwr02, n:49, b0:34, bf:27, t:471, MILS,n=200
+jgl011, n:11, b0:10, bf:10, t:0, CMr
+jgl011, n:11, b0:10, bf:9, t:131, MILS,n=200
+Trefethen_20, n:20, b0:16, bf:16, t:0, CMr
+Trefethen_20, n:20, b0:16, bf:15, t:217, MILS,n=200
+ibm32, n:32, b0:26, bf:29, t:0, CMr
+ibm32, n:32, b0:26, bf:26, t:320, MILS,n=200
+curtis54, n:54, b0:44, bf:36, t:0, CMr
+curtis54, n:54, b0:44, bf:36, t:559, MILS,n=200
+pores_1, n:30, b0:11, bf:14, t:0, CMr
+pores_1, n:30, b0:11, bf:11, t:450, MILS,n=200
+bcsstk01, n:48, b0:35, bf:35, t:0, CMr
+bcsstk01, n:48, b0:35, bf:32, t:546, MILS,n=200

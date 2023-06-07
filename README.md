@@ -2,7 +2,6 @@
 
 
 #### TODO
-    testar perturbacao (hashmap e hashset)
     Implementar MILS
     refac print
     IMPLEMENTAR REGRAS  vizinhos_criticos!
@@ -11,6 +10,7 @@
     George Liu pseudo algo
 
 #### DONE
+    testar perturbacao (hashmap e hashset)
     testar bw_vertex revisar linha 119
     testar criticals
     VErificar proposta com labels
