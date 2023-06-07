@@ -105,13 +105,14 @@ impl Matrix {
         // dbg!(v, neighbour, mid_v);
         for u in neighbour {
             let u = self.labels[*u];
-            if self.mid(v, &mut neighbour).abs_diff(u) < self.mid(v, &mut neighbour).abs_diff(v) {
+            if self.mid(v, &mut neighbour).abs_diff(u) <= self.mid(v, &mut neighbour).abs_diff(v) {
                 // dbg!(v, u, mid_v);
                 // println!("{:?} < {:?}", self.mid(v, &mut neighbour).abs_diff(u), self.mid(v, &mut neighbour).abs_diff(v));
                 neighbour_of_criticals.push(u);
             }
         }
         // dbg!(&neighbour_of_criticals);
+        neighbour_of_criticals.extend(neighbour);
         neighbour_of_criticals
     }
 
