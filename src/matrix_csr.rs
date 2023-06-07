@@ -116,7 +116,7 @@ impl Matrix {
         let mut bw_v: usize = 0;
 
         // let v = self.labels[v];
-        // TODO !!! : Assymetric, m != n 
+        // TODO !!! : Assymetric, m != n
         // if v >= self.row_index.len()-1 {
         //     return 0;
         // }
@@ -235,8 +235,8 @@ impl Matrix {
             let row = self.get_columns_of_row(i);
             print!("{} |", n_row);
             let mut count: usize = 0;
-            // Order by labels 
-            let mut rows:Vec<usize> = Vec::with_capacity(row.len());
+            // Order by labels
+            let mut rows: Vec<usize> = Vec::with_capacity(row.len());
             for j in row {
                 rows.push(self.labels[*j]);
             }
@@ -435,11 +435,9 @@ mod tests {
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.criticals(), vec![3]);
         let order = matrix.cmr(0);
-        // matrix.labels = order.clone();
         matrix2.labels = order;
-        // matrix.print();
-        // dbg!(&matrix);
-        // TODO: descomentar
+        assert_eq!(matrix.bandwidth(), 2);
+        assert_eq!(matrix.criticals(), vec![0]);
         assert_eq!(matrix.criticals(), matrix2.criticals());
 
         let file = "./input/tests/test2.mtx";
@@ -447,17 +445,19 @@ mod tests {
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.criticals(), vec![1, 2, 3]);
         let order = matrix.cmr(0);
-        // matrix.labels = order.clone();
         matrix2.labels = order;
+        assert_eq!(matrix.bandwidth(), 2);
+        assert_eq!(matrix.criticals(), vec![0, 4]);
         assert_eq!(matrix.criticals(), matrix2.criticals());
 
         let file = "./input/tests/test3.mtx";
         let mut matrix = mm_file_to_csr(file);
         let mut matrix2 = matrix.clone();
+        assert_eq!(matrix.bandwidth(), 3);
         assert_eq!(matrix.criticals(), vec![0, 3]);
         let order = matrix.cmr(0);
-        // matrix.labels = order.clone();
         matrix2.labels = order;
+        assert_eq!(matrix.criticals(), vec![1, 3]);
         assert_eq!(matrix.criticals(), matrix2.criticals());
 
         let file = "./input/tests/test4-ipo.mtx";
@@ -467,8 +467,6 @@ mod tests {
         assert_eq!(matrix.criticals(), vec![0, 5]);
         matrix2.labels = vec![2, 5, 1, 0, 3, 4];
         assert_eq!(matrix2.bandwidth(), 2);
-        // dbg!(&matrix2.bandwidth());
-        matrix2.print();
         assert_eq!(matrix2.criticals(), vec![1, 2, 3, 4, 5]);
         let order = matrix.cmr(0);
         matrix2.labels = order;
