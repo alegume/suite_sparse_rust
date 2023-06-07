@@ -64,7 +64,7 @@ impl Matrix {
         let criticos = self.criticals();
         let mut bw_0 = self.bandwidth();
         for v in criticos {
-            for u in self.neighbour_of_criticals(v) {
+            for u in self.neighbour_of_criticals2(v) {
                 // println!("O{:?}", &self.labels);
                 self.labels.swap(v, u);
                 if self.bandwidth() <= bw_0 {
@@ -91,6 +91,20 @@ impl Matrix {
         (min + max) / 2
     }
 
+    fn neighbour_of_criticals2(&self, v: usize) -> Vec<usize> {
+        let mut neighbour = self.get_columns_of_row(self.old_label(v)).clone();
+        let mid_v = self.mid(v, &mut neighbour);
+        let mut neighbour_of_criticals: Vec<usize> = Vec::new();
+        // dbg!(v, neighbour, mid_v);
+        for u in neighbour {
+            let u = self.labels[*u];
+            neighbour_of_criticals.push(u);
+            neighbour_of_criticals.push(self.mid(u, &mut neighbour));
+        }
+        neighbour_of_criticals.extend(neighbour);
+        neighbour_of_criticals
+    }
+
     fn neighbour_of_criticals(&self, v: usize) -> Vec<usize> {
         // TODO: Ordenar em ordem crescente  do valor |mid(v) − f (u)|
         /*
@@ -113,6 +127,7 @@ impl Matrix {
         }
         // dbg!(&neighbour_of_criticals);
         neighbour_of_criticals.extend(neighbour);
+        // dbg!(&neighbour_of_criticals);
         neighbour_of_criticals
     }
 
