@@ -61,7 +61,11 @@ fn experimentation(file: &str, n: &usize) {
         file, matrix.m, bw_0, matrix.bw, total_time, matrix.col_index[0]
     );
 
-    /// MILs
+    // matrix.print();
+
+    // abort();
+    // MILs
+    /*
     let now = Instant::now();
     // matrix.print();
     // matrix_original.labels = order;
@@ -72,6 +76,7 @@ fn experimentation(file: &str, n: &usize) {
         "{}, n:{}, b0:{}, bf:{}, t:{}, MILS ({})",
         file, matrix_original.m, bw_0, matrix_original.bw, total_time, matrix_original.col_index[0]
     );
+    */
     // matrix.print();
     // print!("{:?}", matrix);
 }

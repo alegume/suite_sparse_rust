@@ -115,18 +115,18 @@ impl Matrix {
     fn bw_vertex(&self, v: usize) -> usize {
         let mut bw_v: usize = 0;
 
-        let v = self.labels[v];
+        // let v = self.labels[v];
         // TODO !!! : Assymetric, m != n 
-        if v >= self.row_index.len()-1 {
-            return 0;
-        }
-        dbg!(&v);
+        // if v >= self.row_index.len()-1 {
+        //     return 0;
+        // }
+        // dbg!(&v);
         let v_neighbour = self.get_columns_of_row(v);
         for u in v_neighbour {
             if v == *u {
                 continue;
             }
-            // let i = self.labels[v];
+            let v = self.labels[v];
             let u = self.labels[*u];
             let diff: usize = v.abs_diff(u);
             if diff > bw_v {
@@ -185,7 +185,11 @@ impl Matrix {
         criticals_neighbours
     }
 
-    pub fn print(&self) {
+    fn old_label(&self, v: usize) -> usize {
+        self.labels.iter().position(|x| x == &v).unwrap()
+    }
+
+    /*pub fn print(&self) {
         let mut n_row: usize = 0;
 
         print!("\n    ");
@@ -206,6 +210,44 @@ impl Matrix {
                 }
                 count = j;
                 // println!("\tj={} count={}", j, count);
+                print!(" x |");
+            }
+            if count < self.n {
+                print!(" 0 |");
+            }
+            n_row += 1;
+            println!();
+        }
+        println!();
+    }*/
+
+    // Print considering label
+    pub fn print(&self) {
+        let mut n_row: usize = 0;
+
+        print!("\n    ");
+        for n in 0..self.n {
+            print!("{} | ", n);
+        }
+        println!();
+        while n_row < self.row_index.len() - 1 {
+            let i = self.old_label(n_row);
+            let row = self.get_columns_of_row(i);
+            print!("{} |", n_row);
+            let mut count: usize = 0;
+            // Order by labels 
+            let mut rows:Vec<usize> = Vec::with_capacity(row.len());
+            for j in row {
+                rows.push(self.labels[*j]);
+            }
+            rows.sort_unstable();
+            for j in rows {
+                // Columns in a row
+                let j = j + 1;
+                for _ in 1..j - count {
+                    print!(" 0 |");
+                }
+                count = j;
                 print!(" x |");
             }
             if count < self.n {
@@ -393,10 +435,11 @@ mod tests {
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.criticals(), vec![3]);
         let order = matrix.cmr(0);
-        matrix.labels = order.clone();
+        // matrix.labels = order.clone();
         matrix2.labels = order;
         // matrix.print();
         // dbg!(&matrix);
+        // TODO: descomentar
         assert_eq!(matrix.criticals(), matrix2.criticals());
 
         let file = "./input/tests/test2.mtx";
@@ -404,7 +447,7 @@ mod tests {
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.criticals(), vec![1, 2, 3]);
         let order = matrix.cmr(0);
-        matrix.labels = order.clone();
+        // matrix.labels = order.clone();
         matrix2.labels = order;
         assert_eq!(matrix.criticals(), matrix2.criticals());
 
@@ -413,7 +456,7 @@ mod tests {
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.criticals(), vec![0, 3]);
         let order = matrix.cmr(0);
-        matrix.labels = order.clone();
+        // matrix.labels = order.clone();
         matrix2.labels = order;
         assert_eq!(matrix.criticals(), matrix2.criticals());
 
@@ -424,7 +467,8 @@ mod tests {
         assert_eq!(matrix.criticals(), vec![0, 5]);
         matrix2.labels = vec![2, 5, 1, 0, 3, 4];
         assert_eq!(matrix2.bandwidth(), 2);
-        dbg!(&matrix2);
+        // dbg!(&matrix2.bandwidth());
+        matrix2.print();
         assert_eq!(matrix2.criticals(), vec![1, 2, 3, 4, 5]);
         let order = matrix.cmr(0);
         matrix2.labels = order;
