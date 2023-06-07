@@ -13,6 +13,7 @@ pub struct Matrix {
     pub col_index: Vec<usize>, // column indices of values in v
     pub row_index: Vec<usize>, // indices (in v and row_index) where the rows starts
     pub labels: Vec<usize>,
+    pub old_labels: Vec<usize>,
     pub bw: usize, // Current bandwidth
     pub max_degree: usize,
     pub min_bw: usize,
@@ -28,6 +29,7 @@ impl Matrix {
             row_index: Vec::with_capacity(m + 1),
             col_index: Vec::with_capacity(nz_len),
             labels: Vec::with_capacity(max(m, n)),
+            old_labels: Vec::new(),
             bw: 0,
             max_degree: 0,
             min_bw: 0,
@@ -185,7 +187,7 @@ impl Matrix {
         criticals_neighbours
     }
 
-    fn old_label(&self, v: usize) -> usize {
+    pub fn old_label(&self, v: usize) -> usize {
         self.labels.iter().position(|x| x == &v).unwrap()
     }
 

@@ -10,14 +10,14 @@ use crate::matrix_csr::Matrix;
 impl Matrix {
     // Main code for MILS
     pub fn mils(&mut self, n: &usize) {
-        let mut nivel: usize = 13;
+        let mut nivel: usize = 33;
         let mut iter: usize = 0;
         let mut bw_0 = self.bandwidth();
         let mut h: HashMap<usize, HashSet<usize>> = HashMap::new();
         self.local_search();
         while (iter < *n && (bw_0 > self.min_bw)) {
             iter += 1;
-            // self.perturbation(nivel, &mut h);
+            self.perturbation(nivel, &mut h);
             self.local_search();
             if (self.bw < bw_0) {
                 bw_0 = self.bw;
@@ -86,8 +86,9 @@ impl Matrix {
         // TODO: Ordenar em ordem crescente  do valor |mid(v) − f (u)|
         // TODO: IMPLEMENTAR REGRAS
         let neighbour_of_criticals: Vec<usize> = Vec::with_capacity(self.degree(*v));
+        let v = self.old_label(*v);
         dbg!(v);
-        let neighbour = self.get_columns_of_row(*v).to_owned();
+        let neighbour = self.get_columns_of_row(v).to_owned();
         // if (abs(mid(v) - f(u)) < abs(mid(v) - f(v)) {
         // }
         neighbour

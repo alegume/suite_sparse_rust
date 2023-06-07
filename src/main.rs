@@ -62,21 +62,20 @@ fn experimentation(file: &str, n: &usize) {
     );
 
     // matrix.print();
-
     // abort();
-    // MILs
-    /*
+
+    /// MILs
     let now = Instant::now();
     // matrix.print();
     // matrix_original.labels = order;
     let bw_0 = matrix_original.bandwidth();
+    matrix_original.old_labels = matrix_original.labels.clone();
     matrix_original.mils(n);
     let total_time = now.elapsed().as_millis();
     println!(
         "{}, n:{}, b0:{}, bf:{}, t:{}, MILS ({})",
         file, matrix_original.m, bw_0, matrix_original.bw, total_time, matrix_original.col_index[0]
     );
-    */
     // matrix.print();
     // print!("{:?}", matrix);
 }

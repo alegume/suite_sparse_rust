@@ -2,8 +2,6 @@
 
 
 #### TODO
-    testar bw_vertex revisar linha 119
-    testar criticals
     testar perturbacao (hashmap e hashset)
     Implementar MILS
     refac print
@@ -13,6 +11,8 @@
     George Liu pseudo algo
 
 #### DONE
+    testar bw_vertex revisar linha 119
+    testar criticals
     VErificar proposta com labels
     criar MILS crate
 
