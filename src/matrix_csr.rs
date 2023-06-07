@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 // use std::{collections::VecDeque, process::abort};
 // use std::collections::HashMap;
 use std::cmp::max;
@@ -37,6 +38,55 @@ impl Matrix {
             n,
             nz_len,
         }
+    }
+
+    // George-Liu for for finding pseudo-peripheral vertex
+    pub fn pseudo_george_liu(&mut self) -> usize {
+        let n = max(self.m, self.n);
+        let mut pseudo = 0;
+        // let mut diameter = 0;
+
+        // Find the vertex with the maximum degree
+        // for i in 0..n {
+        //     let degree = self.degree(i);
+        //     if degree > self.max_degree {
+        //         self.max_degree = degree;
+        //         pseudo = i;
+        //         break;
+        //     }
+        // }
+
+        // Perform breadth-first search (BFS) from the pseudo-peripheral vertex
+        let mut queue = VecDeque::new();
+        let mut visited = vec![false; n];
+        let mut distances = vec![0; n];
+
+        // Find if any vertex are left unvisited (e.g. diconected graph)
+        for i in 0..self.m {
+            if visited[i] {
+                continue;
+            }
+            queue.push_back(i);
+            visited[pseudo] = true;
+            // let mut last: usize = pseudo;
+            while let Some(v) = queue.pop_front() {
+                // println!("{} => {:?}", v, self.get_columns_of_row(v));
+                for u in self.get_columns_of_row(v) {
+                    // neighbors
+                    // let neighbor = self.col_index[*i];
+                    if !visited[*u] {
+                        queue.push_back(*u);
+                        visited[*u] = true;
+                        distances[*u] = distances[v] + 1;
+                        // diameter = distances[*neighbor];
+                        pseudo = *u;
+                    }
+                }
+            }
+        }
+        // dbg!(distances);
+
+        pseudo
     }
 
     // Reorder matrix based on a new labeling

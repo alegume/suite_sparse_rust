@@ -2,6 +2,8 @@
 
 
 #### TODO
+    Somente permitir simetricas
+    remover teste com matrizes assimetricas
     Implementar MILS
     refac print
     IMPLEMENTAR REGRAS  vizinhos_criticos!
