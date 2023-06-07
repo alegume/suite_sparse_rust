@@ -64,7 +64,7 @@ impl Matrix {
         let criticos = self.criticals();
         let mut bw_0 = self.bandwidth();
         for v in criticos {
-            for u in self.neighbour_of_criticals(&v) {
+            for u in self.neighbour_of_criticals(v) {
                 // println!("O{:?}", &self.labels);
                 self.labels.swap(v, u);
                 if self.bandwidth() <= bw_0 {
@@ -84,37 +84,35 @@ impl Matrix {
     // Middle of rotulations of v
     fn mid(&self, v: usize, neighbour: &mut &[usize]) -> usize {
         // mid(v) = ⌊(max(v) + min(v))/2⌋
+        let mut neighbour: Vec<usize>= neighbour.to_vec();
         neighbour.sort_unstable();
         let min = neighbour.first().unwrap_or(&0);
         let max = neighbour.last().unwrap_or(&0);
         (min + max) / 2
     }
 
-    fn neighbour_of_criticals(&self, v: &usize) -> Vec<usize> {
+    fn neighbour_of_criticals(&self, v: usize) -> Vec<usize> {
         // TODO: Ordenar em ordem crescente  do valor |mid(v) − f (u)|
-        // TODO: IMPLEMENTAR REGRAS
         /*
         Trocar o rótulo de cada vértice crítico com os rótulos dos vértices u ∈ N ′ (v), em ordem crescente do valor |mid(v) − f (u)| até que se encontre uma solução melhor.
         O conjunto de candidatos a serem trocados com o vértice v é definido por
         N′(v) = {u : |mid(v) − f (u)| < |mid(v) − f (v)|} e
-        N(v) = {u : (u, v) ∈ E}
         mid(v) = ⌊(max(v) + min(v))/2⌋.
-        max(u) = max{f (u) : u ∈ N (v)},
-        min(v) = min{f (u) : u ∈ N (v)}
          */
-        let neighbour_of_criticals: Vec<usize> = Vec::with_capacity(self.degree(*v));
-        // let v = self.old_label(*v);
-        let mut neighbour = self.get_columns_of_row(self.old_label(*v)).clone();
-        let mid_v = self.mid(*v, &mut neighbour);
-
+        let mut neighbour_of_criticals: Vec<usize> = Vec::with_capacity(self.degree(v));
+        let mut neighbour = self.get_columns_of_row(self.old_label(v)).clone();
+        let mid_v = self.mid(v, &mut neighbour);
+        // dbg!(v, neighbour, mid_v);
         for u in neighbour {
             let u = self.labels[*u];
-            // if (abs(mid(v) - u) < abs(mid(v) - v)) {
-            //     continue;
-            // }
+            if self.mid(v, &mut neighbour).abs_diff(u) < self.mid(v, &mut neighbour).abs_diff(v) {
+                // dbg!(v, u, mid_v);
+                // println!("{:?} < {:?}", self.mid(v, &mut neighbour).abs_diff(u), self.mid(v, &mut neighbour).abs_diff(v));
+                neighbour_of_criticals.push(u);
+            }
         }
-
-        neighbour
+        // dbg!(&neighbour_of_criticals);
+        neighbour_of_criticals
     }
 
     // println!("\tcriticals = {:?}", self.criticals);
