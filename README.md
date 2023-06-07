@@ -2,6 +2,7 @@
 
 
 #### TODO
+    testar bw_vertex revisar linha 119
     testar perturbacao (hashmap e hashset)
     Implementar MILS
     refac print

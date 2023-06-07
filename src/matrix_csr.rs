@@ -115,15 +115,20 @@ impl Matrix {
     fn bw_vertex(&self, v: usize) -> usize {
         let mut bw_v: usize = 0;
 
+        let v = self.labels[v];
+        // TODO !!! : Assymetric, m != n 
+        if v >= self.row_index.len()-1 {
+            return 0;
+        }
+        dbg!(&v);
         let v_neighbour = self.get_columns_of_row(v);
         for u in v_neighbour {
             if v == *u {
                 continue;
             }
-            let i = self.labels[v];
-            let j = self.labels[*u];
-            // Columns in a row
-            let diff: usize = i.abs_diff(j);
+            // let i = self.labels[v];
+            let u = self.labels[*u];
+            let diff: usize = v.abs_diff(u);
             if diff > bw_v {
                 bw_v = diff;
             }
@@ -161,10 +166,11 @@ impl Matrix {
     }
 
     // Vertices in edges with bigest bandwidth
-    pub fn criticals(&self) -> Vec<usize> {
+    pub fn criticals(&mut self) -> Vec<usize> {
         let mut n_row: usize = 0;
         let mut criticals_neighbours: Vec<usize> = Vec::new();
 
+        self.bandwidth();
         while n_row < self.row_index.len() - 1 {
             if self.bw_vertex(n_row) == self.bw {
                 let i = self.labels[n_row];
@@ -387,7 +393,10 @@ mod tests {
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.criticals(), vec![3]);
         let order = matrix.cmr(0);
+        matrix.labels = order.clone();
         matrix2.labels = order;
+        // matrix.print();
+        // dbg!(&matrix);
         assert_eq!(matrix.criticals(), matrix2.criticals());
 
         let file = "./input/tests/test2.mtx";
@@ -395,6 +404,7 @@ mod tests {
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.criticals(), vec![1, 2, 3]);
         let order = matrix.cmr(0);
+        matrix.labels = order.clone();
         matrix2.labels = order;
         assert_eq!(matrix.criticals(), matrix2.criticals());
 
@@ -403,6 +413,7 @@ mod tests {
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.criticals(), vec![0, 3]);
         let order = matrix.cmr(0);
+        matrix.labels = order.clone();
         matrix2.labels = order;
         assert_eq!(matrix.criticals(), matrix2.criticals());
 
@@ -413,6 +424,7 @@ mod tests {
         assert_eq!(matrix.criticals(), vec![0, 5]);
         matrix2.labels = vec![2, 5, 1, 0, 3, 4];
         assert_eq!(matrix2.bandwidth(), 2);
+        dbg!(&matrix2);
         assert_eq!(matrix2.criticals(), vec![1, 2, 3, 4, 5]);
         let order = matrix.cmr(0);
         matrix2.labels = order;
