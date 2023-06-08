@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+use std::{collections::VecDeque, io::repeat};
 // use std::{collections::VecDeque, process::abort};
 // use std::collections::HashMap;
 use std::cmp::max;
@@ -40,12 +40,50 @@ impl Matrix {
         }
     }
 
-    // George-Liu for for finding pseudo-peripheral vertex
-    pub fn pseudo_george_liu(&mut self) -> usize {
-        let n = max(self.m, self.n);
-        let mut pseudo = 0;
-        // let mut diameter = 0;
+    /// Perform breadth-first search (BFS) from the pseudo-peripheral vertex
+    /// Return leave nodes and maximun eccentricity
+    fn bfs(&self, v: usize) -> (Vec<usize>, usize) {
+        let mut queue = VecDeque::new();
+        let mut visited = vec![false; self.m];
+        let mut distances = vec![0; self.m];
+        let mut eccentricity = 0;
 
+        queue.push_back(v);
+        visited[v] = true;
+        // Find if any vertex are left unvisited (e.g. diconected graph)
+        for i in 0..self.m {
+            if visited[i] {
+                continue;
+            }
+            while let Some(v) = queue.pop_front() {
+                // println!("{} => {:?}", v, self.get_columns_of_row(v));
+                for u in self.get_columns_of_row(v) {
+                    if !visited[*u] {
+                        queue.push_back(*u);
+                        visited[*u] = true;
+                        distances[*u] = distances[v] + 1;
+                        eccentricity = distances[*u];
+                    }
+                }
+            }
+        }
+        /// Find vertices in the last level of the RLS
+        let leaves: Vec<usize> = distances
+            .iter()
+            .enumerate()
+            .filter(|&(_, &x)| x == eccentricity)
+            .map(|(i, _)| i)
+            .collect();
+
+        (leaves, eccentricity)
+    }
+
+    // George-Liu for for finding pseudo-peripheral vertex
+    pub fn pseudo_george_liu(&mut self, v: usize) -> usize {
+        let mut v = v;
+        let mut leaves: Vec<usize>;
+        let mut eccentricity_u = 0;
+        let mut eccentricity_v = 0;
         // Find the vertex with the maximum degree
         // for i in 0..n {
         //     let degree = self.degree(i);
@@ -56,37 +94,40 @@ impl Matrix {
         //     }
         // }
 
-        // Perform breadth-first search (BFS) from the pseudo-peripheral vertex
-        let mut queue = VecDeque::new();
-        let mut visited = vec![false; n];
-        let mut distances = vec![0; n];
-
-        // Find if any vertex are left unvisited (e.g. diconected graph)
-        for i in 0..self.m {
-            if visited[i] {
-                continue;
+        // BFS 
+        (leaves, eccentricity_v) = self.bfs(v);
+        loop {
+            // Find the leave of minimum degree
+            let mut u:usize = leaves.last().unwrap().clone();
+            if u == v { // Ignore if u = v
+                leaves.pop();
+                u = leaves.last().unwrap().clone();
             }
-            queue.push_back(i);
-            visited[pseudo] = true;
-            // let mut last: usize = pseudo;
-            while let Some(v) = queue.pop_front() {
-                // println!("{} => {:?}", v, self.get_columns_of_row(v));
-                for u in self.get_columns_of_row(v) {
-                    // neighbors
-                    // let neighbor = self.col_index[*i];
-                    if !visited[*u] {
-                        queue.push_back(*u);
-                        visited[*u] = true;
-                        distances[*u] = distances[v] + 1;
-                        // diameter = distances[*neighbor];
-                        pseudo = *u;
-                    }
+            let mut u_degree = self.degree(u);
+            for l in &leaves {
+                let l_degree = self.degree(*l);
+                if l_degree < u_degree {
+                    u = *l;
+                    u_degree = l_degree;
                 }
             }
+            // BFS in u
+            (leaves, eccentricity_u) = self.bfs(u);
+            // println!("{}({}) - {}({})", u, eccentricity_u, v, eccentricity_v);
+            if eccentricity_u > eccentricity_v {
+                v = u;
+                eccentricity_v = eccentricity_u;
+            } else {
+                break;
+            }
         }
-        // dbg!(distances);
+        // self.print();
+        // dbg!(&distances, &leaves, &u, &u_degree);
+        // dbg!(diameter);
+        // assert_eq!(eccentricity, *distances.iter().max().unwrap());
 
-        pseudo
+        v
+        // self.labels[]
     }
 
     // Reorder matrix based on a new labeling
@@ -408,13 +449,13 @@ mod tests {
 
     #[test]
     fn bw_test() {
-        /* Stress tests  */
-        // let file = "./input/tests/apache2.mtx";
-        // let mut matrix = mm_file_to_csr(file, true);
-        // assert_eq!(matrix.bandwidth(), 65837);
-        // let file = "./input/tests/pwtk.mtx";
-        // let mut matrix = mm_file_to_csr(file, true);
-        // assert_eq!(matrix.bandwidth(), 189331);
+        /* Stress tests  
+        let file = "./input/tests/apache2.mtx";
+        let mut matrix = mm_file_to_csr(file, true);
+        assert_eq!(matrix.bandwidth(), 65837);
+        let file = "./input/tests/pwtk.mtx";
+        let mut matrix = mm_file_to_csr(file, true);
+        assert_eq!(matrix.bandwidth(), 189331);*/
 
         let file = "./input/tests/test1.mtx";
         let mut matrix = mm_file_to_csr(file, false);

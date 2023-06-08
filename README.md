@@ -2,15 +2,18 @@
 
 
 #### TODO
-    Ajustar matrizes assimetricas
-    Implementar MILS
-    refac print
-    IMPLEMENTAR REGRAS  vizinhos_criticos!
+    George Liu pseudo algo
+    Pq excentricidade 0?
+    vertices que não estao ligados a ninguem devem receber as rotulações por ultimo, não receber valores "do meio"
+    Revisar  vizinhos_criticos!
     Inserir restart (grasp ideas?)
     Primeiro trocar todo mundo, depois trocar pela ideia do NCHC
-    George Liu pseudo algo
 
 #### DONE
+    IMPLEMENTAR REGRAS  vizinhos_criticos!
+    refac print
+    Implementar MILS
+    Ajustar matrizes assimetricas
     Somente permitir m==n
     testar perturbacao (hashmap e hashset)
     testar bw_vertex revisar linha 119
@@ -19,8 +22,6 @@
     criar MILS crate
 
 #### IDEIAS
-    vertices que não estao ligados a ninguem devem receber as rotulações por ultimo, não receber valores "do meio"
-    Swap
     Perturbação: Selecionar um u aleatorio para trocar com um vertice crítico. Manter um histórico de 100? vertices escolhidos para cada vertice v crítico
     TODO: lista de vértices ruim (maiores degrees do grafo)
 
