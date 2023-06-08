@@ -39,7 +39,7 @@ fn main() {
 }
 
 fn experimentation(file: &str, n: &usize) {
-    let mut matrix_original = matrix_csr::mm_file_to_csr(file);
+    let mut matrix_original = matrix_csr::mm_file_to_csr(file, false);
     // !!! only for pattern matrix - drop v vector
     matrix_original.v = Vec::new();
     let mut matrix = matrix_original.clone();

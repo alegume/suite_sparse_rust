@@ -2,8 +2,7 @@
 
 
 #### TODO
-    Somente permitir simetricas
-    remover teste com matrizes assimetricas
+    Ajustar matrizes assimetricas
     Implementar MILS
     refac print
     IMPLEMENTAR REGRAS  vizinhos_criticos!
@@ -12,6 +11,7 @@
     George Liu pseudo algo
 
 #### DONE
+    Somente permitir m==n
     testar perturbacao (hashmap e hashset)
     testar bw_vertex revisar linha 119
     testar criticals
@@ -19,6 +19,7 @@
     criar MILS crate
 
 #### IDEIAS
+    vertices que não estao ligados a ninguem devem receber as rotulações por ultimo, não receber valores "do meio"
     Swap
     Perturbação: Selecionar um u aleatorio para trocar com um vertice crítico. Manter um histórico de 100? vertices escolhidos para cada vertice v crítico
     TODO: lista de vértices ruim (maiores degrees do grafo)

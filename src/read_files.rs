@@ -5,6 +5,70 @@ pub struct Element {
     pub j: usize,
 }
 
+pub fn read_matrix_market_file_coordinates_no_values(filename: &str) -> (Vec<Element>, usize, usize) {
+    // Indices are 1-based, i.e. A(1,1) is the first element.
+    use std::fs;
+    use std::io::{BufRead, BufReader};
+
+    let file = fs::File::open(filename).unwrap();
+    let reader = BufReader::new(file);
+    let mut header: bool = false;
+    let mut nz_len: usize = 0;
+    let mut coordinates = Vec::<Element>::new();
+    let (mut m, mut n): (usize, usize) = (0, 0);
+
+    for line in reader.lines() {
+        // Format => I1  J1  M(I1, J1)
+        let line = line.unwrap();
+        if line.starts_with('%') {
+            continue;
+        }
+        let mut text = line.splitn(3, ' ');
+
+        let i: &str = text.next().unwrap().trim();
+        let j: &str = text.next().unwrap().trim();
+        // Reading V
+        if let Some(v) = text.next() {
+            if !header {
+                // first line of file => (rows:m, columns:n, entries)
+                nz_len = v
+                    .trim()
+                    .parse()
+                    .expect("Error reading first line of file.mtx");
+                header = true;
+                m = i.parse::<usize>().unwrap();
+                n = j.parse::<usize>().unwrap();
+                assert_eq!(i, j);
+                continue;
+            }
+            // 1-based indices (-1)
+            let el = Element {
+                i: i.parse::<usize>().unwrap() - 1,
+                j: j.parse::<usize>().unwrap() - 1,
+                v: None,
+            };
+            if i != j {
+                // Self reference not alowed
+                coordinates.push(el);
+            }
+        } else {
+            // Coordinate matrix only (don't have V's)
+            let el = Element {
+                i: i.parse::<usize>().unwrap() - 1,
+                j: j.parse::<usize>().unwrap() - 1,
+                v: None,
+            };
+            if i != j {
+                // Self reference not alowed
+                coordinates.push(el);
+            }
+        }
+    }
+    // assert_eq!(coordinates.len(), nz_len); // Do not work if i == j
+    assert!(coordinates.len() <= nz_len);
+    (coordinates, m, n)
+}
+
 pub fn read_matrix_market_file_coordinates(filename: &str) -> (Vec<Element>, usize, usize) {
     // Indices are 1-based, i.e. A(1,1) is the first element.
     use std::fs;
@@ -48,10 +112,7 @@ pub fn read_matrix_market_file_coordinates(filename: &str) -> (Vec<Element>, usi
                     j: j.parse::<usize>().unwrap() - 1,
                     v: Some(v),
                 };
-                if i != j {
-                    // Self reference not alowed
-                    coordinates.push(el);
-                }
+                coordinates.push(el);
             } else {
                 panic!("Can't catch v value ({v});");
             }
@@ -62,10 +123,8 @@ pub fn read_matrix_market_file_coordinates(filename: &str) -> (Vec<Element>, usi
                 j: j.parse::<usize>().unwrap() - 1,
                 v: None,
             };
-            if i != j {
-                // Self reference not alowed
-                coordinates.push(el);
-            }
+            // Self reference not alowed
+            coordinates.push(el);
         }
     }
     // assert_eq!(coordinates.len(), nz_len); // Do not work if i == j
@@ -109,7 +168,7 @@ mod tests {
         }
         assert_eq!(coordinates.len(), coo.len());
         assert_eq!(m, 4);
-        assert_eq!(n, 3);
+        assert_eq!(n, 4);
 
         let file = "./input/tests/test2.mtx";
         let (coordinates, m, n) = read_matrix_market_file_coordinates(file);
@@ -160,7 +219,7 @@ mod tests {
             assert_eq!(Some(el), it.next());
         }
         assert_eq!(coordinates.len(), coo.len());
-        assert_eq!(m, 4);
+        assert_eq!(m, 6);
         assert_eq!(n, 6);
 
         let file = "./input/tests/test3.mtx";
@@ -225,6 +284,115 @@ mod tests {
                 v: Some(2.0),
                 i: 3,
                 j: 3,
+            },
+        ];
+        let mut it = coordinates.iter();
+        for el in coo.iter() {
+            assert_eq!(Some(el), it.next());
+        }
+        assert_eq!(coordinates.len(), coo.len());
+        assert_eq!(m, 4);
+        assert_eq!(n, 4);
+    }
+
+    #[test]
+    fn read_matrix_market_file_no_values_test() {
+        let file = "./input/tests/test1.mtx";
+        let (coordinates, m, n) = read_matrix_market_file_coordinates_no_values(file);
+        let coo = vec![
+            Element {
+                v: None,
+                i: 3,
+                j: 1,
+            },
+        ];
+        let mut it = coordinates.iter();
+        for el in coo.iter() {
+            assert_eq!(Some(el), it.next());
+        }
+        assert_eq!(coordinates.len(), coo.len());
+        assert_eq!(m, 4);
+        assert_eq!(n, 4);
+
+        let file = "./input/tests/test2.mtx";
+        let (coordinates, m, n) = read_matrix_market_file_coordinates_no_values(file);
+        let coo = vec![
+            Element {
+                v: None,
+                i: 0,
+                j: 1,
+            },
+            Element {
+                v: None,
+                i: 1,
+                j: 3,
+            },
+            Element {
+                v: None,
+                i: 2,
+                j: 3,
+            },
+            Element {
+                v: None,
+                i: 3,
+                j: 5,
+            },
+            Element {
+                v: None,
+                i: 2,
+                j: 4,
+            },
+        ];
+        let mut it = coordinates.iter();
+        for el in coo.iter() {
+            assert_eq!(Some(el), it.next());
+        }
+        assert_eq!(coordinates.len(), coo.len());
+        assert_eq!(m, 6);
+        assert_eq!(n, 6);
+
+        let file = "./input/tests/test3.mtx";
+        let (coordinates, m, n) = read_matrix_market_file_coordinates_no_values(file);
+        let coo = vec![
+            Element {
+                v: None,
+                i: 0,
+                j: 1,
+            },
+            Element {
+                v: None,
+                i: 0,
+                j: 3,
+            },
+            Element {
+                v: None,
+                i: 1,
+                j: 0,
+            },
+            Element {
+                v: None,
+                i: 1,
+                j: 3,
+            },
+            Element {
+                v: None,
+                i: 2,
+                j: 3,
+            },
+            Element {
+                v: None,
+                i: 3,
+                j: 0,
+            },
+            Element {
+                v: None,
+                i: 3,
+                j: 1,
+            },
+            Element {
+                v: None,
+                i: 3,
+                j: 2,
             },
         ];
         let mut it = coordinates.iter();
