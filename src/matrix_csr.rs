@@ -67,13 +67,17 @@ impl Matrix {
                 }
             }
         }
-        /// Find vertices in the last level of the RLS
-        let leaves: Vec<usize> = distances
-            .iter()
-            .enumerate()
-            .filter(|&(_, &x)| x == eccentricity)
-            .map(|(i, _)| i)
-            .collect();
+        dbg!(&distances);
+        let mut leaves: Vec<usize> = Vec::new();
+        if eccentricity > 0{
+            // Find vertices in the last level of the RLS
+            leaves =  distances
+                .iter()
+                .enumerate()
+                .filter(|&(_, &x)| x == eccentricity)
+                .map(|(i, _)| i)
+                .collect();
+        }
 
         (leaves, eccentricity)
     }
@@ -90,9 +94,10 @@ impl Matrix {
         (leaves_v, eccentricity_v) = self.bfs(v);
         loop {
             // Find the leave of minimum degree
-            let mut u:usize = leaves_v.pop().unwrap();
-            // dbg!(u);
-            assert_ne!(u, v);
+            let mut u:usize = leaves_v.pop().unwrap_or(v);
+            if u == v { // There are no leaves (directed/disconected graph)
+                break;
+            }
             let mut u_degree = self.degree(u);
             for l in &leaves_v {
                 let l_degree = self.degree(*l);
@@ -103,8 +108,8 @@ impl Matrix {
             }
             // BFS in u
             (leaves_u, eccentricity_u) = self.bfs(u);
-            // let troca: bool = (eccentricity_u > eccentricity_v);
-            // println!("{}|{:?}|{}|{}|{:?}|{}|{:?}", v, leaves_v, eccentricity_v, u, leaves_u, eccentricity_u, troca);
+            let troca: bool = (eccentricity_u > eccentricity_v);
+            println!("{}|{:?}|{}|{}|{:?}|{}|{:?}", v, leaves_v, eccentricity_v, u, leaves_u, eccentricity_u, troca);
             if eccentricity_u > eccentricity_v {
                 v = u;
                 eccentricity_v = eccentricity_u;
@@ -472,9 +477,12 @@ mod tests {
 
         let file = "./input/general/bcspwr01.mtx";
         let mut matrix = mm_file_to_csr(file, false);
+        let mut matrix2 = matrix.clone();
         assert_eq!(matrix.bandwidth(), 38);
         matrix.cmr(matrix.col_index[0]);
-        // assert_eq!(matrix.bandwidth(), 8);
+        let p = matrix2.pseudo_george_liu(0);
+        matrix2.cmr(p);
+        // assert_eq!(matrix2.bandwidth(), 8);
         // CMr 8
 
         let file = "./input/general/lns__131.mtx";
@@ -608,5 +616,38 @@ mod tests {
         assert_eq!(matrix2.bandwidth(), 65);
         matrix2.labels = order;
         assert_eq!(matrix2.bandwidth(), 59);
+    }
+
+    #[test]
+    fn pseudo_george_liu_test() {
+        let file = "./input/tests/test4-ipo.mtx";
+        let mut matrix = mm_file_to_csr(file, false);
+        let p = matrix.pseudo_george_liu(0);
+        assert_eq!(p, 3);
+        let p = matrix.pseudo_george_liu(1);
+        assert_eq!(p, 1);
+        let p = matrix.pseudo_george_liu(3);
+        assert_eq!(p, 3);
+        let p = matrix.pseudo_george_liu(4);
+        assert_eq!(p, 3);
+
+        let file = "./input/tests/test3.mtx";
+        let mut matrix = mm_file_to_csr(file, false);
+        let p = matrix.pseudo_george_liu(0);
+        assert_eq!(p, 0);
+        let p = matrix.pseudo_george_liu(1);
+        assert_eq!(p, 1);
+        let p = matrix.pseudo_george_liu(3);
+        assert_eq!(p, 2);
+
+        let file = "./input/tests/test2.mtx";
+        let mut matrix = mm_file_to_csr(file, false);
+        let p = matrix.pseudo_george_liu(0);
+        assert_eq!(p, 0);
+        let p = matrix.pseudo_george_liu(2);
+        assert_eq!(p, 2);
+        let p = matrix.pseudo_george_liu(3);
+        assert_eq!(p, 3);
+        
     }
 }

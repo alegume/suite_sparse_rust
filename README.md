@@ -3,7 +3,8 @@
 
 #### TODO
     George Liu pseudo algo
-    Pq excentricidade 0?
+    Pq excentricidade 0? Vertices em que nenhum arco chega, apenas sai. Fica com 0 na distância. 
+    ! Retirar/revisar parte do grafo desconexo 
     vertices que não estao ligados a ninguem devem receber as rotulações por ultimo, não receber valores "do meio"
     Revisar  vizinhos_criticos!
     Inserir restart (grasp ideas?)
