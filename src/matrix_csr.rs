@@ -40,7 +40,7 @@ impl Matrix {
         }
     }
 
-    /// Perform breadth-first search (BFS) from the pseudo-peripheral vertex
+    /// Perform breadth-first search (BFS)
     /// Return leave nodes and maximun eccentricity
     fn bfs(&self, v: usize) -> (Vec<usize>, usize) {
         let mut queue = VecDeque::new();
@@ -81,30 +81,20 @@ impl Matrix {
     // George-Liu for for finding pseudo-peripheral vertex
     pub fn pseudo_george_liu(&mut self, v: usize) -> usize {
         let mut v = v;
-        let mut leaves: Vec<usize>;
+        let mut leaves_v: Vec<usize>;
+        let mut leaves_u: Vec<usize>;
         let mut eccentricity_u = 0;
         let mut eccentricity_v = 0;
-        // Find the vertex with the maximum degree
-        // for i in 0..n {
-        //     let degree = self.degree(i);
-        //     if degree > self.max_degree {
-        //         self.max_degree = degree;
-        //         pseudo = i;
-        //         break;
-        //     }
-        // }
 
         // BFS 
-        (leaves, eccentricity_v) = self.bfs(v);
+        (leaves_v, eccentricity_v) = self.bfs(v);
         loop {
             // Find the leave of minimum degree
-            let mut u:usize = leaves.last().unwrap().clone();
-            if u == v { // Ignore if u = v
-                leaves.pop();
-                u = leaves.last().unwrap().clone();
-            }
+            let mut u:usize = leaves_v.pop().unwrap();
+            // dbg!(u);
+            assert_ne!(u, v);
             let mut u_degree = self.degree(u);
-            for l in &leaves {
+            for l in &leaves_v {
                 let l_degree = self.degree(*l);
                 if l_degree < u_degree {
                     u = *l;
@@ -112,11 +102,13 @@ impl Matrix {
                 }
             }
             // BFS in u
-            (leaves, eccentricity_u) = self.bfs(u);
-            // println!("{}({}) - {}({})", u, eccentricity_u, v, eccentricity_v);
+            (leaves_u, eccentricity_u) = self.bfs(u);
+            // let troca: bool = (eccentricity_u > eccentricity_v);
+            // println!("{}|{:?}|{}|{}|{:?}|{}|{:?}", v, leaves_v, eccentricity_v, u, leaves_u, eccentricity_u, troca);
             if eccentricity_u > eccentricity_v {
                 v = u;
                 eccentricity_v = eccentricity_u;
+                leaves_v = leaves_u;
             } else {
                 break;
             }
