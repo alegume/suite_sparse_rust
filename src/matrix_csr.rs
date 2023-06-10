@@ -67,7 +67,7 @@ impl Matrix {
                 }
             }
         }
-        dbg!(&distances);
+        // dbg!(&distances);
         let mut leaves: Vec<usize> = Vec::new();
         if eccentricity > 0{
             // Find vertices in the last level of the RLS
@@ -98,6 +98,7 @@ impl Matrix {
             if u == v { // There are no leaves (directed/disconected graph)
                 break;
             }
+            // Find minimum degree vertex
             let mut u_degree = self.degree(u);
             for l in &leaves_v {
                 let l_degree = self.degree(*l);
@@ -109,7 +110,7 @@ impl Matrix {
             // BFS in u
             (leaves_u, eccentricity_u) = self.bfs(u);
             let troca: bool = (eccentricity_u > eccentricity_v);
-            println!("{}|{:?}|{}|{}|{:?}|{}|{:?}", v, leaves_v, eccentricity_v, u, leaves_u, eccentricity_u, troca);
+            // println!("{}|{:?}|{}|{}|{:?}|{}|{:?}", v, leaves_v, eccentricity_v, u, leaves_u, eccentricity_u, troca);
             if eccentricity_u > eccentricity_v {
                 v = u;
                 eccentricity_v = eccentricity_u;

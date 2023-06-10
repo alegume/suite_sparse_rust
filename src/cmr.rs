@@ -11,17 +11,16 @@ impl Matrix {
         let mut visited = vec![false; self.m];
         let mut n:usize = 0;
         let mut v = v;
-        // let mut distances = vec![0; self.m];
 
-        self.labels = vec![999;self.m];
-        
         loop {
             queue.push_back(v);
             visited[v] = true;
             while let Some(v) = queue.pop_front() {
-                // println!("{} => {:?}", v, self.get_columns_of_row(v));
-                // let x = ;
                 let mut neighbours =  self.get_columns_of_row(v).to_vec();
+                // Sort by degree
+                // dbg!(&v, &neighbours);
+                neighbours.sort_by_key(|&x| self.degree(x));
+                // dbg!(&neighbours);
                 for u in neighbours {
                     if !visited[u] {
                         queue.push_back(u);
@@ -31,6 +30,7 @@ impl Matrix {
                 self.labels[v] = n;
                 n += 1;
             }
+            // Find disconected vertices
             if let Some(u) = visited.iter().position(|&x| x == false) { 
                 v = u;
             } else {
@@ -38,7 +38,7 @@ impl Matrix {
             }
         }
         self.labels.reverse();
-        println!("{:?}", self.labels);
+        // println!("{:?}", self.labels);
     }
 
     // CMr by reordering and changing the graph
@@ -88,5 +88,24 @@ impl Matrix {
                 lines_visited[i] = *n;
             }
         }
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::read_files::{read_matrix_market_file_coordinates, Element, read_matrix_market_file_coordinates_no_values};
+    use crate::matrix_csr::mm_file_to_csr;
+
+    #[test]
+    fn cmr_labels_test() {
+        let file = "./input/tests/test4-ipo.mtx";
+        let mut matrix = mm_file_to_csr(file, true);
+        let mut matrix2 = matrix.clone();
+        matrix.cmr_reorder(0);
+        matrix2.cmr_labels(0);
+        
+        assert_eq!(matrix.bandwidth(), matrix2.bandwidth());
     }
 }
