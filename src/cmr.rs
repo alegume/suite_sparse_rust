@@ -9,6 +9,7 @@ impl Matrix {
     pub fn cmr_labels(&mut self, v: usize) {
         let mut queue = VecDeque::new();
         let mut visited = vec![false; self.m];
+        let mut order = vec![0; self.m];
         let mut n:usize = 0;
         let mut v = v;
 
@@ -16,6 +17,7 @@ impl Matrix {
             queue.push_back(v);
             visited[v] = true;
             while let Some(v) = queue.pop_front() {
+                dbg!(v);
                 let mut neighbours =  self.get_columns_of_row(v).to_vec();
                 // Sort by degree
                 // dbg!(&v, &neighbours);
@@ -27,7 +29,7 @@ impl Matrix {
                         visited[u] = true;
                     }
                 }
-                self.labels[v] = n;
+                order[n] = v;
                 n += 1;
             }
             // Find disconected vertices
@@ -37,8 +39,13 @@ impl Matrix {
                 break;
             }
         }
-        self.labels.reverse();
-        // println!("{:?}", self.labels);
+        let mut label = self.m;
+        for i in order {
+            label -= 1;
+            self.labels[i] = label; 
+        }
+        // self.labels.reverse();
+        println!("{:?}", self.labels);
     }
 
     // CMr by reordering and changing the graph
@@ -102,10 +109,10 @@ mod tests {
     fn cmr_labels_test() {
         let file = "./input/tests/test4-ipo.mtx";
         let mut matrix = mm_file_to_csr(file, true);
-        let mut matrix2 = matrix.clone();
-        matrix.cmr_reorder(0);
-        matrix2.cmr_labels(0);
-        
-        assert_eq!(matrix.bandwidth(), matrix2.bandwidth());
+        matrix.cmr_labels(0);
+
+        assert_eq!(matrix.bandwidth(), 3);
+        assert_eq!(matrix.labels, vec![5, 0, 4, 2, 1, 3]);
+
     }
 }

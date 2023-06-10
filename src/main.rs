@@ -62,10 +62,10 @@ fn experimentation(file: &str, n: &usize) {
     );
 
     // matrix_original.print();
-    let p = matrix_original.pseudo_george_liu(0);
+    // let p = matrix_original.pseudo_george_liu(0);
     // dbg!(p);
     // matrix_original.labels = matrix_original.cmr_reorder(p);
-    matrix_original.cmr_labels(p);
+    matrix_original.cmr_labels(0);
     matrix_original.bandwidth();
     // abort();
 
