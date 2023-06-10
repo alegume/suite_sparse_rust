@@ -109,10 +109,14 @@ mod tests {
     fn cmr_labels_test() {
         let file = "./input/tests/test4-ipo.mtx";
         let mut matrix = mm_file_to_csr(file, true);
+        let mut matrix2 = matrix.clone();
         matrix.cmr_labels(0);
-
+        // println!("{:?}", matrix);
         assert_eq!(matrix.bandwidth(), 3);
         assert_eq!(matrix.labels, vec![5, 0, 4, 2, 1, 3]);
-
+        matrix2.cmr_labels(3);
+        // println!("{:?}", matrix);
+        assert_eq!(matrix2.bandwidth(), 2);
+        assert_eq!(matrix2.labels, vec![3, 0, 4, 5, 2, 1]);
     }
 }
