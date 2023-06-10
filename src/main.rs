@@ -50,7 +50,7 @@ fn experimentation(file: &str, n: &usize) {
 
     let now = Instant::now();
     let bw_0 = matrix.bandwidth();
-    let order = matrix.cmr(0);
+    let order = matrix.cmr_reorder(0);
     matrix.bandwidth();
     let total_time = now.elapsed().as_millis();
 
@@ -62,9 +62,10 @@ fn experimentation(file: &str, n: &usize) {
     );
 
     // matrix_original.print();
-    let p = matrix_original.pseudo_george_liu(0);
-    dbg!(p);
-    matrix_original.labels = matrix_original.cmr(p);
+    // let p = matrix_original.pseudo_george_liu(0);
+    // dbg!(p);
+    // matrix_original.labels = matrix_original.cmr_reorder(p);
+    matrix_original.cmr_labels(0);
     matrix_original.bandwidth();
     // abort();
 
@@ -79,7 +80,7 @@ fn experimentation(file: &str, n: &usize) {
     let total_time = now.elapsed().as_millis();
      */
     println!(
-        "{}, n:{}, b0:{}, bf:{}, t:{}, pseudoCMr,n={}",
+        "{}, n:{}, b0:{}, bf:{}, t:{}, CMr-L,n={}",
         file, matrix_original.m, bw_0, matrix_original.bw, total_time, n
     );
     // matrix.print();

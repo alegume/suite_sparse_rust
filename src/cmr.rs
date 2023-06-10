@@ -5,7 +5,44 @@ use std::collections::VecDeque;
 use crate::matrix_csr::Matrix;
 
 impl Matrix {
-    pub fn cmr(&mut self, start_v: usize) -> Vec<usize> {
+
+    pub fn cmr_labels(&mut self, v: usize) {
+        let mut queue = VecDeque::new();
+        let mut visited = vec![false; self.m];
+        let mut n:usize = 0;
+        let mut v = v;
+        // let mut distances = vec![0; self.m];
+
+        self.labels = vec![999;self.m];
+        
+        loop {
+            queue.push_back(v);
+            visited[v] = true;
+            while let Some(v) = queue.pop_front() {
+                // println!("{} => {:?}", v, self.get_columns_of_row(v));
+                // let x = ;
+                let mut neighbours =  self.get_columns_of_row(v).to_vec();
+                for u in neighbours {
+                    if !visited[u] {
+                        queue.push_back(u);
+                        visited[u] = true;
+                    }
+                }
+                self.labels[v] = n;
+                n += 1;
+            }
+            if let Some(u) = visited.iter().position(|&x| x == false) { 
+                v = u;
+            } else {
+                break;
+            }
+        }
+        self.labels.reverse();
+        println!("{:?}", self.labels);
+    }
+
+    // CMr by reordering and changing the graph
+    pub fn cmr_reorder(&mut self, start_v: usize) -> Vec<usize> {
         let mut lines_visited: Vec<usize> = vec![std::usize::MAX; max(self.m, self.n)];
         // push_back to add to the queue and pop_front to remove from the queue.
         let mut to_visit: VecDeque<usize> = VecDeque::from([start_v]);

@@ -2,7 +2,7 @@
 
 
 #### TODO
-    George Liu pseudo algo
+    revisar GL com estratégia de nao visitados do CMr
     Pq excentricidade 0? Vertices em que nenhum arco chega, apenas sai. Fica com 0 na distância. 
     ! Retirar/revisar parte do grafo desconexo 
     vertices que não estao ligados a ninguem devem receber as rotulações por ultimo, não receber valores "do meio"
@@ -11,6 +11,7 @@
     Primeiro trocar todo mundo, depois trocar pela ideia do NCHC
 
 #### DONE
+    George Liu pseudo algo
     IMPLEMENTAR REGRAS  vizinhos_criticos!
     refac print
     Implementar MILS

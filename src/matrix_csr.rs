@@ -457,7 +457,7 @@ mod tests {
         let file = "./input/tests/test1.mtx";
         let mut matrix = mm_file_to_csr(file, false);
         assert_eq!(matrix.bandwidth(), 2);
-        matrix.labels = matrix.cmr(matrix.col_index[0]);
+        matrix.labels = matrix.cmr_reorder(matrix.col_index[0]);
         assert_eq!(matrix.bandwidth(), 2);
         // TODO: insert new matrix to assert
 
@@ -465,61 +465,61 @@ mod tests {
         let mut matrix = mm_file_to_csr(file, false);
         assert_eq!(matrix.bandwidth(), 2);
         // assert_eq!(matrix.degrees(), [2, 2, 3, 1]);
-        matrix.labels = matrix.cmr(matrix.col_index[0]);
+        matrix.labels = matrix.cmr_reorder(matrix.col_index[0]);
         assert_eq!(matrix.bandwidth(), 5);
 
         let file = "./input/tests/test3.mtx";
         let mut matrix = mm_file_to_csr(file, false);
         assert_eq!(matrix.bandwidth(), 3);
         // assert_eq!(matrix.degrees(), [3, 3, 2, 4]);
-        matrix.cmr(matrix.col_index[0]);
+        matrix.cmr_reorder(matrix.col_index[0]);
         assert_eq!(matrix.bandwidth(), 2);
 
         let file = "./input/general/bcspwr01.mtx";
         let mut matrix = mm_file_to_csr(file, false);
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.bandwidth(), 38);
-        matrix.cmr(matrix.col_index[0]);
+        matrix.cmr_reorder(matrix.col_index[0]);
         let p = matrix2.pseudo_george_liu(0);
-        matrix2.cmr(p);
+        matrix2.cmr_reorder(p);
         // assert_eq!(matrix2.bandwidth(), 8);
-        // CMr 8
+        // cmr_reorder 8
 
         let file = "./input/general/lns__131.mtx";
         let mut matrix = mm_file_to_csr(file, false);
         assert_eq!(matrix.bandwidth(), 111);
-        matrix.cmr(matrix.col_index[0]);
-        // CMr 39
+        matrix.cmr_reorder(matrix.col_index[0]);
+        // cmr_reorder 39
 
         let file = "./input/general/mcca.mtx";
         let mut matrix = mm_file_to_csr(file, false);
         assert_eq!(matrix.bandwidth(), 65);
-        matrix.cmr(matrix.col_index[0]);
-        // CMr 3
+        matrix.cmr_reorder(matrix.col_index[0]);
+        // cmr_reorder 3
 
         let file = "./input/general/will199.mtx";
         let mut matrix = mm_file_to_csr(file, false);
         assert_eq!(matrix.bandwidth(), 169);
-        matrix.cmr(matrix.col_index[0]);
-        // CMr 115
+        matrix.cmr_reorder(matrix.col_index[0]);
+        // cmr_reorder 115
 
         let file = "./input/general/662_bus.mtx";
         let mut matrix = mm_file_to_csr(file, false);
         assert_eq!(matrix.bandwidth(), 335);
-        matrix.cmr(matrix.col_index[0]);
-        // CMr 112
+        matrix.cmr_reorder(matrix.col_index[0]);
+        // cmr_reorder 112
 
         let file = "./input/general/dwt__361.mtx";
         let mut matrix = mm_file_to_csr(file, false);
         assert_eq!(matrix.bandwidth(), 50);
-        matrix.cmr(matrix.col_index[0]);
-        // CMr 25
+        matrix.cmr_reorder(matrix.col_index[0]);
+        // cmr_reorder 25
 
         let file = "./input/general/sherman4.mtx";
         let mut matrix = mm_file_to_csr(file, false);
         assert_eq!(matrix.bandwidth(), 368);
-        matrix.cmr(matrix.col_index[0]);
-        // CMr 0??
+        matrix.cmr_reorder(matrix.col_index[0]);
+        // cmr_reorder 0??
     }
 
     #[test]
@@ -528,7 +528,7 @@ mod tests {
         let mut matrix = mm_file_to_csr(file, false);
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.criticals(), vec![3]);
-        let order = matrix.cmr(0);
+        let order = matrix.cmr_reorder(0);
         matrix2.labels = order;
         assert_eq!(matrix.bandwidth(), 2);
         assert_eq!(matrix.criticals(), vec![0]);
@@ -538,7 +538,7 @@ mod tests {
         let mut matrix = mm_file_to_csr(file, false);
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.criticals(), vec![1, 2, 3]);
-        let order = matrix.cmr(0);
+        let order = matrix.cmr_reorder(0);
         matrix2.labels = order.clone();
         assert_eq!(matrix.bandwidth(), 2);
         assert_eq!(matrix2.bandwidth(), 2);
@@ -549,7 +549,7 @@ mod tests {
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.bandwidth(), 3);
         assert_eq!(matrix.criticals(), vec![0, 3]);
-        let order = matrix.cmr(0);
+        let order = matrix.cmr_reorder(0);
         matrix2.labels = order;
         assert_eq!(matrix.criticals(), vec![1, 3]);
         assert_eq!(matrix.criticals(), matrix2.criticals());
@@ -562,7 +562,7 @@ mod tests {
         matrix2.labels = vec![2, 5, 1, 0, 3, 4];
         assert_eq!(matrix2.bandwidth(), 2);
         assert_eq!(matrix2.criticals(), vec![1, 2, 3, 4, 5]);
-        let order = matrix.cmr(0);
+        let order = matrix.cmr_reorder(0);
         matrix2.labels = order;
         assert_eq!(matrix.criticals(), matrix2.criticals());
     }
@@ -577,7 +577,7 @@ mod tests {
         assert_eq!(matrix.degree(1), 2);
         assert_eq!(matrix.degree(2), 1);
         assert_eq!(matrix.degree(3), 3);
-        let order = matrix.cmr(matrix.col_index[0]);
+        let order = matrix.cmr_reorder(matrix.col_index[0]);
         matrix.labels = order.clone();
         assert_eq!(matrix.bandwidth(), 3);
         assert_eq!(matrix.degree(0), 2);
@@ -590,7 +590,7 @@ mod tests {
         assert_eq!(matrix2.degree(1), 2);
         assert_eq!(matrix2.degree(2), 1);
         assert_eq!(matrix2.degree(3), 3);
-        matrix2.labels = order; // Change label according to CMr
+        matrix2.labels = order; // Change label according to cmr_reorder
         assert_eq!(matrix2.bandwidth(), 2);
         assert_eq!(matrix2.degree(0), 1);
         assert_eq!(matrix2.degree(1), 3);
@@ -601,7 +601,7 @@ mod tests {
         let mut matrix = mm_file_to_csr(file, false);
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.bandwidth(), 111);
-        let order = matrix.cmr(matrix.col_index[0]);
+        let order = matrix.cmr_reorder(matrix.col_index[0]);
         assert_eq!(matrix.bandwidth(), 90);
         assert_eq!(matrix2.bandwidth(), 111);
         matrix2.labels = order;
@@ -611,7 +611,7 @@ mod tests {
         let mut matrix = mm_file_to_csr(file, false);
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.bandwidth(), 65);
-        let order = matrix.cmr(matrix.col_index[0]);
+        let order = matrix.cmr_reorder(matrix.col_index[0]);
         assert_eq!(matrix.bandwidth(), 59);
         assert_eq!(matrix2.bandwidth(), 65);
         matrix2.labels = order;
