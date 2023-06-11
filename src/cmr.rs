@@ -19,12 +19,9 @@ impl Matrix {
             queue.push_back(v);
             visited[v] = true;
             while let Some(v) = queue.pop_front() {
-                dbg!(v);
                 let mut neighbours =  self.get_columns_of_row(v).to_vec();
                 // Sort by degree
-                // dbg!(&v, &neighbours);
                 neighbours.sort_by_key(|&x| self.degree(x));
-                // dbg!(&neighbours);
                 for u in neighbours {
                     if !visited[u] {
                         queue.push_back(u);
@@ -41,13 +38,12 @@ impl Matrix {
                 break;
             }
         }
+        // Labeling in reverse order
         let mut label = self.m;
         for i in order {
             label -= 1;
             self.labels[i] = label; 
         }
-        // self.labels.reverse();
-        println!("{:?}", self.labels);
     }
 
     // CMr by reordering and changing the graph

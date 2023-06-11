@@ -62,12 +62,11 @@ fn experimentation(file: &str, n: &usize) {
     );
 
     // matrix_original.print();
-    // let p = matrix_original.pseudo_george_liu(0);
-    // dbg!(p);
-    // matrix_original.labels = matrix_original.cmr_reorder(p);
-    matrix_original.print();
+    let p = matrix_original.pseudo_george_liu(0);
+     matrix_original.cmr_labels(p);
+    // matrix_original.print();
     // matrix_original.cmr_labels(0);
-    // matrix_original.bandwidth();
+    matrix_original.bandwidth();
     // abort();
 
     // MILs
@@ -80,10 +79,7 @@ fn experimentation(file: &str, n: &usize) {
     matrix_original.mils(n);
     let total_time = now.elapsed().as_millis();
      */
-    println!(
-        "{}, n:{}, b0:{}, bf:{}, t:{}, CMr-L,n={}",
-        file, matrix_original.m, bw_0, matrix_original.bw, total_time, n
-    );
+    println!("{file}, n:{}, b0:{bw_0}, bf:{}, t:{total_time}, CMr-L,n={p:#?}", matrix_original.m, matrix_original.bw);
     // matrix.print();
     // print!("{:?}", matrix);
 }
