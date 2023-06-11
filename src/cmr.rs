@@ -6,6 +6,8 @@ use crate::matrix_csr::Matrix;
 
 impl Matrix {
 
+    // CMr that do not change the graph, only labels
+    // TODO: DO NOT CONSIDER PREVIOUS LABELS
     pub fn cmr_labels(&mut self, v: usize) {
         let mut queue = VecDeque::new();
         let mut visited = vec![false; self.m];

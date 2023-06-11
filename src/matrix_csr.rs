@@ -206,12 +206,6 @@ impl Matrix {
     fn bw_vertex(&self, v: usize) -> usize {
         let mut bw_v: usize = 0;
 
-        // let v = self.labels[v];
-        // TODO !!! : Assymetric, m != n
-        // if v >= self.row_index.len()-1 {
-        //     return 0;
-        // }
-        // dbg!(&v);
         let v_neighbour = self.get_columns_of_row(v);
         for u in v_neighbour {
             if v == *u {
@@ -223,7 +217,6 @@ impl Matrix {
             if diff > bw_v {
                 bw_v = diff;
             }
-            // println!("{}, {} = {}", i, j, diff);
         }
         bw_v
     }
@@ -279,38 +272,6 @@ impl Matrix {
     pub fn old_label(&self, v: usize) -> usize {
         self.labels.iter().position(|x| x == &v).unwrap()
     }
-
-    /*pub fn print(&self) {
-        let mut n_row: usize = 0;
-
-        print!("\n    ");
-        for n in 0..self.n {
-            print!("{} | ", n);
-        }
-        println!();
-        // Each entry on row_index represents a ROW!
-        while n_row < self.row_index.len() - 1 {
-            let row = self.get_columns_of_row(n_row);
-            print!("{} |", n_row);
-            let mut count: usize = 0;
-            for j in row {
-                // Columns in a row
-                let j = j + 1;
-                for _ in 1..j - count {
-                    print!(" 0 |");
-                }
-                count = j;
-                // println!("\tj={} count={}", j, count);
-                print!(" x |");
-            }
-            if count < self.n {
-                print!(" 0 |");
-            }
-            n_row += 1;
-            println!();
-        }
-        println!();
-    }*/
 
     // Print considering label
     pub fn print(&self) {
