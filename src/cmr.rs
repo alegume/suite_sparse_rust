@@ -46,6 +46,9 @@ impl Matrix {
         }
     }
 
+
+    /// LEGACY CODE FROM HERE!!!
+
     // CMr by reordering and changing the graph
     pub fn cmr_reorder(&mut self, start_v: usize) -> Vec<usize> {
         let mut lines_visited: Vec<usize> = vec![std::usize::MAX; max(self.m, self.n)];

@@ -2,13 +2,13 @@
 
 
 #### TODO
-    revisar GL com estratégia de nao visitados do CMr
-    Pq excentricidade 0? Vertices em que nenhum arco chega, apenas sai. Fica com 0 na distância. 
-    ! Retirar/revisar parte do grafo desconexo 
-    vertices que não estao ligados a ninguem devem receber as rotulações por ultimo, não receber valores "do meio"
+    revisar degree n cmr
     Revisar  vizinhos_criticos!
     Inserir restart (grasp ideas?)
     Primeiro trocar todo mundo, depois trocar pela ideia do NCHC
+    revisar GL com estratégia de nao visitados do CMr
+    ! Retirar/revisar parte do grafo desconexo 
+    vertices que não estao ligados a ninguem devem receber as rotulações por ultimo, não receber valores "do meio"
 
 #### DONE
     George Liu pseudo algo
@@ -24,6 +24,7 @@
     criar MILS crate
 
 #### IDEIAS
+    Pq excentricidade 0? Vertices em que nenhum arco chega, apenas sai. Fica com 0 na distância. 
     Perturbação: Selecionar um u aleatorio para trocar com um vertice crítico. Manter um histórico de 100? vertices escolhidos para cada vertice v crítico
     TODO: lista de vértices ruim (maiores degrees do grafo)
 

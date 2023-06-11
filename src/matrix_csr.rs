@@ -47,16 +47,13 @@ impl Matrix {
         let mut visited = vec![false; self.m];
         let mut distances = vec![0; self.m];
         let mut eccentricity = 0;
+        let mut v = v;
 
-        queue.push_back(v);
-        visited[v] = true;
-        // Find if any vertex are left unvisited (e.g. diconected graph)
-        for i in 0..self.m {
-            if visited[i] {
-                continue;
-            }
+        // TODO: Find if any vertex are left unvisited (e.g. diconected graph)
+        // loop {
+            queue.push_back(v);
+            visited[v] = true;
             while let Some(v) = queue.pop_front() {
-                // println!("{} => {:?}", v, self.get_columns_of_row(v));
                 for u in self.get_columns_of_row(v) {
                     if !visited[*u] {
                         queue.push_back(*u);
@@ -66,7 +63,15 @@ impl Matrix {
                     }
                 }
             }
-        }
+        //     // Find disconected vertices
+        //     if let Some(u) = visited.iter().position(|&x| x == false) { 
+        //         // break;
+        //         v = u;
+        //         // dbg!(&v);
+        //     } else {
+        //         break;
+        //     }
+        // }
         // dbg!(&distances);
         let mut leaves: Vec<usize> = Vec::new();
         if eccentricity > 0{
@@ -610,6 +615,5 @@ mod tests {
         assert_eq!(p, 2);
         let p = matrix.pseudo_george_liu(3);
         assert_eq!(p, 3);
-        
     }
 }

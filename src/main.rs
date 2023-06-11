@@ -22,7 +22,7 @@ fn main() {
         dir = format!("input/{}/", arg2);
     }
 
-    println!("instancia, n, bw_0, bw_1, max_degree, tempo(ms), Algo");
+    println!("instancia, n, bw_0, bw_1, CMr, t(ms), MILS, t(ms)");
 
     let files = fs::read_dir(dir.as_str()).unwrap();
     for file in files {
@@ -42,44 +42,28 @@ fn experimentation(file: &str, n: &usize) {
     let mut matrix_original = matrix_csr::mm_file_to_csr(file, false);
     // !!! only for pattern matrix - drop v vector
     matrix_original.v = Vec::new();
-    let mut matrix = matrix_original.clone();
-
-    // println!("\n\n{}", file);
-    // println!("{:?}", matrix);
-    // matrix.print();
-
-    let now = Instant::now();
-    let bw_0 = matrix.bandwidth();
-    matrix.labels = matrix.cmr_reorder(0);
-    matrix.bandwidth();
-    let total_time = now.elapsed().as_millis();
-
     let file = &file[10..]; // Formating instance name
     let file = &file[..file.len() - 4];
-    println!(
-        "{}, n:{}, b0:{}, bf:{}, t:{}, CMr",
-        file, matrix.m, bw_0, matrix.bw, total_time
-    );
-
-    // matrix_original.print();
-    let p = matrix_original.pseudo_george_liu(0);
-     matrix_original.cmr_labels(p);
-    // matrix_original.print();
-    // matrix_original.cmr_labels(0);
-    matrix_original.bandwidth();
-    // abort();
+    
+    // CMr
+    let mut matrix = matrix_original.clone();
+    let now = Instant::now();
+    let bw_0 = matrix.bandwidth();
+    let p = matrix.pseudo_george_liu(0);
+    matrix.cmr_labels(p);
+    matrix.bandwidth();
+    let total_time_cmr = now.elapsed().as_millis();
 
     // MILs
-    /*
     let now = Instant::now();
-    // matrix.print();
-    // matrix_original.labels = order;
-    let bw_0 = matrix_original.bandwidth();
-    matrix_original.old_labels = matrix_original.labels.clone();
     matrix_original.mils(n);
-    let total_time = now.elapsed().as_millis();
-     */
-    println!("{file}, n:{}, b0:{bw_0}, bf:{}, t:{total_time}, CMr-L,n={p:#?}", matrix_original.m, matrix_original.bw);
+    let total_time_mils = now.elapsed().as_millis();
+    matrix_original.bandwidth();
+
+    // Output
+    println!("{file}, {}, {bw_0}, {}, {total_time_cmr}, {}, {total_time_mils}", matrix_original.m, matrix.bw, matrix_original.bw);
+
+
     // matrix.print();
     // print!("{:?}", matrix);
 }

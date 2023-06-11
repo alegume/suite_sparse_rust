@@ -2,9 +2,6 @@ use rand::seq::SliceRandom;
 use rand::Rng;
 use std::collections::{HashMap, HashSet};
 
-// use std::collections::HashMap;
-// use std::collections::VecDeque;
-
 use crate::matrix_csr::Matrix;
 
 impl Matrix {
@@ -14,6 +11,9 @@ impl Matrix {
         let mut iter: usize = 0;
         let mut bw_0 = self.bandwidth();
         let mut h: HashMap<usize, HashSet<usize>> = HashMap::new();
+        let original_labels = self.labels.clone();
+        let mut mils_labels: Vec<usize>;
+
         self.local_search();
         while (iter < *n && (bw_0 > self.min_bw)) {
             // dbg!(&h);
@@ -26,6 +26,20 @@ impl Matrix {
             } else {
                 nivel += 1;
                 iter += 1;
+                if iter > n / 20 {
+                    mils_labels = self.labels.clone();
+                    self.labels = original_labels.clone();
+                    let p = self.pseudo_george_liu(0);
+                    self.cmr_labels(p);
+                    self.bandwidth();
+                    if (self.bw < bw_0) {
+                        bw_0 = self.bw;
+                        iter = 0;
+                        nivel = 1;
+                    } else {
+                        self.labels = mils_labels;
+                    }
+                }
             }
         }
     }
