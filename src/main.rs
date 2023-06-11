@@ -65,8 +65,9 @@ fn experimentation(file: &str, n: &usize) {
     // let p = matrix_original.pseudo_george_liu(0);
     // dbg!(p);
     // matrix_original.labels = matrix_original.cmr_reorder(p);
-    matrix_original.cmr_labels(0);
-    matrix_original.bandwidth();
+    matrix_original.print();
+    // matrix_original.cmr_labels(0);
+    // matrix_original.bandwidth();
     // abort();
 
     // MILs

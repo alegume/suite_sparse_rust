@@ -113,12 +113,24 @@ mod tests {
         let mut matrix = mm_file_to_csr(file, true);
         let mut matrix2 = matrix.clone();
         matrix.cmr_labels(0);
-        // println!("{:?}", matrix);
         assert_eq!(matrix.bandwidth(), 3);
         assert_eq!(matrix.labels, vec![5, 0, 4, 2, 1, 3]);
         matrix2.cmr_labels(3);
-        // println!("{:?}", matrix);
         assert_eq!(matrix2.bandwidth(), 2);
         assert_eq!(matrix2.labels, vec![3, 0, 4, 5, 2, 1]);
+
+        let file = "./input/tests/test3.mtx";
+        let mut matrix = mm_file_to_csr(file, true);
+        let mut matrix2 = matrix.clone();
+        let mut matrix3 = matrix.clone();
+        matrix.cmr_labels(0);
+        assert_eq!(matrix.bandwidth(), 2);
+        assert_eq!(matrix.labels, vec![3, 2, 0, 1]);
+        matrix2.cmr_labels(2);
+        assert_eq!(matrix2.bandwidth(), 2);
+        assert_eq!(matrix2.labels, vec![1, 0, 3, 2]);
+        matrix3.cmr_labels(3);
+        assert_eq!(matrix3.bandwidth(), 3);
+        assert_eq!(matrix3.labels, vec![1, 0, 2, 3]);
     }
 }
