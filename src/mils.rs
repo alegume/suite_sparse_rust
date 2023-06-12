@@ -13,7 +13,12 @@ impl Matrix {
         let mut iter_k: usize = 0;
         let mut bw_0 = self.bandwidth();
         let mut h: HashMap<usize, HashSet<usize>> = HashMap::new();
+        let mut h_restart: HashSet<usize> = HashSet::new();
         let original_labels = self.labels.clone();
+        // let mut rng = rand::thread_rng();
+        let mut pseudo: usize;
+        let options: HashSet<usize> = HashSet::from_iter(self.labels.iter().cloned());
+
         // let mut mils_labels: Vec<usize>;
 
         self.local_search();
@@ -32,7 +37,14 @@ impl Matrix {
             if iter_n == *n && iter_k < *k {
                 // reiniciar h
                 h = HashMap::new();
-                let p = self.pseudo_george_liu(self.labels[0]);
+
+                let diff: HashSet<&usize> = options.difference(&h_restart).collect();
+                let diff: Vec<&usize> = diff.into_iter().collect();
+                pseudo = **diff
+                    .choose(&mut rand::thread_rng())
+                    .unwrap_or(&&self.labels[0]);
+                h_restart.insert(pseudo);
+                let p = self.pseudo_george_liu(pseudo);
                 self.labels = original_labels.clone();
                 self.cmr_labels(p);
                 self.bandwidth();
