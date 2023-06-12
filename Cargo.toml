@@ -8,6 +8,12 @@ edition = "2021"
 [dependencies]
 rand = "0.8.5"
 
+[profile.dev]
+opt-level = 1
+
 [profile.release]
 opt-level = 3
-#opt-level = 2
+# remove after experiments
+lto = true
+codegen-units = 1
+panic = "abort"

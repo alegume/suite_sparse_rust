@@ -3,7 +3,9 @@ use std::{collections::VecDeque, io::repeat};
 // use std::collections::HashMap;
 use std::cmp::max;
 
-use crate::read_files::{read_matrix_market_file_coordinates, Element, read_matrix_market_file_coordinates_no_values};
+use crate::read_files::{
+    read_matrix_market_file_coordinates, read_matrix_market_file_coordinates_no_values, Element,
+};
 
 #[derive(Debug, Clone)]
 pub struct Matrix {
@@ -42,6 +44,7 @@ impl Matrix {
 
     /// Perform breadth-first search (BFS)
     /// Return leave nodes and maximun eccentricity
+    #[inline(always)]
     fn bfs(&self, v: usize) -> (Vec<usize>, usize) {
         let mut queue = VecDeque::new();
         let mut visited = vec![false; self.m];
@@ -51,20 +54,20 @@ impl Matrix {
 
         // TODO: Find if any vertex are left unvisited (e.g. diconected graph)
         // loop {
-            queue.push_back(v);
-            visited[v] = true;
-            while let Some(v) = queue.pop_front() {
-                for u in self.get_columns_of_row(v) {
-                    if !visited[*u] {
-                        queue.push_back(*u);
-                        visited[*u] = true;
-                        distances[*u] = distances[v] + 1;
-                        eccentricity = distances[*u];
-                    }
+        queue.push_back(v);
+        visited[v] = true;
+        while let Some(v) = queue.pop_front() {
+            for u in self.get_columns_of_row(v) {
+                if !visited[*u] {
+                    queue.push_back(*u);
+                    visited[*u] = true;
+                    distances[*u] = distances[v] + 1;
+                    eccentricity = distances[*u];
                 }
             }
+        }
         //     // Find disconected vertices
-        //     if let Some(u) = visited.iter().position(|&x| x == false) { 
+        //     if let Some(u) = visited.iter().position(|&x| x == false) {
         //         // break;
         //         v = u;
         //         // dbg!(&v);
@@ -74,9 +77,9 @@ impl Matrix {
         // }
         // dbg!(&distances);
         let mut leaves: Vec<usize> = Vec::new();
-        if eccentricity > 0{
+        if eccentricity > 0 {
             // Find vertices in the last level of the RLS
-            leaves =  distances
+            leaves = distances
                 .iter()
                 .enumerate()
                 .filter(|&(_, &x)| x == eccentricity)
@@ -88,6 +91,7 @@ impl Matrix {
     }
 
     // George-Liu for for finding pseudo-peripheral vertex
+    #[inline(always)]
     pub fn pseudo_george_liu(&mut self, v: usize) -> usize {
         let mut v = v;
         let mut leaves_v: Vec<usize>;
@@ -95,12 +99,13 @@ impl Matrix {
         let mut eccentricity_u = 0;
         let mut eccentricity_v = 0;
 
-        // BFS 
+        // BFS
         (leaves_v, eccentricity_v) = self.bfs(v);
         loop {
             // Find the leave of minimum degree
-            let mut u:usize = leaves_v.pop().unwrap_or(v);
-            if u == v { // There are no leaves (directed/disconected graph)
+            let mut u: usize = leaves_v.pop().unwrap_or(v);
+            if u == v {
+                // There are no leaves (directed/disconected graph)
                 break;
             }
             // Find minimum degree vertex
@@ -134,6 +139,7 @@ impl Matrix {
     }
 
     // Reorder matrix based on a new labeling
+    #[inline(always)]
     pub fn reorder(&mut self, new_rows: &[usize]) {
         let mut row_offset = Vec::with_capacity(self.m);
         let mut col_index = Vec::with_capacity(self.col_index.len());
@@ -181,6 +187,7 @@ impl Matrix {
     }
 
     // Calculate bandwidth of matrix and return it
+    #[inline(always)]
     pub fn bandwidth(&mut self) -> usize {
         let mut bandwidth: usize = 0;
         let mut n_row: usize = 0;
@@ -208,6 +215,7 @@ impl Matrix {
     }
 
     // Calculate bw of vertex u
+    #[inline(always)]
     fn bw_vertex(&self, v: usize) -> usize {
         let mut bw_v: usize = 0;
 
@@ -227,6 +235,7 @@ impl Matrix {
     }
 
     // Get neighbours of vertex n
+    #[inline(always)]
     pub fn get_columns_of_row(&self, n: usize) -> &[usize] {
         let start = self.row_index[n];
         let stop = self.row_index[n + 1];
@@ -234,6 +243,7 @@ impl Matrix {
     }
 
     // Get values os row n (neighbours of vertex n)
+    #[inline(always)]
     pub fn get_values_of_row(&self, n: usize) -> &[f64] {
         if n < self.m {
             let start = self.row_index[n];
@@ -245,6 +255,7 @@ impl Matrix {
     }
 
     // Degree of row i
+    #[inline(always)]
     pub fn degree(&self, i: usize) -> usize {
         if i < self.row_index.len() - 1 {
             let i = self.labels[i]; // Consider the label of i
@@ -255,6 +266,7 @@ impl Matrix {
     }
 
     // Vertices in edges with bigest bandwidth
+    #[inline(always)]
     pub fn criticals(&mut self) -> Vec<usize> {
         let mut n_row: usize = 0;
         let mut criticals_neighbours: Vec<usize> = Vec::new();
@@ -274,6 +286,7 @@ impl Matrix {
         criticals_neighbours
     }
 
+    #[inline(always)]
     pub fn old_label(&self, v: usize) -> usize {
         self.labels.iter().position(|x| x == &v).unwrap()
     }
@@ -318,7 +331,7 @@ impl Matrix {
 }
 
 // Create matrix from HB file
-pub fn mm_file_to_csr(file: &str, values:bool) -> Matrix {
+pub fn mm_file_to_csr(file: &str, values: bool) -> Matrix {
     let mut coordinates: Vec<Element>;
     let (n, m): (usize, usize);
     if values {
@@ -413,7 +426,7 @@ mod tests {
 
     #[test]
     fn bw_test() {
-        /* Stress tests  
+        /* Stress tests
         let file = "./input/tests/apache2.mtx";
         let mut matrix = mm_file_to_csr(file, true);
         assert_eq!(matrix.bandwidth(), 65837);

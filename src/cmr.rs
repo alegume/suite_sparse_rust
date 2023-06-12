@@ -7,6 +7,7 @@ use crate::matrix_csr::Matrix;
 impl Matrix {
     // CMr that do not change the graph, only labels
     // TODO: DO NOT CONSIDER PREVIOUS LABELS
+    #[inline(always)]
     pub fn cmr_labels(&mut self, v: usize) {
         let mut queue = VecDeque::new();
         let mut visited = vec![false; self.m];
@@ -48,6 +49,7 @@ impl Matrix {
     /// LEGACY CODE FROM HERE!!!
 
     // CMr by reordering and changing the graph
+    #[inline(always)]
     pub fn cmr_reorder(&mut self, start_v: usize) -> Vec<usize> {
         let mut lines_visited: Vec<usize> = vec![std::usize::MAX; max(self.m, self.n)];
         // push_back to add to the queue and pop_front to remove from the queue.
@@ -70,6 +72,7 @@ impl Matrix {
     }
 
     // Cycle through queue in breadth-first search and reverse labeling
+    #[inline(always)]
     fn cycle_through_queue_bfs(
         &self,
         to_visit: &mut VecDeque<usize>,

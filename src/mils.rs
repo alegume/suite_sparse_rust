@@ -6,6 +6,7 @@ use crate::matrix_csr::Matrix;
 
 impl Matrix {
     // Main code for MILS
+    #[inline(always)]
     pub fn mils(&mut self, n: &usize, k: &usize) {
         let mut nivel: usize = 1;
         let mut iter_n: usize = 0;
@@ -46,6 +47,7 @@ impl Matrix {
         self.bw = bw_0;
     }
 
+    #[inline(always)]
     fn perturbation(&mut self, nivel: usize, h: &mut HashMap<usize, HashSet<usize>>) {
         let mut iter = 1;
         let criticos = self.criticals();
@@ -76,6 +78,7 @@ impl Matrix {
     }
 
     // Proceeds with local search and change labels if a better labeling if found
+    #[inline(always)]
     fn local_search(&mut self) {
         let criticos = self.criticals();
         let mut bw_0 = self.bandwidth();
@@ -94,6 +97,7 @@ impl Matrix {
     }
 
     // Middle of rotulations of v
+    #[inline(always)]
     fn mid(&self, v: usize, neighbour: &mut &[usize]) -> usize {
         // mid(v) = ⌊(max(v) + min(v))/2⌋
         let mut neighbour: Vec<usize> = neighbour.to_vec();
@@ -103,6 +107,7 @@ impl Matrix {
         (min + max) / 2
     }
 
+    #[inline(always)]
     fn neighbour_of_criticals2(&self, v: usize) -> Vec<usize> {
         let mut neighbour = self.get_columns_of_row(self.old_label(v));
         let mid_v = self.mid(v, &mut neighbour);
@@ -117,6 +122,7 @@ impl Matrix {
         neighbour_of_criticals
     }
 
+    #[inline(always)]
     fn neighbour_of_criticals(&self, v: usize) -> Vec<usize> {
         // TODO: Ordenar em ordem crescente  do valor |mid(v) − f (u)|
         /*
