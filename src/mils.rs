@@ -16,8 +16,7 @@ impl Matrix {
         let mut mils_labels: Vec<usize>;
 
         self.local_search();
-        while (iter_n < *n && (bw_0 > self.min_bw) && iter_k < *k) {
-            // dbg!(&h);
+        while (iter_n < *n && (bw_0 > self.min_bw)) {
             self.perturbation(nivel, &mut h);
             self.local_search();
             if (self.bw < bw_0) {
@@ -27,26 +26,24 @@ impl Matrix {
             } else {
                 nivel += 1;
                 iter_n += 1;
-                if iter_n > n / 20 {
-                    // reiniciar h
-                    h = HashMap::new();
-                    // TODO: verificar necessidade
-                    mils_labels = self.labels.clone();
-                    let p = self.pseudo_george_liu(self.labels[0]);
-                    self.labels = original_labels.clone();
-                    self.cmr_labels(p);
-                    self.bandwidth();
-                    if (self.bw < bw_0) {
-                        bw_0 = self.bw;
-                        iter_n = 0;
-                        nivel = 1;
-                    } else {
-                        self.labels = mils_labels;
-                    }
-                }
             }
-            iter_k += 1;
+            // Greed restart CMr-GL
+            if (iter_n == *n && iter_k < *k) {
+                // reiniciar h
+                h = HashMap::new();
+                let p = self.pseudo_george_liu(self.labels[0]);
+                self.labels = original_labels.clone();
+                self.cmr_labels(p);
+                self.bandwidth();
+                if (self.bw < bw_0) {
+                    bw_0 = self.bw;
+                }
+                iter_n = 0;
+                nivel = 1;
+                iter_k += 1;
+            }
         }
+        self.bw = bw_0;
     }
 
     fn perturbation(&mut self, nivel: usize, h: &mut HashMap<usize, HashSet<usize>>) {
@@ -84,17 +81,13 @@ impl Matrix {
         let mut bw_0 = self.bandwidth();
         for v in criticos {
             for u in self.neighbour_of_criticals2(v) {
-                // println!("O{:?}", &self.labels);
                 self.labels.swap(v, u);
                 if self.bandwidth() <= bw_0 {
                     bw_0 = self.bw;
-                    // println!("MELHOROU! {}", bw_0);
-                    // println!("M{:?}", &self.labels);
                 } else {
                     // Return to previous situation
                     self.labels.swap(v, u);
                     self.bw = bw_0;
-                    // println!("V{:?}", &self.labels);
                 }
             }
         }
@@ -111,7 +104,7 @@ impl Matrix {
     }
 
     fn neighbour_of_criticals2(&self, v: usize) -> Vec<usize> {
-        let mut neighbour = self.get_columns_of_row(self.old_label(v)).clone();
+        let mut neighbour = self.get_columns_of_row(self.old_label(v));
         let mid_v = self.mid(v, &mut neighbour);
         let mut neighbour_of_criticals: Vec<usize> = Vec::new();
         // dbg!(v, neighbour, mid_v);
@@ -133,7 +126,7 @@ impl Matrix {
         mid(v) = ⌊(max(v) + min(v))/2⌋.
          */
         let mut neighbour_of_criticals: Vec<usize> = Vec::with_capacity(self.degree(v));
-        let mut neighbour = self.get_columns_of_row(self.old_label(v)).clone();
+        let mut neighbour = self.get_columns_of_row(self.old_label(v));
         let mid_v = self.mid(v, &mut neighbour);
         // dbg!(v, neighbour, mid_v);
         for u in neighbour {

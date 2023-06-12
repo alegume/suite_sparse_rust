@@ -63,7 +63,6 @@ fn experimentation(file: &str, n: &usize, k: &usize) {
     let now = Instant::now();
     matrix_original.mils(n, k);
     let total_time_mils = now.elapsed().as_millis();
-    matrix_original.bandwidth();
 
     // Output
     println!(
