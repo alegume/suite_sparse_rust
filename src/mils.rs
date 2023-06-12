@@ -6,41 +6,46 @@ use crate::matrix_csr::Matrix;
 
 impl Matrix {
     // Main code for MILS
-    pub fn mils(&mut self, n: &usize) {
+    pub fn mils(&mut self, n: &usize, k: &usize) {
         let mut nivel: usize = 1;
-        let mut iter: usize = 0;
+        let mut iter_n: usize = 0;
+        let mut iter_k: usize = 0;
         let mut bw_0 = self.bandwidth();
         let mut h: HashMap<usize, HashSet<usize>> = HashMap::new();
         let original_labels = self.labels.clone();
         let mut mils_labels: Vec<usize>;
 
         self.local_search();
-        while (iter < *n && (bw_0 > self.min_bw)) {
+        while (iter_n < *n && (bw_0 > self.min_bw) && iter_k < *k) {
             // dbg!(&h);
             self.perturbation(nivel, &mut h);
             self.local_search();
             if (self.bw < bw_0) {
                 bw_0 = self.bw;
-                iter = 0;
+                iter_n = 0;
                 nivel = 1;
             } else {
                 nivel += 1;
-                iter += 1;
-                if iter > n / 20 {
+                iter_n += 1;
+                if iter_n > n / 20 {
+                    // reiniciar h
+                    h = HashMap::new();
+                    // TODO: verificar necessidade
                     mils_labels = self.labels.clone();
+                    let p = self.pseudo_george_liu(self.labels[0]);
                     self.labels = original_labels.clone();
-                    let p = self.pseudo_george_liu(0);
                     self.cmr_labels(p);
                     self.bandwidth();
                     if (self.bw < bw_0) {
                         bw_0 = self.bw;
-                        iter = 0;
+                        iter_n = 0;
                         nivel = 1;
                     } else {
                         self.labels = mils_labels;
                     }
                 }
             }
+            iter_k += 1;
         }
     }
 
@@ -98,7 +103,7 @@ impl Matrix {
     // Middle of rotulations of v
     fn mid(&self, v: usize, neighbour: &mut &[usize]) -> usize {
         // mid(v) = ⌊(max(v) + min(v))/2⌋
-        let mut neighbour: Vec<usize>= neighbour.to_vec();
+        let mut neighbour: Vec<usize> = neighbour.to_vec();
         neighbour.sort_unstable();
         let min = neighbour.first().unwrap_or(&0);
         let max = neighbour.last().unwrap_or(&0);

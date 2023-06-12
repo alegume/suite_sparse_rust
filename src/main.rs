@@ -13,13 +13,17 @@ mod read_files;
 fn main() {
     let args: Vec<String> = env::args().collect();
     let mut n: usize = 1;
+    let mut k: usize = 3;
     let mut dir: String = String::from("input/tests/");
 
-    if let Some(arg1) = &args.get(1) {
-        n = arg1.parse::<usize>().unwrap();
+    if let Some(arg) = &args.get(1) {
+        dir = format!("input/{}/", arg);
     }
-    if let Some(arg2) = &args.get(2) {
-        dir = format!("input/{}/", arg2);
+    if let Some(arg) = &args.get(2) {
+        n = arg.parse::<usize>().unwrap();
+    }
+    if let Some(arg) = &args.get(3) {
+        k = arg.parse::<usize>().unwrap();
     }
 
     println!("instancia, n, bw_0, bw_1, CMr, t(ms), MILS, t(ms)");
@@ -34,17 +38,18 @@ fn main() {
                 .unwrap()
                 .as_str(),
             &n,
+            &k,
         );
     }
 }
 
-fn experimentation(file: &str, n: &usize) {
+fn experimentation(file: &str, n: &usize, k: &usize) {
     let mut matrix_original = matrix_csr::mm_file_to_csr(file, false);
     // !!! only for pattern matrix - drop v vector
     matrix_original.v = Vec::new();
     let file = &file[10..]; // Formating instance name
     let file = &file[..file.len() - 4];
-    
+
     // CMr
     let mut matrix = matrix_original.clone();
     let now = Instant::now();
@@ -56,13 +61,15 @@ fn experimentation(file: &str, n: &usize) {
 
     // MILs
     let now = Instant::now();
-    matrix_original.mils(n);
+    matrix_original.mils(n, k);
     let total_time_mils = now.elapsed().as_millis();
     matrix_original.bandwidth();
 
     // Output
-    println!("{file}, {}, {bw_0}, {}, {total_time_cmr}, {}, {total_time_mils}", matrix_original.m, matrix.bw, matrix_original.bw);
-
+    println!(
+        "{file}, {}, {bw_0}, {}, {total_time_cmr}, {}, {total_time_mils}",
+        matrix_original.m, matrix.bw, matrix_original.bw
+    );
 
     // matrix.print();
     // print!("{:?}", matrix);
