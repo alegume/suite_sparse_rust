@@ -14,13 +14,13 @@ impl Matrix {
         let mut bw_0 = self.bandwidth();
         let mut h: HashMap<usize, HashSet<usize>> = HashMap::new();
         let original_labels = self.labels.clone();
-        let mut mils_labels: Vec<usize>;
+        // let mut mils_labels: Vec<usize>;
 
         self.local_search();
-        while (iter_n < *n && (bw_0 > self.min_bw)) {
+        while iter_n < *n && (bw_0 > self.min_bw) {
             self.perturbation(nivel, &mut h);
             self.local_search();
-            if (self.bw < bw_0) {
+            if self.bw < bw_0 {
                 bw_0 = self.bw;
                 iter_n = 0;
                 nivel = 1;
@@ -29,14 +29,14 @@ impl Matrix {
                 iter_n += 1;
             }
             // Greed restart CMr-GL
-            if (iter_n == *n && iter_k < *k) {
+            if iter_n == *n && iter_k < *k {
                 // reiniciar h
                 h = HashMap::new();
                 let p = self.pseudo_george_liu(self.labels[0]);
                 self.labels = original_labels.clone();
                 self.cmr_labels(p);
                 self.bandwidth();
-                if (self.bw < bw_0) {
+                if self.bw < bw_0 {
                     bw_0 = self.bw;
                 }
                 iter_n = 0;
@@ -52,9 +52,9 @@ impl Matrix {
         let mut iter = 1;
         let criticos = self.criticals();
         let options: HashSet<usize> = HashSet::from_iter(self.labels.iter().cloned());
-        while (iter <= nivel) {
+        while iter <= nivel {
             let v = criticos.choose(&mut rand::thread_rng()).unwrap();
-            let mut u: &usize = v;
+            let u: &usize = v;
             if let Some(n_v) = h.get_mut(v) {
                 // Vec of vertices not in history of v
                 let n_v_copy = n_v.clone();
@@ -98,7 +98,7 @@ impl Matrix {
 
     // Middle of rotulations of v
     #[inline(always)]
-    fn mid(&self, v: usize, neighbour: &mut &[usize]) -> usize {
+    fn mid(&self, neighbour: &mut &[usize]) -> usize {
         // mid(v) = ⌊(max(v) + min(v))/2⌋
         let mut neighbour: Vec<usize> = neighbour.to_vec();
         neighbour.sort_unstable();
@@ -110,13 +110,13 @@ impl Matrix {
     #[inline(always)]
     fn neighbour_of_criticals2(&self, v: usize) -> Vec<usize> {
         let mut neighbour = self.get_columns_of_row(self.old_label(v));
-        let mid_v = self.mid(v, &mut neighbour);
+        // let mid_v = self.mid(v, &mut neighbour);
         let mut neighbour_of_criticals: Vec<usize> = Vec::new();
         // dbg!(v, neighbour, mid_v);
         for u in neighbour {
             let u = self.labels[*u];
             neighbour_of_criticals.push(u);
-            neighbour_of_criticals.push(self.mid(u, &mut neighbour));
+            neighbour_of_criticals.push(self.mid(&mut neighbour));
         }
         neighbour_of_criticals.extend(neighbour);
         neighbour_of_criticals
@@ -133,11 +133,11 @@ impl Matrix {
          */
         let mut neighbour_of_criticals: Vec<usize> = Vec::with_capacity(self.degree(v));
         let mut neighbour = self.get_columns_of_row(self.old_label(v));
-        let mid_v = self.mid(v, &mut neighbour);
+        // let mid_v = self.mid(&mut neighbour);
         // dbg!(v, neighbour, mid_v);
         for u in neighbour {
             let u = self.labels[*u];
-            if self.mid(v, &mut neighbour).abs_diff(u) <= self.mid(v, &mut neighbour).abs_diff(v) {
+            if self.mid(&mut neighbour).abs_diff(u) <= self.mid(&mut neighbour).abs_diff(v) {
                 // dbg!(v, u, mid_v);
                 // println!("{:?} < {:?}", self.mid(v, &mut neighbour).abs_diff(u), self.mid(v, &mut neighbour).abs_diff(v));
                 neighbour_of_criticals.push(u);

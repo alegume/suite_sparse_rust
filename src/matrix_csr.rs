@@ -1,7 +1,5 @@
-use std::{collections::VecDeque, io::repeat};
-// use std::{collections::VecDeque, process::abort};
-// use std::collections::HashMap;
 use std::cmp::max;
+use std::collections::VecDeque;
 
 use crate::read_files::{
     read_matrix_market_file_coordinates, read_matrix_market_file_coordinates_no_values, Element,
@@ -50,7 +48,7 @@ impl Matrix {
         let mut visited = vec![false; self.m];
         let mut distances = vec![0; self.m];
         let mut eccentricity = 0;
-        let mut v = v;
+        let v = v;
 
         // TODO: Find if any vertex are left unvisited (e.g. diconected graph)
         // loop {
@@ -96,8 +94,8 @@ impl Matrix {
         let mut v = v;
         let mut leaves_v: Vec<usize>;
         let mut leaves_u: Vec<usize>;
-        let mut eccentricity_u = 0;
-        let mut eccentricity_v = 0;
+        let mut eccentricity_u;
+        let mut eccentricity_v;
 
         // BFS
         (leaves_v, eccentricity_v) = self.bfs(v);
@@ -119,8 +117,6 @@ impl Matrix {
             }
             // BFS in u
             (leaves_u, eccentricity_u) = self.bfs(u);
-            let troca: bool = (eccentricity_u > eccentricity_v);
-            // println!("{}|{:?}|{}|{}|{:?}|{}|{:?}", v, leaves_v, eccentricity_v, u, leaves_u, eccentricity_u, troca);
             if eccentricity_u > eccentricity_v {
                 v = u;
                 eccentricity_v = eccentricity_u;
@@ -191,7 +187,7 @@ impl Matrix {
     pub fn bandwidth(&mut self) -> usize {
         let mut bandwidth: usize = 0;
         let mut n_row: usize = 0;
-        let mut diff: usize = 0;
+        let mut diff: usize;
 
         // Each entry on row_index represents a ROW!
         while n_row < self.row_index.len() - 1 {
