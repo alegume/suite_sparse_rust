@@ -2,8 +2,9 @@
 
 
 #### TODO
-    revisar degree n cmr
-    Revisar  vizinhos_criticos!
+    revisar degree n cmr (só o que sai e o que entra?)
+    Otimizar local_search (encontrar primeiro crítico/vizinhos e retornar)
+    Revisar  vizinhos_criticos! 
     Inserir restart (grasp ideas?)
     Primeiro trocar todo mundo, depois trocar pela ideia do NCHC
     revisar GL com estratégia de nao visitados do CMr

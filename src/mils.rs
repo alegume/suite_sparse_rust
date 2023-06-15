@@ -92,6 +92,7 @@ impl Matrix {
     // Proceeds with local search and change labels if a better labeling if found
     #[inline(always)]
     fn local_search(&mut self) {
+        // TODO: Just find the first critical vertex/neighbours and optimize it
         let criticos = self.criticals();
         let mut bw_0 = self.bandwidth();
         for v in criticos {
