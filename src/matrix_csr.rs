@@ -515,7 +515,7 @@ mod tests {
         let mut matrix2 = matrix.clone();
         assert_eq!(matrix.criticals(), vec![1, 2, 3]);
         let order = matrix.cmr_reorder(0);
-        matrix2.labels = order.clone();
+        matrix2.labels = order;
         assert_eq!(matrix.bandwidth(), 2);
         assert_eq!(matrix2.bandwidth(), 2);
         assert_eq!(matrix.criticals(), matrix2.criticals());

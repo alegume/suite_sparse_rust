@@ -5,7 +5,7 @@ use std::collections::{HashMap, HashSet};
 use crate::matrix_csr::Matrix;
 
 impl Matrix {
-    // Main code for MILS
+    // Main code for metaheuristic MILS
     #[inline(always)]
     pub fn mils(&mut self, n: &usize, k: &usize) {
         let mut nivel: usize = 1;
@@ -33,7 +33,7 @@ impl Matrix {
                 nivel += 1;
                 iter_n += 1;
             }
-            // Greed restart CMr-GL
+            // Greed restart RCM-GL
             if iter_n == *n && iter_k < *k {
                 // reiniciar h
                 h = HashMap::new();
