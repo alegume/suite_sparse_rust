@@ -210,6 +210,38 @@ impl Matrix {
         bandwidth
     }
 
+    // Calculate bandwidth of matrix if improves solution
+    // otherwise return last value
+    #[inline(always)]
+    pub fn bandwidth_if_improves(&mut self) -> usize {
+        let mut bandwidth: usize = 0;
+        let mut n_row: usize = 0;
+        let mut diff: usize;
+
+        // Each entry on row_index represents a ROW!
+        while n_row < self.row_index.len() - 1 {
+            let row = self.get_columns_of_row(n_row);
+            for j in row {
+                if n_row == *j {
+                    continue;
+                }
+                let j = self.labels[*j];
+                let i = self.labels[n_row];
+                // Columns in a row
+                diff = i.abs_diff(j);
+                if diff > self.bw { // stop if gets worse
+                    return self.bw
+                }
+                if diff > bandwidth {
+                    bandwidth = diff;
+                }
+            }
+            n_row += 1;
+        }
+        self.bw = bandwidth;
+        bandwidth
+    }
+
     // Calculate bw of vertex u
     #[inline(always)]
     fn bw_vertex(&self, v: usize) -> usize {

@@ -11,7 +11,7 @@ impl Matrix {
         let mut nivel: usize = 1;
         let mut iter_n: usize = 0;
         let mut iter_k: usize = 0;
-        let mut bw_0 = self.bandwidth();
+        let mut bw_0 = self.bw;
         let mut h: HashMap<usize, HashSet<usize>> = HashMap::new();
         let mut h_restart: HashSet<usize> = HashSet::new();
         let original_labels = self.labels.clone();
@@ -94,16 +94,19 @@ impl Matrix {
     fn local_search(&mut self) {
         // TODO: Just find the first critical vertex/neighbours and optimize it
         let criticos = self.criticals();
-        let mut bw_0 = self.bandwidth();
+        let mut bw_0 = self.bw;
         for v in criticos {
             for u in self.neighbour_of_criticals2(v) {
+                if u == v {
+                    continue;
+                }
                 self.labels.swap(v, u);
-                if self.bandwidth() <= bw_0 {
+                if self.bandwidth_if_improves() <= bw_0 {
                     bw_0 = self.bw;
                 } else {
                     // Return to previous situation
                     self.labels.swap(v, u);
-                    self.bw = bw_0;
+                    // self.bw = bw_0;
                 }
             }
         }
@@ -123,15 +126,31 @@ impl Matrix {
     #[inline(always)]
     fn neighbour_of_criticals2(&self, v: usize) -> Vec<usize> {
         let mut neighbour = self.get_columns_of_row(self.old_label(v));
-        // let mid_v = self.mid(v, &mut neighbour);
+
         let mut neighbour_of_criticals: Vec<usize> = Vec::new();
         // dbg!(v, neighbour, mid_v);
         for u in neighbour {
             let u = self.labels[*u];
-            neighbour_of_criticals.push(u);
-            neighbour_of_criticals.push(self.mid(&mut neighbour));
+            if v != u {
+                neighbour_of_criticals.push(u);
+            }
         }
-        neighbour_of_criticals.extend(neighbour);
+
+        let mid = self.mid(&mut neighbour_of_criticals.as_slice());
+        // for u in neighbour {
+        //     // dbg!(u);
+        //     for i in mid.abs_diff(self.labels[*u])..mid.abs_diff(self.labels[v]) {
+        //         // dbg!(i);
+        //         if i == *u {
+        //             continue;
+        //         }
+        //         neighbour_of_criticals.push(i);
+        //     }
+        // }
+        // |mid(v) − f (u)| < |mid(v) − f (v)|
+
+        neighbour_of_criticals.push(mid);
+
         neighbour_of_criticals
     }
 

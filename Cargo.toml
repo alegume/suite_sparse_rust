@@ -9,13 +9,13 @@ edition = "2021"
 rand = "0.8.5"
 
 [profile.dev]
-opt-level = 1
+opt-level = 0
 
 [profile.release]
 opt-level = 3
 # remove after experiments
-lto = true
-codegen-units = 1
-panic = "abort"
+#lto = true
+#codegen-units = 1
+#panic = "abort"
 
 # RUSTFLAGS="-C target-cpu=native" cargo build --release

@@ -10,7 +10,7 @@ mod read_files;
 fn main() {
     let args: Vec<String> = env::args().collect();
     let mut n: usize = 1;
-    let mut k: usize = 3;
+    let mut k: usize = 1;
     let mut dir: String = String::from("input/tests/");
 
     if let Some(arg) = &args.get(1) {
@@ -23,7 +23,7 @@ fn main() {
         k = arg.parse::<usize>().unwrap();
     }
 
-    println!("instancia, n, b_0, CMr, t, MILS, t");
+    println!("instancia, n, b_0, MILS, t, %");
 
     let files = fs::read_dir(dir.as_str()).unwrap();
     for file in files {
@@ -47,31 +47,30 @@ fn experimentation(file: &str, n: &usize, k: &usize) {
     let file = &file[10..]; // Formating instance name
     let file = &file[..file.len() - 4];
 
-    // CMr
+    /* // CMr
     let mut matrix = matrix_original.clone();
     let now = Instant::now();
     let bw_0 = matrix.bandwidth();
     let p = matrix.pseudo_george_liu(0);
     matrix.cmr_labels(p);
     matrix.bandwidth();
-    let total_time_cmr = now.elapsed().as_millis();
+    let total_time_cmr = now.elapsed().as_millis();*/
 
     // MILs
+    let bw_0 = matrix_original.bandwidth();
     let now = Instant::now();
     matrix_original.mils(n, k);
     let total_time_mils = now.elapsed().as_millis();
 
     // Output
     println!(
-        "{}, {}, {}, {}, {}, {}, {} ({:?})",
+        "{}, {}, {}, {}, {}, \t{:?}",
         file,
         matrix_original.m,
         bw_0,
-        matrix.bw,
-        total_time_cmr,
         matrix_original.bw,
         total_time_mils,
-        matrix_original.bw as i32 - matrix.bw as i32,
+        ((matrix_original.bw as f32 / bw_0 as f32) * 100.0) - 100.0,
     );
 
     // matrix.print();
