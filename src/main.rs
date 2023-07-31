@@ -23,7 +23,7 @@ fn main() {
         k = arg.parse::<usize>().unwrap();
     }
 
-    println!("instancia, n, bw_0, CMr, t(ms), MILS, t(ms)");
+    println!("instancia, n, b_0, CMr, t, MILS, t");
 
     let files = fs::read_dir(dir.as_str()).unwrap();
     for file in files {
@@ -63,14 +63,15 @@ fn experimentation(file: &str, n: &usize, k: &usize) {
 
     // Output
     println!(
-        "{}, {}, {}, {}, {}, {}, {}",
+        "{}, {}, {}, {}, {}, {}, {} ({:?})",
         file,
         matrix_original.m,
         bw_0,
         matrix.bw,
         total_time_cmr,
         matrix_original.bw,
-        total_time_mils
+        total_time_mils,
+        matrix_original.bw as i32 - matrix.bw as i32,
     );
 
     // matrix.print();
