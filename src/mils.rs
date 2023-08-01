@@ -11,7 +11,8 @@ impl Matrix {
         let mut iter_n: usize = 0;
         let mut iter_k: usize = 0;
         let mut bw_0 = self.bw;
-        let mut h: HashMap<usize, HashSet<usize>> = HashMap::new();
+        let mut history: HashMap<usize, HashSet<usize>> = HashMap::new();
+        // Reinicialize with different pseudo-peripheral vertex
         let mut h_restart: HashSet<usize> = HashSet::new();
         let original_labels = self.labels.clone();
         let mut pseudo: usize;
@@ -19,7 +20,7 @@ impl Matrix {
 
         self.local_search();
         while iter_n < *n { //&& (bw_0 > self.min_bw)
-            self.perturbation(nivel, &mut h);
+            self.perturbation(nivel, &mut history);
             self.local_search();
             if self.bw < bw_0 {
                 bw_0 = self.bw;
@@ -30,10 +31,8 @@ impl Matrix {
                 iter_n += 1;
             }
 
-            // Greed restart RCM-GL
+            // Greed restart RCM-GL when iter_n == n
             if iter_n == *n && iter_k < *k {
-                // Reinicialize with different pseudo-peripheral vertex
-                h = HashMap::new();
                 let diff: HashSet<&usize> = options.difference(&h_restart).collect();
                 let diff: Vec<&usize> = diff.into_iter().collect();
                 pseudo = **diff
