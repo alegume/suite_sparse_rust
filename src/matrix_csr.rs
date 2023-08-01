@@ -242,6 +242,16 @@ impl Matrix {
         bandwidth
     }
 
+    // Check if vertex is not critical anymore
+    #[inline(always)]
+    pub fn critical_improved(&mut self, v: usize) -> bool {
+        let criticals = self.criticals();
+        if criticals.contains(&v) {
+            return false
+        }
+        true
+    }
+
     // Calculate bw of vertex u
     #[inline(always)]
     fn bw_vertex(&self, v: usize) -> usize {

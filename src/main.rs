@@ -64,13 +64,13 @@ fn experimentation(file: &str, n: &usize, k: &usize) {
 
     // Output
     println!(
-        "{}, {}, {}, {}, {}, \t{:?}",
+        "{}, {}, {}, {}, {}, {:?}",
         file,
         matrix_original.m,
         bw_0,
         matrix_original.bw,
         total_time_mils,
-        ((matrix_original.bw as f32 / bw_0 as f32) * 100.0) - 100.0,
+        (((matrix_original.bw as f32 / bw_0 as f32) * 100.0) - 100.0).abs(),
     );
 
     // matrix.print();

@@ -106,7 +106,7 @@ impl Matrix {
                     continue;
                 }
                 self.labels.swap(v, u);
-                if self.bandwidth_if_improves() <= bw_0 {
+                if self.critical_improved(v) {
                     bw_0 = self.bw;
                 } else {
                     // Return to previous situation
