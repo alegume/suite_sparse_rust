@@ -1,5 +1,4 @@
 use rand::seq::SliceRandom;
-use rand::Rng;
 use std::collections::{HashMap, HashSet};
 
 use crate::matrix_csr::Matrix;
@@ -15,14 +14,11 @@ impl Matrix {
         let mut h: HashMap<usize, HashSet<usize>> = HashMap::new();
         let mut h_restart: HashSet<usize> = HashSet::new();
         let original_labels = self.labels.clone();
-        // let mut rng = rand::thread_rng();
         let mut pseudo: usize;
         let options: HashSet<usize> = HashSet::from_iter(self.labels.iter().cloned());
 
-        // let mut mils_labels: Vec<usize>;
-
         self.local_search();
-        while iter_n < *n && (bw_0 > self.min_bw) {
+        while iter_n < *n { //&& (bw_0 > self.min_bw)
             self.perturbation(nivel, &mut h);
             self.local_search();
             if self.bw < bw_0 {
@@ -33,11 +29,11 @@ impl Matrix {
                 nivel += 1;
                 iter_n += 1;
             }
+
             // Greed restart RCM-GL
             if iter_n == *n && iter_k < *k {
-                // reiniciar h
+                // Reinicialize with different pseudo-peripheral vertex
                 h = HashMap::new();
-
                 let diff: HashSet<&usize> = options.difference(&h_restart).collect();
                 let diff: Vec<&usize> = diff.into_iter().collect();
                 pseudo = **diff
@@ -60,14 +56,14 @@ impl Matrix {
     }
 
     #[inline(always)]
-    fn perturbation(&mut self, nivel: usize, h: &mut HashMap<usize, HashSet<usize>>) {
+    fn perturbation(&mut self, nivel: usize, history: &mut HashMap<usize, HashSet<usize>>) {
         let mut iter = 1;
         let criticos = self.criticals();
         let options: HashSet<usize> = HashSet::from_iter(self.labels.iter().cloned());
         while iter <= nivel {
             let v = criticos.choose(&mut rand::thread_rng()).unwrap();
             let u: &usize = v;
-            if let Some(n_v) = h.get_mut(v) {
+            if let Some(n_v) = history.get_mut(v) {
                 // Vec of vertices not in history of v
                 let n_v_copy = n_v.clone();
                 let diff: Vec<&usize> = options.symmetric_difference(&n_v_copy).collect();
@@ -80,7 +76,7 @@ impl Matrix {
                 dbg!(&h);*/
             } else {
                 let u = self.labels.choose(&mut rand::thread_rng()).unwrap();
-                h.insert(*v, HashSet::from([*u]));
+                history.insert(*v, HashSet::from([*u]));
                 /* println!("\t primeiro");
                 dbg!(&h); */
             }
@@ -121,35 +117,27 @@ impl Matrix {
         let min = neighbour.first().unwrap_or(&0);
         let max = neighbour.last().unwrap_or(&0);
         (min + max) / 2
+        // (self.labels[*min] + self.labels[*max]) / 2
     }
 
     #[inline(always)]
     fn neighbour_of_criticals2(&self, v: usize) -> Vec<usize> {
-        let mut neighbour = self.get_columns_of_row(self.old_label(v));
+        let neighbour = self.get_columns_of_row(self.old_label(v));
 
         let mut neighbour_of_criticals: Vec<usize> = Vec::new();
         // dbg!(v, neighbour, mid_v);
         for u in neighbour {
             let u = self.labels[*u];
+            // let u = *u;
             if v != u {
                 neighbour_of_criticals.push(u);
             }
         }
 
         let mid = self.mid(&mut neighbour_of_criticals.as_slice());
-        // for u in neighbour {
-        //     // dbg!(u);
-        //     for i in mid.abs_diff(self.labels[*u])..mid.abs_diff(self.labels[v]) {
-        //         // dbg!(i);
-        //         if i == *u {
-        //             continue;
-        //         }
-        //         neighbour_of_criticals.push(i);
-        //     }
-        // }
-        // |mid(v) − f (u)| < |mid(v) − f (v)|
 
         neighbour_of_criticals.push(mid);
+        neighbour_of_criticals.push(self.labels[mid]);
 
         neighbour_of_criticals
     }
